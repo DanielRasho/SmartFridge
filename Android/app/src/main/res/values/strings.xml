@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">SmartFridge</string>
+    <!-- Login strings -->
+    <string name="login_btnLogin">Login</string>
+
+    <!-- Home strings -->
+    <string name="home_title">Home</string>
+    <string name="home_searchHint">Search for recipes...</string>
+
+    <!-- Fridge strings -->
+    <string name="fridge_title">Fridge</string>
+
+    <!-- Settings strings -->
+    <string name="settings_title">Settings</string>
+</resources>
