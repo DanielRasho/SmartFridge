@@ -1,7 +1,8 @@
 <resources>
     <string name="app_name">SmartFridge</string>
     <!-- Login strings -->
-    <string name="login_btnLogin">Login</string>
+    <string name="login_btnLogin">Continue with Google</string>
+    <string name="login_btnExit">Exit</string>
 
     <!-- Home strings -->
     <string name="home_title">Home</string>
