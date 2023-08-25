@@ -9,36 +9,37 @@
 
     <ImageButton
         android:id="@+id/imageButton2"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="56dp"
+        android:layout_height="65dp"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="109dp"
         android:background="@drawable/arrow_icon"
         android:backgroundTint="@color/black"
-        app:layout_constraintBottom_toTopOf="@+id/textView5"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/textView4"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.024"
         app:tint="@color/black" />
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="156dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="17dp"
-        android:layout_marginEnd="174dp"
-        android:layout_marginBottom="85dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:fontFamily="sans-serif-medium"
         android:text="@string/ingrediente_title"
         android:textSize="20sp"
         android:textStyle="bold"
         android:typeface="normal"
-        app:layout_constraintBottom_toTopOf="@+id/editTextText2"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@+id/imageButton2"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="17dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="85dp"
+        app:layout_constraintBottom_toTopOf="@+id/editTextText2" />
 
     <TextView
         android:id="@+id/textView5"
