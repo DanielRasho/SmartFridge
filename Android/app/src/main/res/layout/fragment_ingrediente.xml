@@ -26,50 +26,49 @@
         android:id="@+id/textView4"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="85dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/ingrediente_title"
         android:textSize="20sp"
         android:textStyle="bold"
         android:typeface="normal"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/imageButton2"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginTop="17dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="85dp"
-        app:layout_constraintBottom_toTopOf="@+id/editTextText2" />
+        app:layout_constraintBottom_toTopOf="@+id/editTextText2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageButton2"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginBottom="21dp"
+        android:layout_marginBottom="620dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/name"
         android:textColor="@color/material_dynamic_neutral_variant70"
         android:typeface="normal"
-        app:layout_constraintBottom_toTopOf="@+id/textView6"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/editTextText2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageButton2" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginBottom="23dp"
+        android:layout_marginBottom="560dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/date"
         android:textColor="@color/material_dynamic_neutral70"
         android:typeface="normal"
-        app:layout_constraintBottom_toTopOf="@+id/textView7"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/editTextDate"
-        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView7"
@@ -77,15 +76,15 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="57dp"
-        android:layout_marginBottom="26dp"
+        android:layout_marginBottom="508dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/unit"
         android:textColor="@color/material_dynamic_neutral70"
         android:typeface="normal"
-        app:layout_constraintBottom_toTopOf="@+id/textView8"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/editTextNumber"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView8"
@@ -93,15 +92,15 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="38dp"
-        android:layout_marginBottom="27dp"
+        android:layout_marginBottom="452dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/amount"
         android:textColor="@color/material_dynamic_neutral70"
         android:typeface="normal"
-        app:layout_constraintBottom_toTopOf="@+id/textView9"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/editTextNumber"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView7" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView9"
@@ -109,15 +108,15 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginEnd="31dp"
-        android:layout_marginBottom="376dp"
+        android:layout_marginBottom="404dp"
         android:fontFamily="sans-serif-medium"
         android:text="@string/category"
         android:textColor="@color/material_dynamic_neutral70"
         android:typeface="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/editTextNumber"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView8" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/editTextText2"
@@ -125,57 +124,54 @@
         android:layout_height="0dp"
         android:layout_marginStart="52dp"
         android:layout_marginEnd="45dp"
-        android:layout_marginBottom="9dp"
+        android:layout_marginBottom="608dp"
         android:ems="10"
         android:inputType="text"
         android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@+id/editTextDate"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView5"
-        app:layout_constraintTop_toBottomOf="@+id/textView4" />
+        app:layout_constraintStart_toEndOf="@+id/textView5" />
 
     <EditText
         android:id="@+id/editTextDate"
         android:layout_width="259dp"
         android:layout_height="0dp"
         android:layout_marginStart="59dp"
-        android:layout_marginTop="10dp"
         android:layout_marginEnd="40dp"
+        android:layout_marginBottom="548dp"
         android:ems="10"
         android:inputType="date"
-        app:layout_constraintBottom_toTopOf="@+id/editTextText4"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView6"
-        app:layout_constraintTop_toBottomOf="@+id/editTextText2" />
+        app:layout_constraintStart_toEndOf="@+id/textView6" />
 
     <EditText
         android:id="@+id/editTextNumber"
         android:layout_width="257dp"
         android:layout_height="47dp"
         android:layout_marginStart="112dp"
-        android:layout_marginTop="3dp"
         android:layout_marginEnd="42dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="436dp"
         android:ems="10"
         android:inputType="number"
-        app:layout_constraintBottom_toTopOf="@+id/editTextText3"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextText4" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/editTextText3"
         android:layout_width="255dp"
         android:layout_height="46dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="43dp"
+        android:layout_marginBottom="388dp"
         android:ems="10"
         android:inputType="text"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView9"
-        app:layout_constraintTop_toBottomOf="@+id/editTextNumber" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textView9" />
 
     <EditText
         android:id="@+id/editTextText4"
@@ -183,22 +179,21 @@
         android:layout_height="41dp"
         android:layout_marginStart="60dp"
         android:layout_marginEnd="41dp"
-        android:layout_marginBottom="3dp"
+        android:layout_marginBottom="496dp"
         android:ems="10"
         android:inputType="text"
-        app:layout_constraintBottom_toTopOf="@+id/editTextNumber"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/textView7"
-        app:layout_constraintTop_toBottomOf="@+id/editTextDate" />
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textView7" />
 
     <Button
         android:id="@+id/button4"
         android:layout_width="200dp"
         android:layout_height="38dp"
         android:layout_marginStart="29dp"
-        android:layout_marginTop="59dp"
         android:layout_marginEnd="24dp"
-        android:layout_marginBottom="252dp"
+        android:layout_marginBottom="268dp"
         android:backgroundTint="@color/red"
         android:fontFamily="sans-serif-medium"
         android:text="@string/ingrediente_btnsave"
@@ -210,8 +205,7 @@
         app:cornerRadius="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextText3" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/button5"
