@@ -7,30 +7,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.uvg.gt.smartfridgeandroid.placeholder.PlaceholderContent
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-const val HOME_PARAMS_USERNAME = "username"
+private const val ARG_PARAM1 = "param1"
+private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [Home.newInstance] factory method to
+ * Use the [Settings.newInstance] factory method to
  * create an instance of this fragment.
  */
-class Home : Fragment() {
+class Settings : Fragment() {
     // TODO: Rename and change types of parameters
-    private val columnCount = 1
-    private var username: String? = null
+    private var param1: String? = null
+    private var param2: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            username = it.getString(HOME_PARAMS_USERNAME)
+            param1 = it.getString(ARG_PARAM1)
+            param2 = it.getString(ARG_PARAM2)
         }
     }
 
@@ -39,18 +37,10 @@ class Home : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
-        val navBar = view.findViewById<BottomNavigationView>(R.id.home_bottomNavBar)
-        navBar.setupWithNavController(findNavController())
+        val view = inflater.inflate(R.layout.fragment_settings, container, false)
+        val navBar = view.findViewById<BottomNavigationView>(R.id.settings_navBar)
 
-        val listView = view.findViewById<RecyclerView>(R.id.home_recipeList)
-        with(listView) {
-            layoutManager = when {
-                columnCount <= 1 -> LinearLayoutManager(context)
-                else -> GridLayoutManager(context, columnCount)
-            }
-            adapter = RecipeRecyclerViewAdapter(PlaceholderContent.ITEMS)
-        }
+        navBar.setupWithNavController(findNavController())
 
         return view
     }
@@ -60,15 +50,17 @@ class Home : Fragment() {
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
          *
-         * @param username Parameter 1.
-         * @return A new instance of fragment Home.
+         * @param param1 Parameter 1.
+         * @param param2 Parameter 2.
+         * @return A new instance of fragment Settings.
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(username: String) =
-            Home().apply {
+        fun newInstance(param1: String, param2: String) =
+            Settings().apply {
                 arguments = Bundle().apply {
-                    putString(HOME_PARAMS_USERNAME, username)
+                    putString(ARG_PARAM1, param1)
+                    putString(ARG_PARAM2, param2)
                 }
             }
     }

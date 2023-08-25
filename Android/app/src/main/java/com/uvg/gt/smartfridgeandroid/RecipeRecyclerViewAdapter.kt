@@ -15,7 +15,7 @@ import androidx.core.view.children
 import com.uvg.gt.smartfridgeandroid.databinding.FragmentItemBinding
 
 /**
- * [RecyclerView.Adapter] that can display a [PlaceholderItem].
+ * [RecyclerView.Adapter] that can display a [Recipe].
  * TODO: Replace the implementation with code for your data type.
  */
 class RecipeRecyclerViewAdapter(

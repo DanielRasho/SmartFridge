@@ -9,7 +9,12 @@
 
     <!-- Fridge strings -->
     <string name="fridge_title">Fridge</string>
+    <string name="fridge_searchHint">Search for ingredients...</string>
 
     <!-- Settings strings -->
     <string name="settings_title">Settings</string>
+    <string name="settings_styleTitle">Style</string>
+    <string name="settings_styleOption1">Light Theme</string>
+    <string name="settings_styleOption2">Dark Theme</string>
+    <string name="settings_btnLogout">Log Out</string>
 </resources>

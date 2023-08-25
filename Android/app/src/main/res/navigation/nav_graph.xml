@@ -22,4 +22,14 @@
             android:id="@+id/action_login_to_home2"
             app:destination="@id/home2" />
     </fragment>
+    <fragment
+        android:id="@+id/fridge"
+        android:name="com.uvg.gt.smartfridgeandroid.Fridge"
+        android:label="fragment_fridge"
+        tools:layout="@layout/fragment_fridge" />
+    <fragment
+        android:id="@+id/settings2"
+        android:name="com.uvg.gt.smartfridgeandroid.Settings"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
 </navigation>
