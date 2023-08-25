@@ -18,4 +18,16 @@
     <string name="settings_styleOption1">Light Theme</string>
     <string name="settings_styleOption2">Dark Theme</string>
     <string name="settings_btnLogout">Log Out</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Ingrediente strings -->
+    <string name="ingrediente_title">Add Ingredient</string>
+    <string name="name">Name</string>
+    <string name="date">Date</string>
+    <string name="unit">Unit</string>
+    <string name="amount">Amount</string>
+    <string name="category">Category</string>
+    <string name="ingrediente_btnsave">Save</string>
+    <string name="ingrediente_btnContinue">Continue</string>
 </resources>

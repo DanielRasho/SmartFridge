@@ -12,6 +12,9 @@
         <argument
             android:name="username"
             app:argType="string" />
+        <action
+            android:id="@+id/action_home2_to_recipes"
+            app:destination="@id/recipes" />
     </fragment>
     <fragment
         android:id="@+id/login"
@@ -26,10 +29,28 @@
         android:id="@+id/fridge"
         android:name="com.uvg.gt.smartfridgeandroid.Fridge"
         android:label="fragment_fridge"
-        tools:layout="@layout/fragment_fridge" />
+        tools:layout="@layout/fragment_fridge" >
+        <action
+            android:id="@+id/action_fridge_to_ingrediente"
+            app:destination="@id/ingrediente" />
+    </fragment>
     <fragment
         android:id="@+id/settings2"
         android:name="com.uvg.gt.smartfridgeandroid.Settings"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/ingrediente"
+        android:name="com.uvg.gt.smartfridgeandroid.Ingrediente"
+        android:label="fragment_ingrediente"
+        tools:layout="@layout/fragment_ingrediente" >
+        <action
+            android:id="@+id/action_ingrediente_to_fridge"
+            app:destination="@id/fridge" />
+    </fragment>
+    <fragment
+        android:id="@+id/recipes"
+        android:name="com.uvg.gt.smartfridgeandroid.recipes"
+        android:label="fragment_recipes"
+        tools:layout="@layout/fragment_recipes" />
 </navigation>
