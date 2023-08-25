@@ -1,8 +1,11 @@
 package com.uvg.gt.smartfridgeandroid.placeholder
 
+import com.uvg.gt.smartfridgeandroid.FoodQuantity
+import com.uvg.gt.smartfridgeandroid.Ingredient
+import com.uvg.gt.smartfridgeandroid.IngredientHolder
 import com.uvg.gt.smartfridgeandroid.Recipe
-import java.util.ArrayList
-import java.util.HashMap
+import java.time.LocalDate
+import kotlin.random.Random
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -15,29 +18,67 @@ object PlaceholderContent {
     /**
      * An array of sample (placeholder) items.
      */
-    val ITEMS: MutableList<Recipe> = ArrayList()
+    val RECIPES: MutableList<Recipe> = ArrayList()
+    val INGREDIENTS_HOLDERS: MutableList<IngredientHolder> = ArrayList()
 
-    /**
-     * A map of sample (placeholder) items, by ID.
-     */
-    private val ITEM_MAP: MutableMap<String, Recipe> = HashMap()
 
     private const val COUNT = 25
 
     init {
         // Add some sample items.
         for (i in 1..COUNT) {
-            addItem(createPlaceholderItem(i))
+            RECIPES.add(createPlaceholderItem(i))
+        }
+
+        for (i in 1..(COUNT / 5)) {
+            INGREDIENTS_HOLDERS.add(createPlaceholderHolder())
         }
     }
 
-    private fun addItem(item: Recipe) {
-        ITEMS.add(item)
-        ITEM_MAP[item.id] = item
+    private fun createPlaceholderHolder(): IngredientHolder {
+        val values = listOf(
+            IngredientHolder(
+                "Seasonings",
+                mutableListOf(
+                    Ingredient(
+                        LocalDate.now(),
+                        "Peanut Butter",
+                        "Seasonings",
+                        FoodQuantity("Bottles", 2f)
+                    ),
+                    Ingredient(
+                        LocalDate.now(),
+                        "Water",
+                        "Seasonings",
+                        FoodQuantity("Cups", 1f)
+                    )
+                )
+            ),
+            IngredientHolder(
+                "Meat",
+                mutableListOf(
+                    Ingredient(
+                        LocalDate.now(),
+                        "Chicken",
+                        "Meat",
+                        FoodQuantity("Lbs", 5f)
+                    ),
+                    Ingredient(
+                        LocalDate.now(),
+                        "Shrimps",
+                        "Meat",
+                        FoodQuantity("Lbs", 2f)
+                    )
+                )
+            )
+        )
+        return values[Random.nextInt(0, values.size)]
     }
 
     private fun createPlaceholderItem(position: Int): Recipe {
-        return Recipe(position.toString(),
-            "Recipe #$position", "@tools:sample/backgrounds/scenic[0]", listOf("Lunch", "Breakfast"))
+        return Recipe(
+            position.toString(),
+            "Recipe #$position", "@tools:sample/backgrounds/scenic[0]", listOf("Lunch", "Breakfast")
+        )
     }
 }

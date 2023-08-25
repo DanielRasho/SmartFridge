@@ -12,7 +12,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
 
-import com.uvg.gt.smartfridgeandroid.databinding.FragmentItemBinding
+import com.uvg.gt.smartfridgeandroid.databinding.FragmentRecipeItemBinding
 
 /**
  * [RecyclerView.Adapter] that can display a [Recipe].
@@ -25,7 +25,7 @@ class RecipeRecyclerViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 
         return ViewHolder(
-            FragmentItemBinding.inflate(
+            FragmentRecipeItemBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -49,7 +49,7 @@ class RecipeRecyclerViewAdapter(
 
     override fun getItemCount(): Int = values.size
 
-    inner class ViewHolder(binding: FragmentItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(binding: FragmentRecipeItemBinding) : RecyclerView.ViewHolder(binding.root) {
         val bannerView: ImageView = binding.cvBanner
         val titleView: TextView = binding.cvTitle
         val tagsContainer: LinearLayout = binding.cvTagContainer

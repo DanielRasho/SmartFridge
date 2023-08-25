@@ -7,7 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.Recycler
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.uvg.gt.smartfridgeandroid.placeholder.PlaceholderContent
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -39,8 +43,13 @@ class Fridge : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_fridge, container, false)
         val navBar = view.findViewById<BottomNavigationView>(R.id.fridge_navBar)
-
         navBar.setupWithNavController(findNavController())
+
+        val list = view.findViewById<RecyclerView>(R.id.fridge_list)
+        with(list) {
+            layoutManager = LinearLayoutManager(context)
+            adapter = IngredientHolderRecyclerViewAdapter(PlaceholderContent.INGREDIENTS_HOLDERS)
+        }
 
         return view
     }

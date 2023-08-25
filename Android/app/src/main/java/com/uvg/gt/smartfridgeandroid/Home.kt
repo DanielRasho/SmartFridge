@@ -49,7 +49,7 @@ class Home : Fragment() {
                 columnCount <= 1 -> LinearLayoutManager(context)
                 else -> GridLayoutManager(context, columnCount)
             }
-            adapter = RecipeRecyclerViewAdapter(PlaceholderContent.ITEMS)
+            adapter = RecipeRecyclerViewAdapter(PlaceholderContent.RECIPES)
         }
 
         return view

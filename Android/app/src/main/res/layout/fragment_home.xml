@@ -35,7 +35,7 @@
             android:clipChildren="true"
             android:scrollbars="vertical"
             tools:itemCount="25"
-            tools:listitem="@layout/fragment_item" />
+            tools:listitem="@layout/fragment_recipe_item" />
 
     </LinearLayout>
 
