@@ -12,7 +12,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/login_btnLogin"
-        android:textColor="@color/material_dynamic_neutral20"
         android:textColorHighlight="@color/black"
         android:textColorLink="@color/black"
         app:cornerRadius="0dp"
@@ -23,8 +22,7 @@
         app:layout_constraintHorizontal_bias="0.482"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.705"
-        app:strokeColor="@color/black" />
+        app:layout_constraintVertical_bias="0.705"/>
 
     <Button
         android:id="@+id/login_btnExit"
@@ -57,7 +55,6 @@
         android:layout_marginEnd="68dp"
         android:layout_marginBottom="109dp"
         android:src="@drawable/user_icon"
-        app:tint="@color/material_dynamic_neutral_variant30"
         app:layout_constraintBottom_toBottomOf="@+id/login_btnLogin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
