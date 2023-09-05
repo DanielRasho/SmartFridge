@@ -24,7 +24,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.705"
-        app:strokeColor="@color/material_dynamic_neutral20" />
+        app:strokeColor="@color/black" />
 
     <Button
         android:id="@+id/login_btnExit"
