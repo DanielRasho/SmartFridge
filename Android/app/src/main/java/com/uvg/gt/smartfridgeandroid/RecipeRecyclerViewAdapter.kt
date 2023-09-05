@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import androidx.core.view.children
 
 import com.uvg.gt.smartfridgeandroid.databinding.FragmentRecipeItemBinding
@@ -45,11 +46,16 @@ class RecipeRecyclerViewAdapter(
             tv.text = tag
             holder.tagsContainer.addView(tv)
         }
+
+        holder.container.setOnClickListener {
+            // TODO Add navigation to recipe details view
+        }
     }
 
     override fun getItemCount(): Int = values.size
 
     inner class ViewHolder(binding: FragmentRecipeItemBinding) : RecyclerView.ViewHolder(binding.root) {
+        val container: CardView = binding.recipeItemContainer
         val bannerView: ImageView = binding.cvBanner
         val titleView: TextView = binding.cvTitle
         val tagsContainer: LinearLayout = binding.cvTagContainer

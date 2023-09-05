@@ -11,6 +11,7 @@
     android:paddingBottom="10dp">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/recipe_item_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="50dp"
