@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -39,8 +40,13 @@ class Settings : Fragment() {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_settings, container, false)
         val navBar = view.findViewById<BottomNavigationView>(R.id.settings_navBar)
-
         navBar.setupWithNavController(findNavController())
+
+        val logoutBtn = view.findViewById<Button>(R.id.settings_logoutButton)
+        logoutBtn.setOnClickListener {
+            val controller = findNavController()
+            controller.navigate(R.id.action_settings2_to_login)
+        }
 
         return view
     }

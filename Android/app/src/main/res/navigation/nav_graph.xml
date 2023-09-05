@@ -38,7 +38,11 @@
         android:id="@+id/settings2"
         android:name="com.uvg.gt.smartfridgeandroid.Settings"
         android:label="fragment_settings"
-        tools:layout="@layout/fragment_settings" />
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settings2_to_login"
+            app:destination="@id/login" />
+    </fragment>
     <fragment
         android:id="@+id/ingrediente"
         android:name="com.uvg.gt.smartfridgeandroid.Ingrediente"
