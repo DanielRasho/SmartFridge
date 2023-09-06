@@ -9,7 +9,7 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/fridge_navBar"
-        style="@style/BottomNavBar"
+        style="@style/Widget.MaterialComponents.BottomNavigationView.Colored"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
