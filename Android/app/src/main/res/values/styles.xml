@@ -1,6 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="BottomNavBar">
-        <item name="android:background">@color/transparent</item>
+<resources
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--  LIGHT THEME STYLES  -->
+
+    <!--    TODO: this style is not used -->
+    <style name="_BottomNavBar_light" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="itemIconTint">@color/lightDeactivateGrey</item>
+        <item name="itemTextColor">@color/lightDeactivateGrey</item>
+        <item name="colorPrimary">@color/lightPrimary</item>
+        <item name="colorOnPrimary">@color/lightOnBackground</item>
+        <item name="itemRippleColor">@color/lightPrimary</item>
     </style>
+
+    <!--  Setting Nav bar base colors  -->
+    <style name="Widget.App.BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
+    </style>
+
+    <style name="ThemeOverlay.App.BottomNavigationView" parent="">
+        <item name="colorPrimary">@color/lightBackground</item>
+        <item name="colorOnPrimary">@color/lightOnBackground</item>
+    </style>
+
+    <style name="_viewBackground_light">
+        <item name="android:background">@color/lightBackground</item>
+    </style>
+
+    <style name="_textLarge_light" >
+        <item name="android:textColor">@color/lightOnBackground</item>
+    </style>
+    <style name="_textMedium_light">
+        <item name="android:textColor">@color/lightOnBackground</item>
+    </style>
+    <style name="_textNormal_light">
+        <item name="android:textColor">@color/lightOnBackground</item>
+    </style>
+
+    <style name="_cardBackground_light">
+        <item name="android:background">@color/lightVariantPrimary</item>
+    </style>
+    <style name="_cardRecipeText_light">
+        <item name="android:textColor">@color/lightOnPrimary</item>
+    </style>
+    <!--    TODO: When recipeLabel is implemented -->
+    <style name="_cardRecipeLabel_light">
+        <item name="android:background">@color/lightOnSecondary</item>
+    </style>
+    <style name="_navBar_light" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@color/lightPrimary</item>
+    </style>
+    <style name="_importantButton_light" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">@color/lightError</item>
+        <item name="android:textColor">@color/lightOnError</item>
+        <item name="android:textColorHighlight">@color/lightOnError</item>
+        <item name="android:textColorLink">@color/lightOnError</item>
+    </style>
+    <style name="_secondaryButton_light" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:backgroundTint">@color/lightBackground</item>
+        <item name="android:strokeColor">@color/lightDeactivateGrey</item>
+        <item name="android:textColor">@color/lightDeactivateGrey</item>
+        <item name="android:textColorHighlight">@color/lightDeactivateGrey</item>
+        <item name="android:textColorLink">@color/lightDeactivateGrey</item>
+    </style>
+    <style name="_radioButton_light" parent="Widget.Material3.CompoundButton.RadioButton">
+        <item name="android:background">@color/lightPrimary</item>
+    </style>
+    <style name="_floatingButton_light" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">@color/lightPrimary</item>
+        <item name="android:textColor">@color/lightOnPrimary</item>
+        <item name="android:textColorHighlight">@color/lightOnPrimary</item>
+        <item name="android:textColorLink">@color/lightOnPrimary</item>
+    </style>
+    <style name="_checkBox_light" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="android:backgroundTint">@color/transparent</item>
+        <item name="android:textColor">@color/lightOnBackground</item>
+        <item name="android:textColorHighlight">@color/lightOnBackground</item>
+        <item name="android:textColorLink">@color/lightOnBackground</item>
+    </style>
+
+    <!--  LIGHT THEME STYLES  -->
+
+    <!--    TODO: this style is not used -->
+    <style name="_BottomNavBar_dark" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="itemIconTint">@color/lightDeactivateGrey</item>
+        <item name="itemTextColor">@color/lightDeactivateGrey</item>
+        <item name="colorPrimary">@color/lightPrimary</item>
+        <item name="colorOnPrimary">@color/lightOnBackground</item>
+        <item name="itemRippleColor">@color/lightPrimary</item>
+    </style>
+
+    <!--  Setting Nav bar base colors  -->
+    <style name="Widget.App.BottomNavigationViewDark" parent="Widget.MaterialComponents.BottomNavigationView.Colored">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.BottomNavigationView</item>
+    </style>
+
+    <style name="ThemeOverlay.App.BottomNavigationViewDark" parent="">
+        <item name="colorPrimary">@color/darkBackground</item>
+        <item name="colorOnPrimary">@color/darkOnBackground</item>
+    </style>
+
+    <style name="_viewBackground_dark">
+        <item name="android:background">@color/darkBackground</item>
+    </style>
+
+    <style name="_textLarge_dark" >
+        <item name="android:textColor">@color/darkOnBackground</item>
+    </style>
+    <style name="_textMedium_dark">
+        <item name="android:textColor">@color/darkOnBackground</item>
+    </style>
+    <style name="_textNormal_dark">
+        <item name="android:textColor">@color/darkOnBackground</item>
+    </style>
+
+    <style name="_cardBackground_dark">
+        <item name="android:background">@color/darkVariantPrimary</item>
+    </style>
+    <style name="_cardRecipeText_dark">
+        <item name="android:textColor">@color/darkOnPrimary</item>
+    </style>
+    <!--    TODO: When recipeLabel is implemented -->
+    <style name="_cardRecipeLabel_dark">
+        <item name="android:background">@color/darkOnSecondary</item>
+    </style>
+    <style name="_navBar_dark" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@color/darkPrimary</item>
+    </style>
+    <style name="_importantButton_dark" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">@color/darkError</item>
+        <item name="android:textColor">@color/darkOnError</item>
+        <item name="android:textColorHighlight">@color/darkOnError</item>
+        <item name="android:textColorLink">@color/darkOnError</item>
+    </style>
+    <style name="_secondaryButton_dark" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:backgroundTint">@color/darkBackground</item>
+        <item name="android:strokeColor">@color/darkDeactivateGrey</item>
+        <item name="android:textColor">@color/darkDeactivateGrey</item>
+        <item name="android:textColorHighlight">@color/darkDeactivateGrey</item>
+        <item name="android:textColorLink">@color/darkDeactivateGrey</item>
+    </style>
+    <style name="_radioButton_dark" parent="Widget.Material3.CompoundButton.RadioButton">
+        <item name="android:background">@color/darkPrimary</item>
+    </style>
+    <style name="_floatingButton_dark" parent="Widget.Material3.Button">
+        <item name="android:backgroundTint">@color/darkPrimary</item>
+        <item name="android:textColor">@color/darkOnPrimary</item>
+        <item name="android:textColorHighlight">@color/darkOnPrimary</item>
+        <item name="android:textColorLink">@color/darkOnPrimary</item>
+    </style>
+    <style name="_checkBox_dark" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="android:backgroundTint">@color/transparent</item>
+        <item name="android:textColor">@color/darkOnBackground</item>
+        <item name="android:textColorHighlight">@color/darkOnBackground</item>
+        <item name="android:textColorLink">@color/darkOnBackground</item>
+    </style>
+
 </resources>

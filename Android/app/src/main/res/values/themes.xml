@@ -1,9 +1,50 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.SmartFridgeAndroid" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- LIGHT THEME -->
+        <!-- override light theme styles -->
+    <style name="Base.Theme.SmartFridgeAndroidLight" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="_viewBackground">@style/_viewBackground_light</item>
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
+
+        <item name="_textLarge">@style/_textLarge_light</item>
+        <item name="_textMedium">@style/_textMedium_light</item>
+        <item name="_textNormal">@style/_textNormal_light</item>
+
+        <item name="_cardBackground">@style/_cardBackground_light</item>
+        <item name="_cardRecipeText">@style/_cardRecipeText_light</item>
+        <item name="_cardRecipeLabel">@style/_cardRecipeLabel_light</item>
+
+        <item name="_importantButton">@style/_importantButton_light</item>
+        <item name="_secondaryButton">@style/_secondaryButton_light</item>
+        <item name="_radioButton">@style/_radioButton_light</item>
+        <item name="_floatingButton">@style/_floatingButton_light</item>
+        <item name="_checkBox">@style/_floatingButton_light</item>
+
     </style>
 
-    <style name="Theme.SmartFridgeAndroid" parent="Base.Theme.SmartFridgeAndroid" />
+    <style name="Base.Theme.SmartFridgeAndroidDark" parent="Theme.Material3.Dark">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="_viewBackground">@style/_viewBackground_dark</item>
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationViewDark</item>
+
+        <item name="_textLarge">@style/_textLarge_dark</item>
+        <item name="_textMedium">@style/_textMedium_dark</item>
+        <item name="_textNormal">@style/_textNormal_dark</item>
+
+        <item name="_cardBackground">@style/_cardBackground_dark</item>
+        <item name="_cardRecipeText">@style/_cardRecipeText_dark</item>
+        <item name="_cardRecipeLabel">@style/_cardRecipeLabel_dark</item>
+
+        <item name="_importantButton">@style/_importantButton_dark</item>
+        <item name="_secondaryButton">@style/_secondaryButton_dark</item>
+        <item name="_radioButton">@style/_radioButton_dark</item>
+        <item name="_floatingButton">@style/_floatingButton_dark</item>
+        <item name="_checkBox">@style/_floatingButton_dark</item>
+
+    </style>
+        <!-- Creating Custom Light theme -->
+    <style name="Theme.SmartFridgeAndroidLight" parent="Base.Theme.SmartFridgeAndroidLight" />
+    <style name="Theme.SmartFridgeAndroidDark" parent="Base.Theme.SmartFridgeAndroidDark" />
 </resources>
