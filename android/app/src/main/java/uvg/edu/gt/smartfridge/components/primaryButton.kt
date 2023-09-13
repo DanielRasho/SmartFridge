@@ -16,6 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 
+/**
+ * A normal text Primary Button
+ *
+ * If you need and image inside the button please use an [IconPrimaryButton].
+ *
+ * @param text The text to display.
+ * @param onClick The action to execute when the button is clicked.
+ * @param modifier The modifier of the button.
+ */
 @Composable
 fun PrimaryButton(
     text: String,
@@ -33,6 +42,16 @@ fun PrimaryButton(
     }
 }
 
+/**
+ * A primary button with an icon on it's side.
+ *
+ * If you don't need an icon please use [PrimaryButton].
+ *
+ * @param text The text to display.
+ * @param icon The icon to display adjacent to the text.
+ * @param onClick The action to execute when the button is clicked.
+ * @param modifier The modifier of the button.
+ */
 @Composable
 fun IconPrimaryButton(
     text: String,
