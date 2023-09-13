@@ -3,19 +3,24 @@ package uvg.edu.gt.smartfridge
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
+import uvg.edu.gt.smartfridge.views.FridgeView
+import uvg.edu.gt.smartfridge.views.HomeView
+import uvg.edu.gt.smartfridge.views.SettingsView
 
 class MainActivity : ComponentActivity() {
+    @ExperimentalMaterial3Api
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -25,27 +30,31 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    MainComponent()
                 }
             }
         }
     }
 }
 
+@ExperimentalMaterial3Api
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier.background(MaterialTheme.colorScheme.primary),
-        color = MaterialTheme.colorScheme.onPrimary,
-        style = MaterialTheme.typography.displayLarge
-    )
+fun MainComponent(
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController()
+) {
+    NavHost(navController = navController, startDestination = "Home", modifier = modifier) {
+        composable("Home") { HomeView(navController) }
+        composable("Settings") { SettingsView() }
+        composable("Fridge") { FridgeView() }
+    }
 }
 
 @Preview(showBackground = true)
+@ExperimentalMaterial3Api
 @Composable
 fun GreetingPreview() {
     smartFridgeTheme {
-        Greeting("Android")
+        MainComponent()
     }
 }
