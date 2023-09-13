@@ -1,12 +1,12 @@
 package uvg.edu.gt.smartfridge.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 
 /**
  * A normal text Primary Button
@@ -28,17 +29,14 @@ import androidx.compose.ui.tooling.preview.Preview
 @Composable
 fun PrimaryButton(
     text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
     Button(
         onClick = { onClick() },
-        modifier = modifier.background(
-            MaterialTheme.colorScheme.primary,
-            shape = RoundedCornerShape(10)
-        )
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+        shape = RoundedCornerShape(10),
     ) {
-        Text(text, color = MaterialTheme.colorScheme.onPrimary)
+        Text(text, color = MaterialTheme.colorScheme.onError)
     }
 }
 
@@ -56,22 +54,19 @@ fun PrimaryButton(
 fun IconPrimaryButton(
     text: String,
     icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit
 ) {
     Button(
         onClick = { onClick() },
-        modifier = modifier.background(
-            MaterialTheme.colorScheme.primary,
-            shape = RoundedCornerShape(10)
-        )
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+        shape = RoundedCornerShape(10),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceAround
+            horizontalArrangement = Arrangement.SpaceAround,
         ) {
-            Icon(icon, contentDescription = "Button Icon")
-            Text(text)
+            Icon(icon, contentDescription = "Button Icon", tint = MaterialTheme.colorScheme.onError)
+            Text(text, color = MaterialTheme.colorScheme.onError)
         }
     }
 }
@@ -79,7 +74,9 @@ fun IconPrimaryButton(
 @Preview
 @Composable
 private fun PrimaryButtonPreview_Logout(text: String = "Logout", onClick: () -> Unit = { -> }) {
-    PrimaryButton(text = text, onClick = { onClick() })
+    smartFridgeTheme {
+        PrimaryButton(text = text, onClick = { onClick() })
+    }
 }
 
 @Preview
@@ -89,5 +86,7 @@ private fun IconPrimaryButtonPreview_Exit(
     icon: ImageVector = Icons.Rounded.ArrowBack,
     onClick: () -> Unit = { -> }
 ) {
-    IconPrimaryButton(text = text, icon = icon, onClick = { onClick() })
+    smartFridgeTheme {
+        IconPrimaryButton(text = text, icon = icon, onClick = { onClick() })
+    }
 }
