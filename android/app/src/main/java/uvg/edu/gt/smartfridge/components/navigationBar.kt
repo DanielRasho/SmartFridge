@@ -25,12 +25,31 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 
+/**
+ * A Nav item for the nav bar.
+ *
+ * Represents a navigation screen and holds all the necessary information to navigate to it.
+ *
+ * @param route The route of the screen.
+ * @param label A Label to show under the icon.
+ * @param icon An Icon for display with the label.
+ */
 sealed class NavItem(val route: String, val label: String, val icon: ImageVector) {
     object Home : NavItem("Home", "Home", Icons.Filled.Home)
     object Settings : NavItem("Settings", "Settings", Icons.Filled.Settings)
     object Fridge : NavItem("Fridge", "Fridge", Icons.Filled.List)
 }
 
+/**
+ * The Application Bottom navigation bar.
+ *
+ * For navigation to work, please supply a navController and a list of items of type NavItem.
+ * You can use the already defined [NavItem.Home], [NavItem.Settings] and others to create a basic nav bar.
+ *
+ * @param navController The controller used for navigation.
+ * @param items A sequence of NavItems.
+ * @param modifier This element modifier.
+ */
 @Composable
 fun BottomNavBar(
     navController: NavHostController = rememberNavController(),
