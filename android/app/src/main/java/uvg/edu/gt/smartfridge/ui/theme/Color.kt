@@ -1,5 +1,7 @@
 package uvg.edu.gt.smartfridge.ui.theme
 
+import androidx.compose.material.Colors
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 // App Color palette.
@@ -32,7 +34,7 @@ val md_theme_light_inverseSurface = Color(0xFFFFFFFF)
 val md_theme_light_inversePrimary = Color(0xFF69DD86)
 val md_theme_light_shadow = Color(0xFF000000)
 val md_theme_light_surfaceTint = Color(0xFF006D32)
-val md_theme_light_outlineVariant = Color(0xFFC1C9BE)
+val md_theme_light_outlineVariant = Color(0xFF878B85)
 val md_theme_light_scrim = Color(0xFF000000)
 
 val md_theme_dark_primary = Color(0xFF337045)
@@ -63,8 +65,7 @@ val md_theme_dark_inverseSurface = Color(0xFF000000)
 val md_theme_dark_inversePrimary = Color(0xFF006D32)
 val md_theme_dark_shadow = Color(0xFF000000)
 val md_theme_dark_surfaceTint = Color(0xFF69DD86)
-val md_theme_dark_outlineVariant = Color(0xFF414941)
+val md_theme_dark_outlineVariant = Color(0xFFAFB9AC)
 val md_theme_dark_scrim = Color(0xFF000000)
-
 
 val seed = Color(0xFF48BE6B)
