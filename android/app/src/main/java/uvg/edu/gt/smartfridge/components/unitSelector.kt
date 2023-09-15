@@ -35,7 +35,7 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UnitSelector(
-    onSelected: () -> Unit = {},
+    onSelected: (String) -> Unit = {},
     onCloseButtonClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -61,7 +61,7 @@ fun UnitSelector(
     val changeUnitAction = { newUnit: String ->
         if (newUnit != selectedUnit) {
             setSelectedUnit(newUnit)
-            onSelected()
+            onSelected(newUnit)
         }
     }
 
