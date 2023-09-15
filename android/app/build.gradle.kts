@@ -72,4 +72,7 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    // Load image from a URL
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }
