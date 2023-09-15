@@ -50,7 +50,7 @@ fun dateField (pickedDate : MutableState<LocalDate>) {
     Row (verticalAlignment = Alignment.CenterVertically){
        Text(text = "Date",
            style = MaterialTheme.typography.labelLarge,
-           color = MaterialTheme.colorScheme.outline)
+           color = MaterialTheme.colorScheme.outlineVariant)
         Spacer(modifier = Modifier.width(16.dp))
         Column (horizontalAlignment = Alignment.CenterHorizontally){
             TextButton(onClick = { dateDialogState.show() },
