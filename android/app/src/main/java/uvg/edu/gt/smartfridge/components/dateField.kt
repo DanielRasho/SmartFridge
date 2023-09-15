@@ -5,15 +5,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalMinimumTouchTargetEnforcement
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -33,6 +38,7 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun dateField (pickedDate : MutableState<LocalDate>) {
 
@@ -48,25 +54,35 @@ fun dateField (pickedDate : MutableState<LocalDate>) {
 
     // Layout definition
     Row (verticalAlignment = Alignment.CenterVertically){
-       Text(text = "Date",
-           style = MaterialTheme.typography.labelLarge,
-           color = MaterialTheme.colorScheme.outlineVariant)
+        Column ( modifier = Modifier.weight(1f)){
+            Text(text = "Date",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.outlineVariant)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
         Spacer(modifier = Modifier.width(16.dp))
-        Column (horizontalAlignment = Alignment.CenterHorizontally){
-            TextButton(onClick = { dateDialogState.show() },
-                shape = RectangleShape,
-                modifier = Modifier
-                    .fillMaxWidth(),
-                contentPadding = PaddingValues(0.dp)
-            )
-                {
-                Text(text = formattedDate,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.fillMaxWidth()
+        Column ( modifier = Modifier.weight(5f),
+            horizontalAlignment = Alignment.CenterHorizontally){
+            CompositionLocalProvider(
+                LocalMinimumTouchTargetEnforcement provides false
+            ) {
+                TextButton(onClick = { dateDialogState.show() },
+                    shape = RectangleShape,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .defaultMinSize(minWidth = 1.dp, minHeight = 1.dp),
+                    contentPadding = PaddingValues(0.dp)
                 )
+                {
+                    Text(text = formattedDate,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
-            Divider(color = MaterialTheme.colorScheme.onSurface)
+            Spacer(modifier = Modifier.height(8.dp))
+            Divider(color = MaterialTheme.colorScheme.outlineVariant)
         }
         // Date picker definition
         MaterialDialog(
@@ -97,13 +113,16 @@ fun dateField (pickedDate : MutableState<LocalDate>) {
 fun dateFieldText(){
     smartFridgeTheme {
         var owo = remember { mutableStateOf(LocalDate.now())}
+        var value = remember { mutableStateOf("") }
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ){
+            textField(label = "Texto", textValue = value)
             dateField(owo)
+            textField(label = "Texto", textValue = value)
         }
     }
 }

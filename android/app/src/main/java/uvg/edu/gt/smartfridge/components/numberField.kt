@@ -41,18 +41,19 @@ fun numberField (label : String, numberValue: MutableState<String>) {
 
     // Layout definition
     Row (verticalAlignment = Alignment.CenterVertically){
-        Column {
+        Column (modifier = Modifier.weight(1f)){
             Text(text = label,
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.outlineVariant)
             Spacer(modifier = Modifier.height(8.dp))
         }
         Spacer(modifier = Modifier.width(16.dp))
-        Column (horizontalAlignment = Alignment.CenterHorizontally){
+        Column (modifier = Modifier.weight(5f),
+            horizontalAlignment = Alignment.CenterHorizontally){
             BasicTextField(value = numberValue.value,
                 onValueChange = {
                     if(it.isDigitsOnly())
-                    numberValue.value = it },
+                        numberValue.value = it },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier
                     .fillMaxWidth(),
