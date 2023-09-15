@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.NavItem
+import uvg.edu.gt.smartfridge.components.UnitSelector
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
@@ -17,6 +18,6 @@ fun HomeView(navController: NavHostController) {
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
     Scaffold(bottomBar = { BottomNavBar(items = items, navController = navController) }) {
-        Text("Hello from HOME!")
+        UnitSelector()
     }
 }
