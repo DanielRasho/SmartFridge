@@ -45,7 +45,7 @@ fun MainComponent(
 ) {
     NavHost(navController = navController, startDestination = "Home", modifier = modifier) {
         composable("Home") { HomeView(navController) }
-        composable("Settings") { SettingsView() }
+        composable("Settings") { SettingsView(navController) }
         composable("Fridge") { FridgeView() }
     }
 }
