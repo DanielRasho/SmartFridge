@@ -18,7 +18,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -98,17 +100,17 @@ fun HomeView(navController: NavHostController, modifier: Modifier = Modifier) {
                                 modifier = modifier.padding(10.dp, 0.dp),
                                 style = MaterialTheme.typography.bodyLarge
                             )
-                            Row {
+                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start, modifier = modifier.padding(10.dp)) {
                                 recipe.tags.forEach { tag ->
                                     Text(
                                         tag,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = modifier
                                             .background(MaterialTheme.colorScheme.secondaryContainer)
-                                            .padding(5.dp),
-                                        style = MaterialTheme.typography.bodyMedium
+                                            .padding(3.dp),
+                                        style = MaterialTheme.typography.labelLarge
                                     )
-                                    Spacer(modifier = modifier.width(5.dp))
+                                    Spacer(modifier = modifier.width(8.dp))
                                 }
                             }
                         }
