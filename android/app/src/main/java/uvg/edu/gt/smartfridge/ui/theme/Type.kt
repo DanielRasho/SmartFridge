@@ -60,7 +60,7 @@ val appTypography = Typography(
     ), // 12
     labelSmall = TextStyle(
         fontFamily = outfitFamily,
-        fontSize = 8.sp,
+        fontSize = 12.sp,
         fontWeight = FontWeight.Normal
     ), // 8
 )
