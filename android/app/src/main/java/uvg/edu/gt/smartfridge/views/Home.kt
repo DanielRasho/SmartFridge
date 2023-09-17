@@ -29,6 +29,7 @@ import coil.compose.AsyncImage
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.NavItem
 import uvg.edu.gt.smartfridge.components.SearchBar
+import uvg.edu.gt.smartfridge.components.Title
 import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.models.Recipe
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
@@ -78,7 +79,7 @@ fun HomeView(navController: NavHostController, modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .padding(10.dp, 0.dp)
         ) {
-            Text("Home", style = MaterialTheme.typography.displayLarge)
+            Title("Home")
             SearchBar()
             LazyColumn {
                 recipes.forEach { recipe ->

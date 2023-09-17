@@ -26,6 +26,7 @@ import androidx.navigation.compose.rememberNavController
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.IconPrimaryButton
 import uvg.edu.gt.smartfridge.components.NavItem
+import uvg.edu.gt.smartfridge.components.Title
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -41,11 +42,8 @@ fun SettingsView(navController: NavHostController, modifier: Modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .padding(10.dp, 0.dp)
         ) {
-            Text(
-                "Settings",
-                color = MaterialTheme.colorScheme.onBackground,
-                style = MaterialTheme.typography.displayLarge
-            )
+            Title("Settings")
+
             Spacer(modifier = modifier.height(20.dp))
             Text(
                 "Style",
