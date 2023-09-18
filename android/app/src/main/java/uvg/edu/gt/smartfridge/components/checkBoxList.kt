@@ -28,7 +28,7 @@ fun CheckBoxList(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp)
+                    //.padding(8.dp)
 
             ) {
                 Checkbox(
@@ -48,7 +48,9 @@ fun CheckBoxList(
                     style= MaterialTheme.typography.bodyMedium,
                     fontSize=16.sp
                 )
+
             }
+            Spacer(modifier = Modifier.height(1.dp))
         }
     }
 }

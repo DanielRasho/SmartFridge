@@ -85,7 +85,7 @@ fun HomeView(navController: NavHostController, modifier: Modifier = Modifier) {
                 recipes.forEach { recipe ->
                     item {
                         Card(
-                            onClick = { /*TODO*/ },
+                            onClick = { navController.navigate("Recipe") },
                             modifier = modifier
                                 .fillMaxWidth()
                                 .padding(15.dp, 0.dp),

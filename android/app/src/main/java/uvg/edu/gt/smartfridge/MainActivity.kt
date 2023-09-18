@@ -18,6 +18,7 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.views.FridgeView
 import uvg.edu.gt.smartfridge.views.HomeView
 import uvg.edu.gt.smartfridge.views.LoginView
+import uvg.edu.gt.smartfridge.views.RecipeView
 import uvg.edu.gt.smartfridge.views.SettingsView
 
 class MainActivity : ComponentActivity() {
@@ -49,6 +50,7 @@ fun MainComponent(
         composable("Home") { HomeView(navController) }
         composable("Settings") { SettingsView(navController) }
         composable("Fridge") { FridgeView() }
+        composable("Recipe") { RecipeView(navController) }
     }
 }
 
