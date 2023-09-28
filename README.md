@@ -1,1 +1,19 @@
 # SmartFridge
+
+Smart Fridge es una aplicación que se encargará de recomendarte recetas de cocina en base a lo que exista en tu refrigerador.
+
+## Servicios
+Esta aplicación utiliza una API personal para guardar la información del usuario dentro del backend y un servicio externo llamado: [WorldWide Recipes](https://rapidapi.com/ptwebsolution/api/worldwide-recipes1/).
+- API Interna: Es una API que expondrá el backend para guardar datos del usuario, así como para obtener los datos de las recetas.
+- [WorldWide Recipes](https://rapidapi.com/ptwebsolution/api/worldwide-recipes1/): Es la API que utilizará el backend para obtener las recetas que mostrará el cliente.
+
+## Librerías
+Las librerías que utiliza el cliente se pueden ver en el archivo `build.gradle` dentro de la carpeta `Android/app`.
+
+Las librerías que utiliza el backend se pueden ver en el archivo `Cargo.toml` dentro de la carpeta `backend`.
+
+Una lista de las más destacadas son:
+- **Gson**, librería de Google para parsear JSON en kotlin.
+- **OkHttp**, librería usada en el cliente móvil para conectarse al backend.
+- **Serde**, librería en el backend utilizada para convertir objetos a JSON.
+- **Axum, Tokio, Tower**, librerías que facilitan la creación de una REST-API.
