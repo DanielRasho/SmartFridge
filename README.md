@@ -22,6 +22,22 @@ Esta aplicación utiliza una API personal para guardar la información del usuar
 - API Interna: Es una API que expondrá el backend para guardar datos del usuario, así como para obtener los datos de las recetas.
 - [WorldWide Recipes](https://rapidapi.com/ptwebsolution/api/worldwide-recipes1/): Es la API que utilizará el backend para obtener las recetas que mostrará el cliente.
 
+#### WorldWide Recipes
+
+A continuación ejemplos llamadas a las rutas que se utilizaran de esta API.
+
+**GET /explore**
+
+![](./media/exploreRequestExample.png)
+
+**Get /search**
+
+![](./media/searchRequestExample.png)
+
+**Get /detail**
+
+![](./media/detailRequestExample.png)
+
 ## Librerías
 
 Una lista completa de las librerías que utiliza el cliente se pueden ver en el archivo `build.gradle` dentro de la carpeta `Android/app`.
