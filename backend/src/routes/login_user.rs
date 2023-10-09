@@ -33,8 +33,6 @@ struct LoginUserPayload {
     password: String,
 }
 
-pub const APP_SECRET: &[u8] = b"super-secret-key";
-
 pub async fn login_user(
     payload: Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, ResponseError<LoginUserErrors>> {
