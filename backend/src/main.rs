@@ -1,7 +1,7 @@
 use std::{net::SocketAddr, sync::Arc};
 
 use axum::{routing::post, Router};
-use backend::routes::{login_user, register_user};
+use backend::routes::{login_user::login_user, register_user::register_user, search_recipes::search_recipes};
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -60,6 +60,7 @@ async fn start_server_on(addr: SocketAddr, client: Arc<Option<Client>>) {
 #[allow(dead_code)]
 fn app(db_client: Arc<Option<Client>>) -> Router {
     Router::new()
-        .route("/register_user", post(register_user::register_user))
-        .route("/login_user", post(login_user::login_user))
+        .route("/register_user", post(register_user))
+        .route("/login_user", post(login_user))
+        .route("/search_recipes", post(search_recipes))
 }
