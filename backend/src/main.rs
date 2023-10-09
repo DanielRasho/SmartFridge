@@ -1,13 +1,18 @@
 use std::{net::SocketAddr, sync::Arc};
 
 use axum::{routing::post, Router};
-use backend::routes::{login_user::login_user, register_user::register_user, search_recipes::search_recipes, get_recipes::get_recipes, get_ingredients::get_ingredients, search_ingredients::search_ingredients};
+use backend::routes::{
+    get_ingredients::get_ingredients, get_recipes::get_recipes, login_user::login_user, logout::logout,
+    register_user::register_user, search_ingredients::search_ingredients,
+    search_recipes::search_recipes,
+};
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 const DB_CONNECTION_CONFIG: &str =
     "host=localhost port=5432 user=postgres dbname=lab04 connect_timeout=10";
+pub const APP_SECRET: &[u8] = b"super-secret-key";
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -62,6 +67,7 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
     Router::new()
         .route("/register_user", post(register_user))
         .route("/login_user", post(login_user))
+        .route("/logout", post(logout))
         .route("/get_recipes", post(get_recipes))
         .route("/search_recipes", post(search_recipes))
         .route("/get_ingredients", post(get_ingredients))
