@@ -19,21 +19,21 @@ pub struct UserSettings {
 /// Represents an ingredient that the user needs.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Ingredient {
-    expire_date: DateTime<Utc>,
-    name: String,
-    category: String,
-    quantity: u32,
-    unit: String,
+    pub expire_date: DateTime<Utc>,
+    pub name: String,
+    pub category: String,
+    pub quantity: u32,
+    pub unit: String,
 }
 
 /// Represents a Food Recipe in the app.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Recipe {
-    title: String,
-    banner: String,
-    tags: Vec<String>,
-    ingredients: Vec<Ingredient>,
-    source: String,
+    pub title: String,
+    pub banner: String,
+    pub tags: Vec<String>,
+    pub ingredients: Vec<Ingredient>,
+    pub source: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

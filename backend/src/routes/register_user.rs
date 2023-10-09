@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use axum::{response::IntoResponse, Json, debug_handler};
+use axum::{debug_handler, response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::Deserialize;
 

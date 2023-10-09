@@ -41,7 +41,11 @@ pub async fn login_user(
     let LoginUserPayload { username, password } = match serde_json::from_value(payload.0.clone()) {
         Ok(p) => p,
         Err(err) => {
-            tracing::error!("An error `{:?}` occurred while parsing payload {}", err, payload.0);
+            tracing::error!(
+                "An error `{:?}` occurred while parsing payload {}",
+                err,
+                payload.0
+            );
             let error: ResponseError<_> = (
                 StatusCode::BAD_REQUEST,
                 LoginUserErrors::InvalidPayload {

@@ -1,11 +1,11 @@
-use hmac::{Hmac, digest::KeyInit};
-use jwt::SignWithKey;
+use hmac::{digest::KeyInit, Hmac};
+use jwt::{SignWithKey, VerifyWithKey};
 use models::JWT_Token;
 use sha2::Sha256;
 
 mod models;
-pub mod routes;
 mod responses;
+pub mod routes;
 
 #[derive(Debug)]
 pub enum GenerateJWTErrors {
@@ -14,6 +14,22 @@ pub enum GenerateJWTErrors {
 }
 
 pub fn generate_jwt(secret: &[u8], token_info: JWT_Token) -> Result<String, GenerateJWTErrors> {
-    let secret_key: Hmac<Sha256> = Hmac::new_from_slice(secret).map_err(|_| GenerateJWTErrors::ErrorGeneratingHmacKey)?;
-    token_info.sign_with_key(&secret_key).map_err(|_| GenerateJWTErrors::ErrorSigningWithKey)
+    let secret_key: Hmac<Sha256> =
+        Hmac::new_from_slice(secret).map_err(|_| GenerateJWTErrors::ErrorGeneratingHmacKey)?;
+    token_info
+        .sign_with_key(&secret_key)
+        .map_err(|_| GenerateJWTErrors::ErrorSigningWithKey)
+}
+
+#[derive(Debug)]
+pub enum ExtractJWTErrors {
+    ErrorGeneratingHmacKey,
+    ErrorExtractingWithKey,
+}
+pub fn extract_jwt(secret: &[u8], token: &str) -> Result<JWT_Token, ExtractJWTErrors> {
+    let secret_key: Hmac<Sha256> =
+        Hmac::new_from_slice(secret).map_err(|_| ExtractJWTErrors::ErrorGeneratingHmacKey)?;
+    token
+        .verify_with_key(&secret_key)
+        .map_err(|_| ExtractJWTErrors::ErrorExtractingWithKey)
 }
