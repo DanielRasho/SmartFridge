@@ -4,7 +4,7 @@ use axum::{routing::post, Router};
 use backend::routes::{
     get_ingredients::get_ingredients, get_recipes::get_recipes, login_user::login_user, logout::logout,
     register_user::register_user, search_ingredients::search_ingredients,
-    search_recipes::search_recipes,
+    search_recipes::search_recipes, save_settings::save_settings,
 };
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
@@ -72,4 +72,5 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
         .route("/search_recipes", post(search_recipes))
         .route("/get_ingredients", post(get_ingredients))
         .route("/search_ingredients", post(search_ingredients))
+        .route("/save_settings", post(save_settings))
 }
