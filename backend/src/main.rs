@@ -1,7 +1,7 @@
 use std::{net::SocketAddr, sync::Arc};
 
 use axum::{routing::post, Router};
-use backend::routes::{login_user::login_user, register_user::register_user, search_recipes::search_recipes, get_recipes::get_recipes, get_ingredients::get_ingredients};
+use backend::routes::{login_user::login_user, register_user::register_user, search_recipes::search_recipes, get_recipes::get_recipes, get_ingredients::get_ingredients, search_ingredients::search_ingredients};
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -65,4 +65,5 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
         .route("/get_recipes", post(get_recipes))
         .route("/search_recipes", post(search_recipes))
         .route("/get_ingredients", post(get_ingredients))
+        .route("/search_ingredients", post(search_ingredients))
 }
