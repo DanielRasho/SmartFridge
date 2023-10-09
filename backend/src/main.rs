@@ -1,22 +1,13 @@
 use std::{net::SocketAddr, sync::Arc};
 
-use axum::{
-    routing::{get, post},
-    Json, Router,
-};
-use routes::{login_user, register_user};
-use tokio_postgres::{Client, Error, NoTls};
-use tower::ServiceBuilder;
+use axum::{routing::post, Router};
+use backend::routes::{login_user, register_user};
+use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 const DB_CONNECTION_CONFIG: &str =
     "host=localhost port=5432 user=postgres dbname=lab04 connect_timeout=10";
-
-mod models;
-mod requests;
-mod responses;
-mod routes;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {

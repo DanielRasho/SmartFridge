@@ -4,7 +4,7 @@ use models::JWT_Token;
 use sha2::Sha256;
 
 mod models;
-mod routes;
+pub mod routes;
 mod responses;
 
 #[derive(Debug)]
