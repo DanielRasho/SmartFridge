@@ -2,9 +2,10 @@ use std::{net::SocketAddr, sync::Arc};
 
 use axum::{routing::post, Router};
 use backend::routes::{
-    get_ingredients::get_ingredients, get_recipes::get_recipes, login_user::login_user, logout::logout,
-    register_user::register_user, search_ingredients::search_ingredients,
-    search_recipes::search_recipes, save_settings::save_settings,
+    get_ingredients::get_ingredients, get_recipes::get_recipes, login_user::login_user,
+    logout::logout, recipe_details::recipe_details, register_user::register_user,
+    save_settings::save_settings, search_ingredients::search_ingredients,
+    search_recipes::search_recipes,
 };
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
@@ -68,9 +69,10 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
         .route("/register_user", post(register_user))
         .route("/login_user", post(login_user))
         .route("/logout", post(logout))
-        .route("/get_recipes", post(get_recipes))
-        .route("/search_recipes", post(search_recipes))
-        .route("/get_ingredients", post(get_ingredients))
-        .route("/search_ingredients", post(search_ingredients))
+        .route("/get_recipes", get(get_recipes))
+        .route("/search_recipes", get(search_recipes))
+        .route("/get_ingredients", get(get_ingredients))
+        .route("/search_ingredients", get(search_ingredients))
         .route("/save_settings", post(save_settings))
+        .route("/recipe_details", get(recipe_details))
 }
