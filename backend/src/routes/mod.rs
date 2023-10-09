@@ -10,3 +10,5 @@ pub mod search_ingredients;
 
 pub mod save_settings;
 pub mod recipe_details;
+
+pub mod add_ingredient;
