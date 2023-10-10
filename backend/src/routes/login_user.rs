@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, sync::atomic::AtomicUsize};
 
 use axum::{response::IntoResponse, Json};
 use chrono::{Duration, Utc};
@@ -33,14 +33,23 @@ struct LoginUserPayload {
     password: String,
 }
 
+static ID: AtomicUsize = AtomicUsize::new(0);
+
 pub async fn login_user(
     payload: Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, ResponseError<LoginUserErrors>> {
+    let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+    let tracing_prefix = format!("/LOGIN_USER - {}:", id);
+
+    tracing::debug!("{} START", tracing_prefix);
+
+    tracing::debug!("{} Parsing payload...", tracing_prefix);
     let LoginUserPayload { username, password } = match serde_json::from_value(payload.0.clone()) {
         Ok(p) => p,
         Err(err) => {
             tracing::error!(
-                "An error `{:?}` occurred while parsing payload {}",
+                "{} An error `{:?}` occurred while parsing payload {}",
+                tracing_prefix,
                 err,
                 payload.0
             );
@@ -54,10 +63,15 @@ pub async fn login_user(
             Err(error)?
         }
     };
-    //TODO Assume DB check passed...
+    tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
 
+    // TODO Check if pasword is correct...
+
+    // TODO Generate session in DB...
+
+    tracing::debug!("{} Generating JWT...", tracing_prefix);
     let user_id = Uuid::new_v4().to_string();
-    let expired_date = Utc::now() + Duration::minutes(30);
+    let expired_date = Utc::now() + Duration::days(7);
     let token = JWT_Token {
         user_id,
         expired_date,
@@ -67,7 +81,11 @@ pub async fn login_user(
     let token = match generate_jwt(APP_SECRET, token) {
         Ok(t) => t,
         Err(err) => {
-            tracing::error!("An error ocurred while generating the JWT {:?}", err);
+            tracing::error!(
+                "{} An error ocurred while generating the JWT {:?}",
+                tracing_prefix,
+                err
+            );
             let error: ResponseError<_> = (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 LoginUserErrors::CouldntGenerateJWT(err),
@@ -76,6 +94,8 @@ pub async fn login_user(
             Err(error)?
         }
     };
+    tracing::debug!("{} JWT generated successfully!", tracing_prefix);
 
+    tracing::debug!("{} DONE", tracing_prefix);
     Ok(Json(LoginUserResponse { token }))
 }
