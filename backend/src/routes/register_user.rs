@@ -1,6 +1,6 @@
-use std::fmt::Display;
+use std::{fmt::Display, sync::atomic::AtomicUsize};
 
-use axum::{debug_handler, response::IntoResponse, Json};
+use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::Deserialize;
 
@@ -23,8 +23,22 @@ pub struct RegisterUserPayload {
     password: String,
 }
 
+static ID: AtomicUsize = AtomicUsize::new(0);
+
 pub async fn register_user(
     payload: Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, ResponseError<RegisterUserErrors>> {
+    let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+    let tracing_prefix = format!("/REGISTER_USER {}:", id);
+
+    tracing::debug!("{} START", tracing_prefix);
+
+    // TODO Check if username exists...
+
+    // TODO Encrypt password...
+    
+    // TODO Insert into DB...
+
+    tracing::debug!("{} DONE", tracing_prefix);
     Ok((StatusCode::OK, ""))
 }
