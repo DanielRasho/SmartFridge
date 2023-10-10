@@ -24,8 +24,6 @@ struct SaveSettingsPayload {
     settings: UserSettings,
 }
 
-pub const APP_SECRET: &[u8] = b"super-secret-key";
-
 pub async fn save_settings(
     payload: Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, ResponseError<LoginUserErrors>> {

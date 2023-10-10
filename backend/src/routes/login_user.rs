@@ -6,7 +6,7 @@ use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::{generate_jwt, models::JWT_Token, responses::ResponseError};
+use crate::{generate_jwt, models::JWT_Token, responses::ResponseError, APP_SECRET};
 
 #[derive(Debug)]
 pub enum LoginUserErrors {

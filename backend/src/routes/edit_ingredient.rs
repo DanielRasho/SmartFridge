@@ -4,9 +4,7 @@ use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 
-use crate::{extract_jwt, models::Ingredient, responses::ResponseError};
-
-use super::save_settings::APP_SECRET;
+use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET};
 
 #[derive(Debug, Serialize)]
 pub enum EditIngredientErrors {

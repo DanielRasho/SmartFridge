@@ -7,6 +7,8 @@ mod models;
 mod responses;
 pub mod routes;
 
+pub const APP_SECRET: &[u8] = b"super-secret-key";
+
 #[derive(Debug)]
 pub enum GenerateJWTErrors {
     ErrorGeneratingHmacKey,
@@ -26,6 +28,7 @@ pub enum ExtractJWTErrors {
     ErrorGeneratingHmacKey,
     ErrorExtractingWithKey,
 }
+
 pub fn extract_jwt(secret: &[u8], token: &str) -> Result<JWT_Token, ExtractJWTErrors> {
     let secret_key: Hmac<Sha256> =
         Hmac::new_from_slice(secret).map_err(|_| ExtractJWTErrors::ErrorGeneratingHmacKey)?;

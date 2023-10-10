@@ -8,10 +8,8 @@ use serde::Deserialize;
 use crate::{
     extract_jwt,
     models::{Ingredient, Recipe},
-    responses::ResponseError,
+    responses::ResponseError, APP_SECRET,
 };
-
-use super::login_user::APP_SECRET;
 
 #[derive(Debug)]
 pub enum GetRecipesError {

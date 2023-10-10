@@ -5,9 +5,7 @@ use chrono::{Duration, Utc};
 use hyper::StatusCode;
 use serde::Deserialize;
 
-use crate::{extract_jwt, models::Ingredient, responses::ResponseError};
-
-use super::login_user::APP_SECRET;
+use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET};
 
 #[derive(Debug)]
 pub enum GetIngredientsErrors {
