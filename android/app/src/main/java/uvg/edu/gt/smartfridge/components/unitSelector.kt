@@ -1,5 +1,6 @@
 package uvg.edu.gt.smartfridge.components
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,29 +36,32 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UnitSelector(
+    title: String = "Title",
+    categories : Map<String, List<String>> = mapOf<String, List<String>>(),
     onSelected: (String) -> Unit = {},
     onCloseButtonClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val categories = mapOf(
-        "Weight" to listOf("Kg", "g", "Lb"),
-        "Volume" to listOf("L", "mL", "Cups"),
-        "Miscellaneous" to listOf("Bags", "Bottles", "")
-    )
 
-    val (selectedCategory, setSelectedCategory) = remember { mutableStateOf("Weight") }
-    val (selectedCategoryItems, setselectedCategoryItems) = remember { mutableStateOf(categories[selectedCategory]) }
-
+    // Saves the current selected category
+    val (selectedCategory, setSelectedCategory) = remember { mutableStateOf(
+        categories.entries.iterator().next().key // Get first key of categories, map, to have default.
+    ) }
+    // Saves the current category's items to display.
+    val (selectedCategoryItems, setSelectedCategoryItems) = remember { mutableStateOf(categories[selectedCategory]) }
+    // Saves the item selected from the ones saved on selectedCategoryItems.
     val (selectedUnit, setSelectedUnit) = remember { mutableStateOf(selectedCategoryItems?.get(0)) }
 
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
 
+    // Function to select a category.
     val changeCategoryAction = {newCategory: String ->
         setSelectedCategory(newCategory)
-        setselectedCategoryItems(categories[newCategory])
+        setSelectedCategoryItems(categories[newCategory])
     }
 
+    // Function to select an item from within a category.
     val changeUnitAction = { newUnit: String ->
         if (newUnit != selectedUnit) {
             setSelectedUnit(newUnit)
@@ -75,7 +79,7 @@ fun UnitSelector(
                     .fillMaxWidth()
             ) {
                 Text(
-                    "Unit",
+                    title,
                     color = MaterialTheme.colorScheme.inverseOnSurface,
                     modifier = modifier.padding(16.dp, 0.dp)
                 )
@@ -117,15 +121,26 @@ fun UnitSelector(
                 }
                 Column (verticalArrangement = Arrangement.Top) {
                     selectedCategoryItems?.forEach {
+                        if(it == selectedUnit)
                         Button(
                             onClick = { changeUnitAction(it) },
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.outline),
                             shape = RectangleShape,
                             modifier = modifier.width(screenWidth / 2),
                             border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                         ) {
                             Text(it, color = MaterialTheme.colorScheme.onBackground)
                         }
+                        else
+                            Button(
+                                onClick = { changeUnitAction(it) },
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
+                                shape = RectangleShape,
+                                modifier = modifier.width(screenWidth / 2),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+                            ) {
+                                Text(it, color = MaterialTheme.colorScheme.onBackground)
+                            }
                     }
                 }
             }
@@ -136,7 +151,23 @@ fun UnitSelector(
 @Preview
 @Composable
 private fun UnitSelectorPreview() {
+    var (text, setText) = remember { mutableStateOf("TEXT") }
+
+    val categories = mapOf(
+        "Weight" to listOf("Kg", "g", "Lb"),
+        "Volume" to listOf("L", "mL", "Cups"),
+        "Miscellaneous" to listOf("Bags", "Bottles")
+    )
+
+    // Dummy function to edit "text" variable.
+    val onSelectedFun : (String) -> Unit = {selectedText ->
+        Log.i("INFO", "Selected text is $selectedText")
+        setText(selectedText)
+    }
     smartFridgeTheme {
-        UnitSelector()
+        Column {
+            UnitSelector("Hello World", categories, onSelectedFun)
+            Text(text = text)
+        }
     }
 }
