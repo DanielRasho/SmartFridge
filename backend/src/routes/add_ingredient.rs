@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, sync::atomic::AtomicUsize};
 
 use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
@@ -24,15 +24,24 @@ pub struct AddIngredientPayload {
     ingredient: Ingredient,
 }
 
+static ID: AtomicUsize = AtomicUsize::new(0);
+
 pub async fn add_ingredient(
     payload: Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, ResponseError<AddIngredientErrors>> {
+    let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+    let tracing_prefix = format!("/ADD_INGREDIENT - {}:", id);
+
+    tracing::debug!("{} START", tracing_prefix);
+
+    tracing::debug!("{} Parsing payload...", tracing_prefix);
     let AddIngredientPayload { token, ingredient } = match serde_json::from_value(payload.0.clone())
     {
         Ok(p) => p,
         Err(err) => {
             tracing::error!(
-                "An error `{:?}` occurred parsing payload `{}`",
+                "{} An error `{:?}` occurred parsing payload `{}`",
+                tracing_prefix,
                 err,
                 payload.0
             );
@@ -46,12 +55,15 @@ pub async fn add_ingredient(
             Err(error)?
         }
     };
+    tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
 
+    tracing::debug!("{} Extracting JWT...", tracing_prefix);
     let token_info = match extract_jwt(APP_SECRET, &token) {
         Ok(t) => t,
         Err(err) => {
             tracing::error!(
-                "An error `{:?}` occurred while extracting the JWT `{}`",
+                "{} An error `{:?}` occurred while extracting the JWT `{}`",
+                tracing_prefix,
                 err,
                 token
             );
@@ -60,10 +72,12 @@ pub async fn add_ingredient(
             Err(error)?
         }
     };
+    tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
     // TODO Check if token is valid...
 
     // TODO Add ingredient to DB...
 
+    tracing::debug!("{} DONE!", tracing_prefix);
     Ok(StatusCode::OK)
 }
