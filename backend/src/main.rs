@@ -1,11 +1,15 @@
 use std::{net::SocketAddr, sync::Arc};
 
-use axum::{routing::{post, get}, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use backend::routes::{
+    add_ingredient::add_ingredient, edit_ingredient::edit_ingredient,
     get_ingredients::get_ingredients, get_recipes::get_recipes, login_user::login_user,
     logout::logout, recipe_details::recipe_details, register_user::register_user,
     save_settings::save_settings, search_ingredients::search_ingredients,
-    search_recipes::search_recipes, add_ingredient::add_ingredient, edit_ingredient::edit_ingredient,
+    search_recipes::search_recipes,
 };
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
@@ -13,7 +17,6 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 const DB_CONNECTION_CONFIG: &str =
     "host=localhost port=5432 user=postgres dbname=lab04 connect_timeout=10";
-pub const APP_SECRET: &[u8] = b"super-secret-key";
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
