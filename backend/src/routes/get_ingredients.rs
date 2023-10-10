@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, sync::atomic::AtomicUsize};
 
 use axum::{response::IntoResponse, Json};
 use chrono::{Duration, Utc};
@@ -24,14 +24,23 @@ struct GetIngredientsPayload {
     token: String,
 }
 
+const ID: AtomicUsize = AtomicUsize::new(0);
+
 pub async fn get_ingredients(
     payload: Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, ResponseError<GetIngredientsErrors>> {
+    let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+    let tracing_prefix = format!("/GET_INGREDIENT - {}:", id);
+
+    tracing::debug!("{} START", tracing_prefix);
+
+    tracing::debug!("{} Parsing payload...", tracing_prefix);
     let GetIngredientsPayload { token } = match serde_json::from_value(payload.0.clone()) {
         Ok(p) => p,
         Err(err) => {
             tracing::error!(
-                "An error {:?} occurred while parsing the payload `{}`",
+                "{} An error {:?} occurred while parsing the payload `{}`",
+                tracing_prefix,
                 err,
                 payload.0
             );
@@ -45,16 +54,23 @@ pub async fn get_ingredients(
             Err(error)?
         }
     };
+    tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
 
+    tracing::debug!("{} Extracting JWT...", tracing_prefix);
     let token_info = match extract_jwt(APP_SECRET, &token) {
         Ok(t) => t,
         Err(_) => {
-            tracing::error!("An error occurred while extracting the JWT `{}`", token);
+            tracing::error!(
+                "{} An error occurred while extracting the JWT `{}`",
+                tracing_prefix,
+                token
+            );
             let error: ResponseError<_> =
                 (StatusCode::BAD_REQUEST, GetIngredientsErrors::InvalidJWT).into();
             Err(error)?
         }
     };
+    tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
     // TODO Validate token with DB
 
@@ -98,5 +114,6 @@ pub async fn get_ingredients(
         },
     ];
 
+    tracing::debug!("{} DONE", tracing_prefix);
     Ok(Json(recipes))
 }
