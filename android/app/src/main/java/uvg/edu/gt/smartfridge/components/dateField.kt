@@ -26,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -40,7 +39,7 @@ import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun dateField (pickedDate : MutableState<LocalDate>) {
+fun dateField (label: String = "Date", pickedDate : MutableState<LocalDate>) {
 
     // State definitions
     val formattedDate by remember {
@@ -54,13 +53,13 @@ fun dateField (pickedDate : MutableState<LocalDate>) {
 
     // Layout definition
     Row (verticalAlignment = Alignment.CenterVertically){
-        Column ( modifier = Modifier.weight(1f)){
-            Text(text = "Date",
+        Column ( modifier = Modifier.weight(2f)){
+            Text(text = label,
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.outlineVariant)
             Spacer(modifier = Modifier.height(8.dp))
         }
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Column ( modifier = Modifier.weight(5f),
             horizontalAlignment = Alignment.CenterHorizontally){
             CompositionLocalProvider(
@@ -110,7 +109,7 @@ fun dateField (pickedDate : MutableState<LocalDate>) {
 
 @Preview
 @Composable
-fun dateFieldText(){
+fun dateFieldTest(){
     smartFridgeTheme {
         var owo = remember { mutableStateOf(LocalDate.now())}
         var value = remember { mutableStateOf("") }
@@ -121,7 +120,7 @@ fun dateFieldText(){
                 .padding(16.dp)
         ){
             textField(label = "Texto", textValue = value)
-            dateField(owo)
+            dateField(pickedDate = owo)
             textField(label = "Texto", textValue = value)
         }
     }

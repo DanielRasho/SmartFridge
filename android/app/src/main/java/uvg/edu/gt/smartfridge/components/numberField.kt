@@ -41,13 +41,13 @@ fun numberField (label : String, numberValue: MutableState<String>) {
 
     // Layout definition
     Row (verticalAlignment = Alignment.CenterVertically){
-        Column (modifier = Modifier.weight(1f)){
+        Column (modifier = Modifier.weight(2f)){
             Text(text = label,
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.outlineVariant)
             Spacer(modifier = Modifier.height(8.dp))
         }
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Column (modifier = Modifier.weight(5f),
             horizontalAlignment = Alignment.CenterHorizontally){
             BasicTextField(value = numberValue.value,
