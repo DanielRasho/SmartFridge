@@ -4,11 +4,12 @@ use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::Deserialize;
 
-use crate::responses::ResponseError;
+use crate::{encrypt_password, responses::ResponseError};
 
 #[derive(Debug)]
 pub enum RegisterUserErrors {
     NoDBConnection,
+    InvalidPayload { payload: String },
 }
 
 impl Display for RegisterUserErrors {
@@ -33,10 +34,35 @@ pub async fn register_user(
 
     tracing::debug!("{} START", tracing_prefix);
 
+    tracing::debug!("{} Parsing payload...", tracing_prefix);
+    let RegisterUserPayload { username, password } = match serde_json::from_value(payload.0.clone())
+    {
+        Ok(p) => p,
+        Err(err) => {
+            tracing::error!(
+                "{} An error `{:?}` occurred while parsing payload `{}`",
+                tracing_prefix,
+                err,
+                payload.0
+            );
+            let error: ResponseError<_> = (
+                StatusCode::BAD_REQUEST,
+                RegisterUserErrors::InvalidPayload {
+                    payload: payload.0.to_string(),
+                },
+            )
+                .into();
+            Err(error)?
+        }
+    };
+    tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
+
     // TODO Check if username exists...
 
-    // TODO Encrypt password...
-    
+    tracing::debug!("{} Encrypting password...", tracing_prefix);
+    let encrypted = encrypt_password(password);
+    tracing::debug!("{} Password encrypted successfully!", tracing_prefix);
+
     // TODO Insert into DB...
 
     tracing::debug!("{} DONE", tracing_prefix);
