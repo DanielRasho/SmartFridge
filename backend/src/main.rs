@@ -5,7 +5,7 @@ use backend::routes::{
     get_ingredients::get_ingredients, get_recipes::get_recipes, login_user::login_user,
     logout::logout, recipe_details::recipe_details, register_user::register_user,
     save_settings::save_settings, search_ingredients::search_ingredients,
-    search_recipes::search_recipes, add_ingredient::add_ingredient,
+    search_recipes::search_recipes, add_ingredient::add_ingredient, edit_ingredient::edit_ingredient,
 };
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
@@ -76,4 +76,5 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
         .route("/save_settings", post(save_settings))
         .route("/recipe_details", get(recipe_details))
         .route("/add_ingredient", post(add_ingredient))
+        .route("/edit_ingredient", post(edit_ingredient))
 }
