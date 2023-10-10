@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{fmt::Display, sync::atomic::AtomicUsize};
 
 use axum::{response::IntoResponse, Json};
 use chrono::Utc;
@@ -8,7 +8,8 @@ use serde::Deserialize;
 use crate::{
     extract_jwt,
     models::{Ingredient, Recipe},
-    responses::ResponseError, APP_SECRET,
+    responses::ResponseError,
+    APP_SECRET,
 };
 
 #[derive(Debug)]
@@ -29,14 +30,23 @@ struct SearchRecipesPayload {
     query: String,
 }
 
+static ID: AtomicUsize = AtomicUsize::new(0);
+
 pub async fn search_recipes(
     payload: Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, ResponseError<SearchRecipesErrors>> {
+    let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+    let tracing_prefix = format!("/SEARCH_RECIPES - {}:", id);
+
+    tracing::debug!("{} START", tracing_prefix);
+
+    tracing::debug!("{} Parsing payload...", tracing_prefix);
     let SearchRecipesPayload { token, query } = match serde_json::from_value(payload.0.clone()) {
         Ok(p) => p,
         Err(err) => {
             tracing::error!(
-                "An error {:?} occurred while parsing the payload `{}`",
+                "{} An error {:?} occurred while parsing the payload `{}`",
+                tracing_prefix,
                 err,
                 payload.0
             );
@@ -50,16 +60,23 @@ pub async fn search_recipes(
             Err(error)?
         }
     };
+    tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
 
+    tracing::debug!("{} Extracting JWT...", tracing_prefix);
     let token_info = match extract_jwt(APP_SECRET, &token) {
         Ok(t) => t,
         Err(_) => {
-            tracing::error!("An error occurred while extracting the JWT `{}`", token);
+            tracing::error!(
+                "{} An error occurred while extracting the JWT `{}`",
+                tracing_prefix,
+                token
+            );
             let error: ResponseError<_> =
                 (StatusCode::BAD_REQUEST, SearchRecipesErrors::InvalidJWT).into();
             Err(error)?
         }
     };
+    tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
     // TODO Validate token with DB
 
@@ -89,5 +106,6 @@ pub async fn search_recipes(
         },
     ];
 
+    tracing::debug!("{} DONE", tracing_prefix);
     Ok(Json(recipes))
 }
