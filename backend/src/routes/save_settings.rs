@@ -1,18 +1,19 @@
-use std::fmt::Display;
+use std::{fmt::Display, sync::atomic::AtomicUsize};
 
 use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::Deserialize;
 
-use crate::{models::UserSettings, responses::ResponseError};
+use crate::{extract_jwt, models::UserSettings, responses::ResponseError, APP_SECRET};
 
 #[derive(Debug)]
-pub enum LoginUserErrors {
+pub enum SaveSettingsErrors {
     InvalidPayload { payload: String },
     NoDBConnection,
+    InvalidJWT,
 }
 
-impl Display for LoginUserErrors {
+impl Display for SaveSettingsErrors {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
@@ -24,20 +25,29 @@ struct SaveSettingsPayload {
     settings: UserSettings,
 }
 
+static ID: AtomicUsize = AtomicUsize::new(0);
+
 pub async fn save_settings(
     payload: Json<serde_json::Value>,
-) -> Result<impl IntoResponse, ResponseError<LoginUserErrors>> {
+) -> Result<impl IntoResponse, ResponseError<SaveSettingsErrors>> {
+    let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+    let tracing_prefix = format!("/SAVE_SETTINGS - {}:", id);
+
+    tracing::debug!("{} START", tracing_prefix);
+
+    tracing::debug!("{} Parsing payload...", tracing_prefix);
     let SaveSettingsPayload { token, settings } = match serde_json::from_value(payload.0.clone()) {
         Ok(p) => p,
         Err(err) => {
             tracing::error!(
-                "An error `{:?}` occurred while parsing payload {}",
+                "{} An error `{:?}` occurred while parsing payload {}",
+                tracing_prefix,
                 err,
                 payload.0
             );
             let error: ResponseError<_> = (
                 StatusCode::BAD_REQUEST,
-                LoginUserErrors::InvalidPayload {
+                SaveSettingsErrors::InvalidPayload {
                     payload: payload.0.to_string(),
                 },
             )
@@ -45,10 +55,28 @@ pub async fn save_settings(
             Err(error)?
         }
     };
+    tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
+
+    tracing::debug!("{} Extracting JWT...", tracing_prefix);
+    let token_info = match extract_jwt(APP_SECRET, &token) {
+        Ok(t) => t,
+        Err(_) => {
+            tracing::error!(
+                "{} An error occurred while extracting the JWT `{}`",
+                tracing_prefix,
+                token
+            );
+            let error: ResponseError<_> =
+                (StatusCode::BAD_REQUEST, SaveSettingsErrors::InvalidJWT).into();
+            Err(error)?
+        }
+    };
+    tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
     // TODO Check if token is valid...
 
     // TODO Save settings in DB...
 
+    tracing::debug!("{} DONE", tracing_prefix);
     Ok(StatusCode::OK)
 }
