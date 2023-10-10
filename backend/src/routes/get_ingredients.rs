@@ -24,7 +24,7 @@ struct GetIngredientsPayload {
     token: String,
 }
 
-const ID: AtomicUsize = AtomicUsize::new(0);
+static ID: AtomicUsize = AtomicUsize::new(0);
 
 pub async fn get_ingredients(
     payload: Json<serde_json::Value>,
