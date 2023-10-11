@@ -76,13 +76,13 @@ pub async fn register_user(
     tracing::debug!("{} Connecting to DB...", tracing_prefix);
     let username_exists = match client.as_ref() {
         Some(conn) => {
-            let result = conn
-                .query_one(
+            match conn
+                .query(
                     "SELECT user_id FROM sf_user WHERE username=$1",
                     &[&username],
                 )
-                .await;
-            match result {
+                .await
+            {
                 Ok(r) => !r.is_empty(),
                 Err(err) => {
                     tracing::error!(
@@ -100,6 +100,7 @@ pub async fn register_user(
                 }
             }
         }
+
         None => {
             tracing::debug!(
                 "{} DB Connection not found! Couldn't check if username exists!",
