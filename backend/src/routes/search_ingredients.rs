@@ -8,6 +8,7 @@ use chrono::{Duration, Utc};
 use hyper::StatusCode;
 use serde::Deserialize;
 use tokio_postgres::Client;
+use uuid::Uuid;
 
 use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET};
 
@@ -88,6 +89,7 @@ pub async fn search_ingredients(
 
     let recipes = vec![
         Ingredient {
+            ingredient_id: Uuid::new_v4(),
             expire_date: Utc::now() + Duration::days(10),
             name: "Steak".to_string(),
             category: "Meat".to_string(),
@@ -95,6 +97,7 @@ pub async fn search_ingredients(
             unit: "Lb".to_string(),
         },
         Ingredient {
+            ingredient_id: Uuid::new_v4(),
             expire_date: Utc::now() + Duration::days(10),
             name: "Chicken".to_string(),
             category: "Meat".to_string(),
@@ -102,6 +105,7 @@ pub async fn search_ingredients(
             unit: "Lb".to_string(),
         },
         Ingredient {
+            ingredient_id: Uuid::new_v4(),
             expire_date: Utc::now() + Duration::days(10),
             name: "Oranges".to_string(),
             category: "Fruit".to_string(),

@@ -1,4 +1,7 @@
-use std::{fmt::Display, sync::{atomic::AtomicUsize, Arc}};
+use std::{
+    fmt::Display,
+    sync::{atomic::AtomicUsize, Arc},
+};
 
 use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
@@ -37,26 +40,26 @@ pub async fn edit_ingredient(
     tracing::debug!("{} START", tracing_prefix);
 
     tracing::debug!("{} Parsing payload...", tracing_prefix);
-    let EditIngredientPayload { token, ingredient } = match serde_json::from_value(payload.0.clone())
-    {
-        Ok(p) => p,
-        Err(err) => {
-            tracing::error!(
-                "{} An error `{:?}` occurred parsing payload `{}`",
-                tracing_prefix,
-                err,
-                payload.0
-            );
-            let error: ResponseError<_> = (
-                StatusCode::BAD_REQUEST,
-                EditIngredientErrors::InvalidPayload {
-                    payload: payload.0.to_string(),
-                },
-            )
-                .into();
-            Err(error)?
-        }
-    };
+    let EditIngredientPayload { token, ingredient } =
+        match serde_json::from_value(payload.0.clone()) {
+            Ok(p) => p,
+            Err(err) => {
+                tracing::error!(
+                    "{} An error `{:?}` occurred parsing payload `{}`",
+                    tracing_prefix,
+                    err,
+                    payload.0
+                );
+                let error: ResponseError<_> = (
+                    StatusCode::BAD_REQUEST,
+                    EditIngredientErrors::InvalidPayload {
+                        payload: payload.0.to_string(),
+                    },
+                )
+                    .into();
+                Err(error)?
+            }
+        };
     tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
 
     tracing::debug!("{} Extracting JWT...", tracing_prefix);

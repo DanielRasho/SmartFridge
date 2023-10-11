@@ -1,4 +1,7 @@
-use std::{fmt::Display, sync::{atomic::AtomicUsize, Arc}};
+use std::{
+    fmt::Display,
+    sync::{atomic::AtomicUsize, Arc},
+};
 
 use axum::{response::IntoResponse, Json};
 use chrono::{Duration, Utc};

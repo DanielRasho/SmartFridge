@@ -1,10 +1,14 @@
-use std::{fmt::Display, sync::{atomic::AtomicUsize, Arc}};
+use std::{
+    fmt::Display,
+    sync::{atomic::AtomicUsize, Arc},
+};
 
 use axum::{response::IntoResponse, Json};
 use chrono::{Duration, Utc};
 use hyper::StatusCode;
 use serde::Deserialize;
 use tokio_postgres::Client;
+use uuid::Uuid;
 
 use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET};
 
@@ -85,6 +89,7 @@ pub async fn get_ingredients(
             category: "Dairy".to_string(),
             quantity: 10,
             unit: "Units".to_string(),
+            ingredient_id: Uuid::new_v4(),
         },
         Ingredient {
             expire_date: Utc::now() + Duration::days(10),
@@ -92,6 +97,7 @@ pub async fn get_ingredients(
             category: "Dairy".to_string(),
             quantity: 10,
             unit: "L".to_string(),
+            ingredient_id: Uuid::new_v4(),
         },
         Ingredient {
             expire_date: Utc::now() + Duration::days(10),
@@ -99,6 +105,7 @@ pub async fn get_ingredients(
             category: "Meat".to_string(),
             quantity: 3,
             unit: "Lb".to_string(),
+            ingredient_id: Uuid::new_v4(),
         },
         Ingredient {
             expire_date: Utc::now() + Duration::days(10),
@@ -106,6 +113,7 @@ pub async fn get_ingredients(
             category: "Meat".to_string(),
             quantity: 5,
             unit: "Lb".to_string(),
+            ingredient_id: Uuid::new_v4(),
         },
         Ingredient {
             expire_date: Utc::now() + Duration::days(10),
@@ -113,6 +121,7 @@ pub async fn get_ingredients(
             category: "Fruit".to_string(),
             quantity: 15,
             unit: "Units".to_string(),
+            ingredient_id: Uuid::new_v4(),
         },
     ];
 

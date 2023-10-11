@@ -1,10 +1,14 @@
-use std::{fmt::Display, sync::{atomic::AtomicUsize, Arc}};
+use std::{
+    fmt::Display,
+    sync::{atomic::AtomicUsize, Arc},
+};
 
 use axum::{response::IntoResponse, Json};
 use chrono::Utc;
 use hyper::StatusCode;
 use serde::Deserialize;
 use tokio_postgres::Client;
+use uuid::Uuid;
 
 use crate::{
     extract_jwt,
@@ -85,31 +89,35 @@ pub async fn get_recipes(
 
     let recipes = vec![
         Recipe {
+            recipe_id: Uuid::new_v4(),
             title: "Test Recipe #1".to_string(),
             banner: "https://lh3.googleusercontent.com/uSzqXtfkILNLvbaIhzU8LK-iKCOG6w60AXCXEhWNzY-UrUaLypLSpH10MoloHfa96NPONh19gIz0ebK-XL7v".to_string(),
             tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string() }],
+            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
             source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
         },
         Recipe {
+            recipe_id: Uuid::new_v4(),
             title: "Test Recipe #2".to_string(),
             banner: "https://lh3.googleusercontent.com/uSzqXtfkILNLvbaIhzU8LK-iKCOG6w60AXCXEhWNzY-UrUaLypLSpH10MoloHfa96NPONh19gIz0ebK-XL7v".to_string(),
             tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string() }],
+            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
             source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
         },
         Recipe {
+            recipe_id: Uuid::new_v4(),
             title: "Test Recipe #3".to_string(),
             banner: "https://lh3.googleusercontent.com/efGuFTcoR-Atb8-OgBL8PMCVbPwRQANTX0ZVgllhlzBkVc92d0G9LkapW1TiNmTL4iZJNlPIkyGKS1ODOUNCOxM".to_string(),
             tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string() }],
+            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
             source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
         },
         Recipe {
+            recipe_id: Uuid::new_v4(),
             title: "Test Recipe #4".to_string(),
             banner: "https://lh3.googleusercontent.com/JumnqUM5mRUraff-j2tx7Oy1c9oXbGJP8ba4fDcF3OqYC2W_2R_Tug1AVJhbwtZcJqaVf5MpVGAfHP1VtHIKzw".to_string(),
             tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string() }],
+            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4()}],
             source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
         },
     ];

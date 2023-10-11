@@ -1,9 +1,11 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 /// Represents the theme of the app the user selected.
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub enum AppThemes {
+    #[default]
     Light,
     Dark,
     Foxy,
@@ -13,6 +15,12 @@ pub enum AppThemes {
 /// Represents the settings the user has for the client app.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct UserSettings {
+    #[serde(rename = "SettingsId")]
+    settings_id: Uuid,
+
+    #[serde(rename = "UserId")]
+    user_id: Uuid,
+
     #[serde(rename = "Theme")]
     theme: AppThemes,
 }
@@ -20,6 +28,9 @@ pub struct UserSettings {
 /// Represents an ingredient that the user needs.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Ingredient {
+    #[serde(rename = "IngredientId")]
+    pub ingredient_id: Uuid,
+
     #[serde(rename = "ExpireDate")]
     pub expire_date: DateTime<Utc>,
 
@@ -39,6 +50,9 @@ pub struct Ingredient {
 /// Represents a Food Recipe in the app.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Recipe {
+    #[serde(rename = "RecipeId")]
+    pub recipe_id: Uuid,
+
     #[serde(rename = "Recipe")]
     pub title: String,
 
