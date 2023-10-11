@@ -1,8 +1,9 @@
-use std::{fmt::Display, sync::atomic::AtomicUsize};
+use std::{fmt::Display, sync::{atomic::AtomicUsize, Arc}};
 
 use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
+use tokio_postgres::Client;
 
 use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET};
 
@@ -28,6 +29,7 @@ static ID: AtomicUsize = AtomicUsize::new(0);
 
 pub async fn edit_ingredient(
     payload: Json<serde_json::Value>,
+    client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<EditIngredientErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
     let tracing_prefix = format!("/EDIT_INGREDIENT - {}:", id);

@@ -1,8 +1,9 @@
-use std::{fmt::Display, sync::atomic::AtomicUsize};
+use std::{fmt::Display, sync::{atomic::AtomicUsize, Arc}};
 
 use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::Deserialize;
+use tokio_postgres::Client;
 
 use crate::responses::ResponseError;
 
@@ -27,6 +28,7 @@ static ID: AtomicUsize = AtomicUsize::new(0);
 
 pub async fn logout(
     payload: Json<serde_json::Value>,
+    client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<LogoutUserErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
     let tracing_prefix = format!("/LOGOUT - {}:", id);

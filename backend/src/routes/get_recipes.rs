@@ -1,9 +1,10 @@
-use std::{fmt::Display, sync::atomic::AtomicUsize};
+use std::{fmt::Display, sync::{atomic::AtomicUsize, Arc}};
 
 use axum::{response::IntoResponse, Json};
 use chrono::Utc;
 use hyper::StatusCode;
 use serde::Deserialize;
+use tokio_postgres::Client;
 
 use crate::{
     extract_jwt,
@@ -33,6 +34,7 @@ static ID: AtomicUsize = AtomicUsize::new(0);
 
 pub async fn get_recipes(
     payload: Json<serde_json::Value>,
+    client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<GetRecipesError>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
     let tracing_prefix = format!("/GET_RECIPES - {}:", id);

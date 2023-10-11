@@ -16,7 +16,7 @@ use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
 const DB_CONNECTION_CONFIG: &str =
-    "host=localhost port=5432 user=postgres dbname=lab04 connect_timeout=10";
+    "host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10";
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -34,13 +34,12 @@ async fn main() -> Result<(), Error> {
         SocketAddr::from(([0, 0, 0, 0], 3000))
     };
 
-    //let (client, connection) = tokio_postgres::connect(DB_CONNECTION_CONFIG, NoTls).await?;
+    let (client, connection) =
+        tokio_postgres::connect(DB_CONNECTION_CONFIG, tokio_postgres::NoTls).await?;
 
-    //let db_connection_handle = tokio::spawn(async {
-    //connection.await
-    //});
+    let _ = tokio::spawn(async { connection.await });
 
-    start_server_on(addr, Arc::new(None)).await;
+    start_server_on(addr, Arc::new(Some(client))).await;
 
     Ok(())
 }
@@ -68,16 +67,30 @@ async fn start_server_on(addr: SocketAddr, client: Arc<Option<Client>>) {
 /// without having to create an HTTP server.
 #[allow(dead_code)]
 fn app(db_client: Arc<Option<Client>>) -> Router {
+    let db_c_1 = db_client.clone();
+    let db_c_2 = db_client.clone();
+    let db_c_3 = db_client.clone();
+    let db_c_4 = db_client.clone();
+    let db_c_5 = db_client.clone();
+    let db_c_6 = db_client.clone();
+    let db_c_7 = db_client.clone();
+    let db_c_8 = db_client.clone();
+    let db_c_9 = db_client.clone();
+    let db_c_10 = db_client.clone();
+
     Router::new()
-        .route("/register_user", post(register_user))
-        .route("/login_user", post(login_user))
-        .route("/logout", post(logout))
-        .route("/get_recipes", get(get_recipes))
-        .route("/search_recipes", get(search_recipes))
-        .route("/get_ingredients", get(get_ingredients))
-        .route("/search_ingredients", get(search_ingredients))
-        .route("/save_settings", post(save_settings))
-        .route("/recipe_details", get(recipe_details))
-        .route("/add_ingredient", post(add_ingredient))
-        .route("/edit_ingredient", post(edit_ingredient))
+        .route("/register_user", post(|p| register_user(p, db_client)))
+        .route("/login_user", post(|p| login_user(p, db_c_1)))
+        .route("/logout", post(|p| logout(p, db_c_2)))
+        .route("/get_recipes", get(|p| get_recipes(p, db_c_3)))
+        .route("/search_recipes", get(|p| search_recipes(p, db_c_4)))
+        .route("/get_ingredients", get(|p| get_ingredients(p, db_c_5)))
+        .route(
+            "/search_ingredients",
+            get(|p| search_ingredients(p, db_c_6)),
+        )
+        .route("/save_settings", post(|p| save_settings(p, db_c_7)))
+        .route("/recipe_details", get(|p| recipe_details(p, db_c_8)))
+        .route("/add_ingredient", post(|p| add_ingredient(p, db_c_9)))
+        .route("/edit_ingredient", post(|p| edit_ingredient(p, db_c_10)))
 }

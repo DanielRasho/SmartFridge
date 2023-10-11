@@ -1,12 +1,13 @@
 use std::{
     fmt::{format, Display},
-    sync::atomic::AtomicUsize,
+    sync::{atomic::AtomicUsize, Arc},
 };
 
 use axum::{response::IntoResponse, Json};
 use chrono::{Duration, Utc};
 use hyper::StatusCode;
 use serde::Deserialize;
+use tokio_postgres::Client;
 
 use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET};
 
@@ -32,6 +33,7 @@ static ID: AtomicUsize = AtomicUsize::new(0);
 
 pub async fn search_ingredients(
     payload: Json<serde_json::Value>,
+    client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<SearchRandomIngredientsErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
     let tracing_prefix = format!("/SEARCH_INGREDIENTS - {}:", id);
