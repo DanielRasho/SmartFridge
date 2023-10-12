@@ -1,8 +1,6 @@
 package uvg.edu.gt.smartfridge.components
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,18 +10,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -36,9 +30,8 @@ import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun spinnerField(label : String){
-    val options = listOf("Food", "Bill Payment", "Recharges", "Outing", "Other")
-    val (selectedOption, setOption) = remember{ mutableStateOf("") }
+fun spinnerField(label : String, options : List<String>, selectedTextHolder: MutableState<String>){
+
     val (isDropdownExposed, setExpose) = remember{ mutableStateOf(false) }
 
     // Layout definition
@@ -56,7 +49,7 @@ fun spinnerField(label : String){
                 onExpandedChange = { setExpose(it) }
             ) {
                 Row (){
-                    BasicTextField( value = selectedOption,
+                    BasicTextField( value = selectedTextHolder.value,
                         readOnly = true,
                         onValueChange = {},
                         modifier = Modifier
@@ -68,10 +61,6 @@ fun spinnerField(label : String){
                         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
                         singleLine = true
                     )
-                    Icon( imageVector = Icons.Default.Person,
-                        contentDescription = "Person Icon",
-                        tint = MaterialTheme.colorScheme.outline
-                    )
                     ExposedDropdownMenu(expanded = isDropdownExposed,
                         onDismissRequest = { setExpose(false) }
                     ) {
@@ -79,7 +68,7 @@ fun spinnerField(label : String){
                             DropdownMenuItem(
                                 text = { Text(text = it) },
                                 onClick = {
-                                    setOption(it)
+                                    selectedTextHolder.value = it
                                     setExpose(false)
                                 })
                         }
@@ -88,7 +77,6 @@ fun spinnerField(label : String){
             }
             Spacer(modifier = Modifier.height(8.dp))
             Divider(color = MaterialTheme.colorScheme.outlineVariant)
-            // keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number))
         }
     }
 }
@@ -97,15 +85,15 @@ fun spinnerField(label : String){
 @Composable
 fun spinnerFieldTest(){
     smartFridgeTheme {
-        var owo = remember { mutableStateOf(LocalDate.now())}
         var value = remember { mutableStateOf("") }
+        val options = listOf("Food", "Bill Payment", "Recharges", "Outing", "Other")
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp)
         ){
-            spinnerField(label = "Texting")
+            spinnerField(label = "Texting", options, value)
         }
     }
 }
