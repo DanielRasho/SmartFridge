@@ -13,3 +13,4 @@ pub mod save_settings;
 
 pub mod add_ingredient;
 pub mod edit_ingredient;
+pub mod remove_ingredient;

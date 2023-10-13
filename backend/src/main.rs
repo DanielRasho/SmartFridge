@@ -9,7 +9,7 @@ use backend::routes::{
     get_ingredients::get_ingredients, get_recipes::get_recipes, login_user::login_user,
     logout::logout, recipe_details::recipe_details, register_user::register_user,
     save_settings::save_settings, search_ingredients::search_ingredients,
-    search_recipes::search_recipes,
+    search_recipes::search_recipes, remove_ingredient::remove_ingredient,
 };
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
@@ -37,7 +37,11 @@ async fn main() -> Result<(), Error> {
     let (client, connection) =
         tokio_postgres::connect(DB_CONNECTION_CONFIG, tokio_postgres::NoTls).await?;
 
-    let _ = tokio::spawn(async { connection.await });
+    tokio::spawn(async move {
+        if let Err(e) = connection.await {
+            tracing::error!("An error `{:?}` occurred connecting to DB: `{}`", e, DB_CONNECTION_CONFIG);
+        }
+    });
 
     start_server_on(addr, Arc::new(Some(client))).await;
 
@@ -77,6 +81,7 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
     let db_c_8 = db_client.clone();
     let db_c_9 = db_client.clone();
     let db_c_10 = db_client.clone();
+    let db_c_11 = db_client.clone();
 
     Router::new()
         .route("/register_user", post(|p| register_user(p, db_client)))
@@ -93,4 +98,5 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
         .route("/recipe_details", get(|p| recipe_details(p, db_c_8)))
         .route("/add_ingredient", post(|p| add_ingredient(p, db_c_9)))
         .route("/edit_ingredient", post(|p| edit_ingredient(p, db_c_10)))
+        .route("/remove_ingredient", post(|p| remove_ingredient(p, db_c_11)))
 }
