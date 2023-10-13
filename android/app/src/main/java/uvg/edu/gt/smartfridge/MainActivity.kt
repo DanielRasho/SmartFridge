@@ -49,7 +49,7 @@ fun MainComponent(
         composable("Login") { LoginView(navController) }
         composable("Home") { HomeView(navController) }
         composable("Settings") { SettingsView(navController) }
-        composable("Fridge") { FridgeView() }
+        composable("Fridge") { FridgeView(navController) }
         composable("Recipe") { RecipeView(navController) }
     }
 }
