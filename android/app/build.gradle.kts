@@ -51,12 +51,32 @@ android {
 
 dependencies {
     val nav_version = "2.6.0"
+    val ktor_version = "2.3.4"
     val version = "0.9.0"
+    val lifecycle_version = "2.6.2"
 
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    // ViewModel utilities for Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+    // Library for Loading Async Image from URL
+    implementation("io.coil-kt:coil-compose:2.4.0")
+    // HTTP Client
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-client-logging:$ktor_version")
+    // Json Serializer
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
+    // Navigation
     implementation("androidx.navigation:navigation-compose:$nav_version")
+    // UI Libraries for display Calendars.
     implementation("androidx.compose.material:material:1.4.3")
     implementation ("io.github.vanpra.compose-material-dialogs:datetime:${version}")
     implementation ("io.github.vanpra.compose-material-dialogs:core:${version}")
+
+    // Enabling coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
     implementation("androidx.activity:activity-compose:1.7.2")
