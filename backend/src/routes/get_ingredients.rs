@@ -36,7 +36,7 @@ pub async fn get_ingredients(
     client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<GetIngredientsErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
-    let tracing_prefix = format!("/GET_INGREDIENT - {}:", id);
+    let tracing_prefix = format!("/ingredients - {}:", id);
 
     tracing::debug!("{} START", tracing_prefix);
 

@@ -34,7 +34,7 @@ pub async fn logout(
     client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<LogoutUserErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
-    let tracing_prefix = format!("/LOGOUT - {}:", id);
+    let tracing_prefix = format!("/user/logout - {}:", id);
 
     tracing::debug!("{} START", tracing_prefix);
 

@@ -8,8 +8,8 @@ use backend::routes::{
     add_ingredient::add_ingredient, edit_ingredient::edit_ingredient,
     get_ingredients::get_ingredients, get_recipes::get_recipes, login_user::login_user,
     logout::logout, recipe_details::recipe_details, register_user::register_user,
-    save_settings::save_settings, search_ingredients::search_ingredients,
-    search_recipes::search_recipes, remove_ingredient::remove_ingredient,
+    remove_ingredient::remove_ingredient, save_settings::save_settings,
+    search_ingredients::search_ingredients, search_recipes::search_recipes,
 };
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
@@ -39,7 +39,11 @@ async fn main() -> Result<(), Error> {
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
-            tracing::error!("An error `{:?}` occurred connecting to DB: `{}`", e, DB_CONNECTION_CONFIG);
+            tracing::error!(
+                "An error `{:?}` occurred connecting to DB: `{}`",
+                e,
+                DB_CONNECTION_CONFIG
+            );
         }
     });
 
@@ -84,19 +88,24 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
     let db_c_11 = db_client.clone();
 
     Router::new()
-        .route("/register_user", post(|p| register_user(p, db_client)))
-        .route("/login_user", post(|p| login_user(p, db_c_1)))
-        .route("/logout", post(|p| logout(p, db_c_2)))
-        .route("/get_recipes", get(|p| get_recipes(p, db_c_3)))
-        .route("/search_recipes", get(|p| search_recipes(p, db_c_4)))
-        .route("/get_ingredients", get(|p| get_ingredients(p, db_c_5)))
+        .route("/user/register", post(|p| register_user(p, db_client)))
+        .route("/user/login", post(|p| login_user(p, db_c_1)))
+        .route("/user/logout", post(|p| logout(p, db_c_2)))
+        .route("/settings/save", post(|p| save_settings(p, db_c_7)))
+        // Recipes
+        .route("/recipes", get(|p| get_recipes(p, db_c_3)))
+        .route("/recipes/search", get(|p| search_recipes(p, db_c_4)))
+        .route("/recipes/details", get(|p| recipe_details(p, db_c_8)))
+        // Ingredients
+        .route("/ingredients", get(|p| get_ingredients(p, db_c_5)))
+        .route("/ingredients/add", post(|p| add_ingredient(p, db_c_9)))
+        .route("/ingredients/edit", post(|p| edit_ingredient(p, db_c_10)))
         .route(
-            "/search_ingredients",
+            "/ingredients/remove",
+            post(|p| remove_ingredient(p, db_c_11)),
+        )
+        .route(
+            "/ingredients/search",
             get(|p| search_ingredients(p, db_c_6)),
         )
-        .route("/save_settings", post(|p| save_settings(p, db_c_7)))
-        .route("/recipe_details", get(|p| recipe_details(p, db_c_8)))
-        .route("/add_ingredient", post(|p| add_ingredient(p, db_c_9)))
-        .route("/edit_ingredient", post(|p| edit_ingredient(p, db_c_10)))
-        .route("/remove_ingredient", post(|p| remove_ingredient(p, db_c_11)))
 }

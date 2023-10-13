@@ -46,7 +46,7 @@ pub async fn register_user(
     client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<RegisterUserErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
-    let tracing_prefix = format!("/REGISTER_USER {}:", id);
+    let tracing_prefix = format!("/user/register {}:", id);
 
     tracing::debug!("{} START", tracing_prefix);
 

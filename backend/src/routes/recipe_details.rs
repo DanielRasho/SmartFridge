@@ -43,7 +43,7 @@ pub async fn recipe_details(
     client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<RecipeDetailsErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
-    let tracing_prefix = format!("/RECIPE_DETAILS - {}:", id);
+    let tracing_prefix = format!("/recipes/details - {}:", id);
 
     tracing::debug!("{} START", tracing_prefix);
 

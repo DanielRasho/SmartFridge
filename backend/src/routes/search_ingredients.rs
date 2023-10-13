@@ -37,7 +37,7 @@ pub async fn search_ingredients(
     client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<SearchRandomIngredientsErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
-    let tracing_prefix = format!("/SEARCH_INGREDIENTS - {}:", id);
+    let tracing_prefix = format!("/ingredients/search - {}:", id);
 
     tracing::debug!("{} START", tracing_prefix);
 

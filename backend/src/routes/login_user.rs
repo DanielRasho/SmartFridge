@@ -44,7 +44,7 @@ pub async fn login_user(
     client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<LoginUserErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
-    let tracing_prefix = format!("/LOGIN_USER - {}:", id);
+    let tracing_prefix = format!("/user/login - {}:", id);
 
     tracing::debug!("{} START", tracing_prefix);
 

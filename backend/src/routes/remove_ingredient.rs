@@ -35,7 +35,7 @@ pub async fn remove_ingredient(
     client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<RemoveIngredientErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
-    let tracing_prefix = format!("/REMOVE_INGREDIENT - {}:", id);
+    let tracing_prefix = format!("/ingredients/remove - {}:", id);
 
     tracing::debug!("{} START", tracing_prefix);
 

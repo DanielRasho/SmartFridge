@@ -36,7 +36,7 @@ pub async fn save_settings(
     client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<SaveSettingsErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
-    let tracing_prefix = format!("/SAVE_SETTINGS - {}:", id);
+    let tracing_prefix = format!("/settings/save - {}:", id);
 
     tracing::debug!("{} START", tracing_prefix);
 

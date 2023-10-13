@@ -35,7 +35,7 @@ pub async fn add_ingredient(
     client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<AddIngredientErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
-    let tracing_prefix = format!("/ADD_INGREDIENT - {}:", id);
+    let tracing_prefix = format!("/ingredients/add - {}:", id);
 
     tracing::debug!("{} START", tracing_prefix);
 
