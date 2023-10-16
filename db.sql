@@ -19,7 +19,8 @@ CREATE TABLE sf_settings (
 CREATE TABLE sf_session (
 	session_id varchar(64) UNIQUE NOT NULL,
 	user_id varchar(64) NOT NULL REFERENCES sf_user(user_id),
-	expire_date date NOT NULL, PRIMARY KEY( session_id )
+	expire_date TIMESTAMP WITH TIME ZONE NOT NULL,
+	PRIMARY KEY( session_id )
 );
 
 CREATE TABLE sf_ingredient (

@@ -44,21 +44,28 @@ pub fn extract_jwt(secret: &[u8], token: &str) -> Result<JWT_Token, ExtractJWTEr
 }
 
 /// Encrypts the given password with a random 16 bytes salt.
-fn encrypt_password(password: String) -> String {
+fn encrypt_password(password: &str) -> String {
     let mut rand = thread_rng();
     let salt: [u8; 16] = rand.gen();
     encrypt_password_with_salt(password, &salt)
 }
 
 /// Encrypts the password with the given salt.
-fn encrypt_password_with_salt(password: String, salt: &[u8]) -> String {
+fn encrypt_password_with_salt(password: &str, salt: &[u8]) -> String {
     let salt = salt.iter();
-    let password_bytes = password.into_bytes();
+    let password_bytes = password.bytes();
 
     let mut hasher = Sha256::new();
-    hasher.update(password_bytes);
+    hasher.update(password_bytes.collect::<Vec<u8>>());
     let password_bytes = hasher.finalize().to_vec();
     let password_bytes: Vec<u8> = salt.chain(password_bytes.iter()).copied().collect();
 
     general_purpose::STANDARD_NO_PAD.encode(password_bytes)
+}
+
+/// Obtains the salt from the given password.
+fn obtain_salt(db_password: &str) -> Result<Vec<u8>, base64::DecodeError> {
+    let decoded_bytes = general_purpose::STANDARD_NO_PAD
+        .decode(db_password.as_bytes())?;
+    Ok(decoded_bytes[0..16].to_vec())
 }
