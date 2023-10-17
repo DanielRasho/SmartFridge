@@ -1,5 +1,5 @@
 use base64::{engine::general_purpose, Engine};
-use chrono::{Utc, DateTime};
+use chrono::{DateTime, Utc};
 use hmac::{digest::KeyInit, Hmac};
 use jwt::{SignWithKey, VerifyWithKey};
 use models::JWT_Token;
@@ -67,8 +67,7 @@ fn encrypt_password_with_salt(password: &str, salt: &[u8]) -> String {
 
 /// Obtains the salt from the given password.
 fn obtain_salt(db_password: &str) -> Result<Vec<u8>, base64::DecodeError> {
-    let decoded_bytes = general_purpose::STANDARD_NO_PAD
-        .decode(db_password.as_bytes())?;
+    let decoded_bytes = general_purpose::STANDARD_NO_PAD.decode(db_password.as_bytes())?;
     Ok(decoded_bytes[0..16].to_vec())
 }
 
@@ -76,17 +75,37 @@ fn obtain_salt(db_password: &str) -> Result<Vec<u8>, base64::DecodeError> {
 enum IsSessionValidErrors {
     InternalDBError(tokio_postgres::Error),
     NoSessionWithId(String),
-    UserIdDoesntMatchDBRecord { db_user_id: String, user_id: String },
-    ExpireDateDoesntMatchDBRecord { db_expire_date: chrono::DateTime<Utc>, expire_date: chrono::DateTime<Utc> },
+    UserIdDoesntMatchDBRecord {
+        db_user_id: String,
+        user_id: String,
+    },
+    ExpireDateDoesntMatchDBRecord {
+        db_expire_date: chrono::DateTime<Utc>,
+        expire_date: chrono::DateTime<Utc>,
+    },
 }
 
 /// Checks if the given JWT represents a valid session with the given connection.
-/// 
+///
 /// This method returns true if the connection is valid and false if the current date is less than
 /// the expired date of the token.
-async fn is_session_valid(JWT_Token { user_id, session_id, expire_date, username }: JWT_Token, conn: &Client) -> Result<bool, IsSessionValidErrors> {
+async fn is_session_valid(
+    JWT_Token {
+        user_id,
+        session_id,
+        expire_date,
+        username,
+    }: JWT_Token,
+    conn: &Client,
+) -> Result<bool, IsSessionValidErrors> {
     let current_date = Utc::now();
-    let rows = conn.query("SELECT user_id, expire_date FROM sf_session WHERE session_id=$1", &[&session_id]).await.map_err(|err| IsSessionValidErrors::InternalDBError(err))?;
+    let rows = conn
+        .query(
+            "SELECT user_id, expire_date FROM sf_session WHERE session_id=$1",
+            &[&session_id],
+        )
+        .await
+        .map_err(|err| IsSessionValidErrors::InternalDBError(err))?;
     if rows.is_empty() {
         return Err(IsSessionValidErrors::NoSessionWithId(session_id));
     }
@@ -96,10 +115,16 @@ async fn is_session_valid(JWT_Token { user_id, session_id, expire_date, username
     let db_expire_date = row.get::<usize, DateTime<Utc>>(1);
 
     if db_user_id != user_id {
-        return Err(IsSessionValidErrors::UserIdDoesntMatchDBRecord{ db_user_id, user_id });
+        return Err(IsSessionValidErrors::UserIdDoesntMatchDBRecord {
+            db_user_id,
+            user_id,
+        });
     }
     if db_expire_date != expire_date {
-        return Err(IsSessionValidErrors::ExpireDateDoesntMatchDBRecord{ db_expire_date, expire_date});
+        return Err(IsSessionValidErrors::ExpireDateDoesntMatchDBRecord {
+            db_expire_date,
+            expire_date,
+        });
     }
 
     Ok(current_date < db_expire_date)

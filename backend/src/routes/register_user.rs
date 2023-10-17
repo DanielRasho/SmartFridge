@@ -123,7 +123,11 @@ pub async fn register_user(
 
     tracing::debug!("{} Encrypting password...", tracing_prefix);
     let encrypted = encrypt_password(&password);
-    tracing::debug!("{} Password encrypted successfully! `{}`", tracing_prefix, encrypted);
+    tracing::debug!(
+        "{} Password encrypted successfully! `{}`",
+        tracing_prefix,
+        encrypted
+    );
 
     tracing::debug!("{} Creating user...", tracing_prefix);
     let user_id = Uuid::new_v4().to_string();
