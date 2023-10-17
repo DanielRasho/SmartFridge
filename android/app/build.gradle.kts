@@ -50,6 +50,7 @@ android {
 }
 
 dependencies {
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     val nav_version = "2.6.0"
     val ktor_version = "2.3.4"
     val version = "0.9.0"
