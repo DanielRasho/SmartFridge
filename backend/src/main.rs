@@ -11,6 +11,7 @@ use backend::routes::{
     remove_ingredient::remove_ingredient, save_settings::save_settings,
     search_ingredients::search_ingredients, search_recipes::search_recipes,
 };
+use clap::Parser;
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -18,8 +19,42 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 const DB_CONNECTION_CONFIG: &str =
     "host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10";
 
+#[derive(Debug, Parser)]
+#[command(author, version, about, long_about = None)]
+struct Params {
+    /// The host to start the server.
+    /// The default host is: 127.0.0.1
+    /// Also known as localhost.
+    host: Option<String>,
+
+    /// The port to start the server. Make sure this port is free before starting.
+    /// The default port is: 3000
+    port: Option<String>,
+
+    /// The connection string to connect to the database.
+    /// Default is: host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10
+    db_connection: Option<String>,
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    let params = Params::parse();
+
+    let host = match &params.host {
+        Some(v) => v,
+        None => "127.0.0.1",
+    };
+
+    let port = match &params.port {
+        Some(v) => v,
+        None => "3000",
+    };
+
+    let db_config = match &params.db_connection {
+        Some(v) => v,
+        None => "host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10",
+    };
+
     tracing_subscriber::registry()
         .with(
             tracing_subscriber::EnvFilter::try_from_default_env()
@@ -28,14 +63,10 @@ async fn main() -> Result<(), Error> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let addr = if cfg!(debug_assertions) {
-        SocketAddr::from(([127, 0, 0, 1], 5710))
-    } else {
-        SocketAddr::from(([0, 0, 0, 0], 3000))
-    };
+    let addr = format!("{}:{}", host, port);
+    let addr: SocketAddr = addr.parse().unwrap();
 
-    let (client, connection) =
-        tokio_postgres::connect(DB_CONNECTION_CONFIG, tokio_postgres::NoTls).await?;
+    let (client, connection) = tokio_postgres::connect(db_config, tokio_postgres::NoTls).await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
