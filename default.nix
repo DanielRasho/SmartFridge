@@ -14,14 +14,9 @@ in
       # (nixpkgs.rustChannelOf { rustToolchain = ./rust-toolchain; }).rust
       openssl
       pkg-config
-	  android-tools
-	  android-studio
-	  android-udev-rules
-	  glibc
 
     ];
     shellHook = ''
       export RUST_BACKTRACE=1
-	  alias and='android-studio > /dev/null 2>&1 &'
       '';
   }
