@@ -24,7 +24,12 @@ struct Params {
     server_host: SocketAddr,
 
     /// The connection string to connect to the database.
-    #[arg(short, long, env, default_value ="host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10" )]
+    #[arg(
+        short,
+        long,
+        env,
+        default_value = "host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10"
+    )]
     db_connection: String,
 }
 
@@ -50,7 +55,10 @@ async fn main() -> Result<(), Error> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let (client, connection) = tokio_postgres::connect(&params.db_connection, tokio_postgres::NoTls).await?;
+    tracing::debug!("Connecting to DB...");
+
+    let (client, connection) =
+        tokio_postgres::connect(&params.db_connection, tokio_postgres::NoTls).await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
@@ -61,6 +69,7 @@ async fn main() -> Result<(), Error> {
             );
         }
     });
+    tracing::debug!("Connection with DB established!");
 
     start_server_on(params.server_host, Arc::new(Some(client))).await;
 
@@ -69,7 +78,7 @@ async fn main() -> Result<(), Error> {
 
 /// Starts a server on the specified address
 async fn start_server_on(addr: SocketAddr, client: Arc<Option<Client>>) {
-    tracing::debug!("listening on {}", addr);
+    tracing::debug!("Listening on `{}` ...", addr);
 
     let cors = if cfg!(debug_assertions) {
         CorsLayer::new()
