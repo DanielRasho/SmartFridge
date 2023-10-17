@@ -8,5 +8,5 @@ data class Ingredient(
     val category: String,
     val quantity: Float,
     val unit: String,
-    val expireDate: String? = null
+    val expireDate: String = ""
 )
