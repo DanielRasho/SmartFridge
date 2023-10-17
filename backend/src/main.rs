@@ -29,7 +29,7 @@ async fn main() -> Result<(), Error> {
         .init();
 
     let addr = if cfg!(debug_assertions) {
-        SocketAddr::from(([127, 0, 0, 1], 3102))
+        SocketAddr::from(([127, 0, 0, 1], 5710))
     } else {
         SocketAddr::from(([0, 0, 0, 0], 3000))
     };
