@@ -1,4 +1,4 @@
-use std::{net::SocketAddr, sync::Arc};
+use std::{io, net::SocketAddr, sync::Arc};
 
 use axum::{
     routing::{get, post},
@@ -16,44 +16,31 @@ use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-const DB_CONNECTION_CONFIG: &str =
-    "host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10";
-
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
 struct Params {
-    /// The host to start the server.
-    /// The default host is: 127.0.0.1
-    /// Also known as localhost.
-    host: Option<String>,
-
-    /// The port to start the server. Make sure this port is free before starting.
-    /// The default port is: 3000
-    port: Option<String>,
+    /// The host to start the server on. Check the port is free before starting the server.
+    #[arg(short, long, env, default_value = "127.0.0.1:3000", value_parser = resolve_host)]
+    server_host: SocketAddr,
 
     /// The connection string to connect to the database.
-    /// Default is: host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10
-    db_connection: Option<String>,
+    #[arg(short, long, env, default_value ="host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10" )]
+    db_connection: String,
+}
+
+fn resolve_host(host: &str) -> io::Result<SocketAddr> {
+    let host: SocketAddr = host.parse().map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::AddrNotAvailable,
+            format!("Couldn't find destination {host}"),
+        )
+    })?;
+    Ok(host)
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
     let params = Params::parse();
-
-    let host = match &params.host {
-        Some(v) => v,
-        None => "127.0.0.1",
-    };
-
-    let port = match &params.port {
-        Some(v) => v,
-        None => "3000",
-    };
-
-    let db_config = match &params.db_connection {
-        Some(v) => v,
-        None => "host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10",
-    };
 
     tracing_subscriber::registry()
         .with(
@@ -63,22 +50,19 @@ async fn main() -> Result<(), Error> {
         .with(tracing_subscriber::fmt::layer())
         .init();
 
-    let addr = format!("{}:{}", host, port);
-    let addr: SocketAddr = addr.parse().unwrap();
-
-    let (client, connection) = tokio_postgres::connect(db_config, tokio_postgres::NoTls).await?;
+    let (client, connection) = tokio_postgres::connect(&params.db_connection, tokio_postgres::NoTls).await?;
 
     tokio::spawn(async move {
         if let Err(e) = connection.await {
             tracing::error!(
                 "An error `{:?}` occurred connecting to DB: `{}`",
                 e,
-                DB_CONNECTION_CONFIG
+                params.db_connection
             );
         }
     });
 
-    start_server_on(addr, Arc::new(Some(client))).await;
+    start_server_on(params.server_host, Arc::new(Some(client))).await;
 
     Ok(())
 }
