@@ -1,5 +1,5 @@
 use base64::{engine::general_purpose, Engine};
-use chrono::Utc;
+use chrono::{Utc, DateTime};
 use hmac::{digest::KeyInit, Hmac};
 use jwt::{SignWithKey, VerifyWithKey};
 use models::JWT_Token;
@@ -92,8 +92,8 @@ async fn is_session_valid(JWT_Token { user_id, session_id, expire_date, username
     }
 
     let row = rows.get(0).unwrap();
-    let db_user_id = row.get(0).unwrap();
-    let db_expire_date = row.get(0).unwrap();
+    let db_user_id = row.get::<usize, String>(0);
+    let db_expire_date = row.get::<usize, DateTime<Utc>>(1);
 
     if db_user_id != user_id {
         return Err(IsSessionValidErrors::UserIdDoesntMatchDBRecord{ db_user_id, user_id });
