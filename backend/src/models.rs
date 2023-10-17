@@ -72,6 +72,7 @@ pub struct Recipe {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct JWT_Token {
     pub user_id: String,
+    pub session_id: String,
     pub expire_date: DateTime<Utc>,
     pub username: String,
 }

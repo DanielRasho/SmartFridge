@@ -79,8 +79,6 @@ pub async fn login_user(
     };
     tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
 
-    // TODO Check if password is correct...
-
     tracing::debug!("{} Checking if we have a DB connection...", tracing_prefix);
     if let None = client.as_ref() {
         let error: ResponseError<_> = (
@@ -163,7 +161,6 @@ pub async fn login_user(
 
     tracing::debug!("{} Passwords match! Generating session...", tracing_prefix);
 
-    // TODO Generate session in DB...
     let session_id = Uuid::new_v4().to_string();
     let expire_date = Utc::now() + Duration::days(7);
     if let Err(err) = conn
@@ -196,6 +193,7 @@ pub async fn login_user(
     let user_id = Uuid::new_v4().to_string();
     let token = JWT_Token {
         user_id,
+        session_id,
         expire_date,
         username,
     };

@@ -4,16 +4,18 @@ use std::{
 };
 
 use axum::{response::IntoResponse, Json};
+use chrono::{Duration, Utc};
 use hyper::StatusCode;
 use serde::Deserialize;
 use tokio_postgres::Client;
 
-use crate::responses::ResponseError;
+use crate::{extract_jwt, models::JWT_Token, responses::ResponseError};
 
 #[derive(Debug)]
 pub enum LogoutUserErrors {
-    InvalidPayload { payload: String },
+    InvalidPayload,
     NoDBConnection,
+    ErrorUpdatingSessionDate,
 }
 
 impl Display for LogoutUserErrors {
@@ -48,21 +50,72 @@ pub async fn logout(
                 err,
                 payload.0
             );
-            let error: ResponseError<_> = (
-                StatusCode::BAD_REQUEST,
-                LogoutUserErrors::InvalidPayload {
-                    payload: payload.0.to_string(),
-                },
-            )
-                .into();
+            let error: ResponseError<_> =
+                (StatusCode::BAD_REQUEST, LogoutUserErrors::InvalidPayload).into();
             Err(error)?
         }
     };
     tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
 
-    // TODO Check token with DB...
+    tracing::debug!("{} Extracting JWT...", tracing_prefix);
+    let JWT_Token {
+        user_id: _,
+        session_id,
+        expire_date: _,
+        username: _,
+    } = match extract_jwt(crate::APP_SECRET, &token) {
+        Ok(r) => r,
+        Err(err) => {
+            tracing::error!(
+                "{} An error `{:?}` occurred while trying to extract the JWT!",
+                tracing_prefix,
+                err
+            );
+            let error: ResponseError<_> =
+                (StatusCode::BAD_REQUEST, LogoutUserErrors::InvalidPayload).into();
+            Err(error)?
+        }
+    };
+    tracing::debug!("{} JWT extracted!", tracing_prefix);
 
-    // TODO Close DB Session...
+    if let None = client.as_ref() {
+        tracing::error!("{} No DB connection found!", tracing_prefix);
+        let err: ResponseError<_> = (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            LogoutUserErrors::NoDBConnection,
+        )
+            .into();
+        Err(err)?
+    }
+
+    tracing::debug!(
+        "{} DB connection found! Updating expire date...",
+        tracing_prefix
+    );
+    let conn = client.as_ref().as_ref().unwrap();
+    let new_expire_date = Utc::now() - Duration::seconds(3);
+
+    if let Err(err) = conn
+        .execute(
+            "UPDATE sf_session SET expire_date=$1 WHERE session_id=$2",
+            &[&new_expire_date, &session_id],
+        )
+        .await
+    {
+        tracing::error!(
+            "{} An error `{:?}` occurred while updating session with id `{}`",
+            tracing_prefix,
+            err,
+            session_id
+        );
+        let error: ResponseError<_> = (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            LogoutUserErrors::ErrorUpdatingSessionDate,
+        )
+            .into();
+        Err(error)?
+    }
+    tracing::debug!("{} Session updated successfully!", tracing_prefix);
 
     tracing::debug!("{} DONE", tracing_prefix);
     Ok(StatusCode::OK)
