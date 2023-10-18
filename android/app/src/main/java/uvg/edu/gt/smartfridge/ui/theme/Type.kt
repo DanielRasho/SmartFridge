@@ -35,7 +35,7 @@ val appTypography = Typography(
     ), //24
     titleMedium = TextStyle(
         fontFamily = outfitFamily,
-        fontSize = 32.sp,
+        fontSize = 24.sp,
         fontWeight = FontWeight.Normal
     ), // 32
     bodyLarge = TextStyle(
@@ -50,12 +50,12 @@ val appTypography = Typography(
     ), // 16
     labelLarge = TextStyle(
         fontFamily = outfitFamily,
-        fontSize = 16.sp,
+        fontSize = 20.sp,
         fontWeight = FontWeight.Normal
     ), // 16
     labelMedium = TextStyle(
         fontFamily = outfitFamily,
-        fontSize = 12.sp,
+        fontSize = 16.sp,
         fontWeight = FontWeight.Normal
     ), // 12
     labelSmall = TextStyle(
