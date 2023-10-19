@@ -15,7 +15,7 @@ class FridgeService(client: HttpClient) : Service(client) {
     //const val SEARCH_INGREDIENTS = "/search_ingredients"
 
     // TODO
-    suspend fun getIngredients() : Result<List<Ingredient>>{
+    suspend fun getIngredients(JWT_TOKEN : String) : Result<List<Ingredient>>{
 
         return handleHttpRequest {
             // Making Request

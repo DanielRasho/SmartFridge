@@ -8,8 +8,10 @@ import io.ktor.client.plugins.logging.Logging
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import uvg.edu.gt.smartfridge.models.Ingredient
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FridgeServiceTest {
     private lateinit var fridgeService: FridgeService
     private lateinit var httpClient: HttpClient
