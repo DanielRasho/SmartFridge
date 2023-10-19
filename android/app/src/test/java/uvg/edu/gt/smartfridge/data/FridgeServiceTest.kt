@@ -6,15 +6,16 @@ import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import kotlinx.coroutines.runBlocking
-import org.junit.Test
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import uvg.edu.gt.smartfridge.models.Ingredient
 
 class FridgeServiceTest {
-
-    private lateinit var service: FridgeService
+    private lateinit var fridgeService: FridgeService
     private lateinit var httpClient: HttpClient
-    @BeforeEach
+    private lateinit var JWT_TOKEN : String
+
+    @BeforeAll
     fun setUp() {
         httpClient = HttpClient(CIO) {
             install (Logging) {
@@ -22,13 +23,16 @@ class FridgeServiceTest {
                 filter { request ->  request.url.host.contains("ktor.io")  }
             }
         }
-        service = FridgeService(httpClient)
+        //Log.i("INFO","HEY THERE")
+        fridgeService = FridgeService(httpClient)
     }
 
     @Test
     fun getIngredients() {
+        println("HEY THERE")
+
         runBlocking {
-            val response : Result<List<Ingredient>> = service.getIngredients()
+            val response : Result<List<Ingredient>> = fridgeService.getIngredients("")
             if (response.isSuccess)
                 println(response.getOrThrow())
             else
