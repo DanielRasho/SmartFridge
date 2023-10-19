@@ -17,6 +17,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -27,6 +29,9 @@ import androidx.navigation.compose.rememberNavController
 import uvg.edu.gt.smartfridge.R
 import uvg.edu.gt.smartfridge.components.IconPrimaryButton
 import uvg.edu.gt.smartfridge.components.IconSecondaryButton
+import uvg.edu.gt.smartfridge.components.PrimaryButton
+import uvg.edu.gt.smartfridge.components.SecondaryButton
+import uvg.edu.gt.smartfridge.components.textField
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -42,7 +47,7 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
             .height(796.dp)
 
     ) {
-        Spacer(modifier = Modifier.height(192.dp))
+        Spacer(modifier = Modifier.height(50.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -52,10 +57,10 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
             painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
             modifier = Modifier
-                .width(240.dp)
-                .height(240.dp)
+                .width(100.dp)
+                .height(100.dp)
         )}
-        Spacer(modifier = Modifier.width(32.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -68,23 +73,37 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
                 .padding(vertical = 8.dp)
                 .width(240.dp)
         )}
-        Spacer(modifier = Modifier.width(32.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = modifier.fillMaxWidth()
-        ) {
-        IconSecondaryButton(text = "Continue with Google", icon = R.drawable.google_icon) {
-            navController.navigate("Home")
-        }}
-        Spacer(modifier = Modifier.width(24.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            IconPrimaryButton(text = "Exit", icon = Icons.Rounded.ExitToApp) {
 
+        Spacer(modifier = Modifier.height(100.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = modifier.fillMaxWidth()
+        ) {
+            var textSaved = remember { mutableStateOf("") }
+            textField(label = "Username", textValue = textSaved)
+        }
+        Spacer(modifier = Modifier.height(30.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = modifier.fillMaxWidth()
+        ) {
+            var textSaved = remember { mutableStateOf("") }
+            textField(label = "Password", textValue = textSaved)
+        }
+        Spacer(modifier = Modifier.height(70.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = modifier.fillMaxWidth()
+        ) {
+            PrimaryButton(text = "Back") {
+                navController.navigate("Principal")
+            }
+            Spacer(modifier = Modifier.width(50.dp))
+            SecondaryButton(text = "Log in") {
+                navController.navigate("Home")
             }
         }
     }

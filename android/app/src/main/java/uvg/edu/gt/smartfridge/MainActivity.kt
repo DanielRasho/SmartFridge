@@ -18,7 +18,9 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.views.FridgeView
 import uvg.edu.gt.smartfridge.views.HomeView
 import uvg.edu.gt.smartfridge.views.LoginView
+import uvg.edu.gt.smartfridge.views.PrincipalView
 import uvg.edu.gt.smartfridge.views.RecipeView
+import uvg.edu.gt.smartfridge.views.RegisterView
 import uvg.edu.gt.smartfridge.views.SettingsView
 
 class MainActivity : ComponentActivity() {
@@ -45,8 +47,10 @@ fun MainComponent(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-    NavHost(navController = navController, startDestination = "Login", modifier = modifier) {
+    NavHost(navController = navController, startDestination = "Principal", modifier = modifier) {
+        composable("Principal") { PrincipalView(navController) }
         composable("Login") { LoginView(navController) }
+        composable("Register") { RegisterView(navController) }
         composable("Home") { HomeView(navController) }
         composable("Settings") { SettingsView(navController) }
         composable("Fridge") { FridgeView(navController) }

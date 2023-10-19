@@ -72,7 +72,7 @@ fun SettingsView(navController: NavHostController, modifier: Modifier = Modifier
                 modifier = modifier.fillMaxWidth()
             ) {
                 IconPrimaryButton(text = "Logout", icon = Icons.Rounded.ExitToApp) {
-                    navController.navigate("Login")
+                    navController.navigate("Principal")
                 }
             }
         }
