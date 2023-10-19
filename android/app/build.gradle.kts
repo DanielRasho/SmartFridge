@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("de.mannodermaus.android-junit5") version "1.9.3.0"
 }
 
 android {
@@ -47,10 +48,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
 }
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     val nav_version = "2.6.0"
     val ktor_version = "2.3.4"
     val version = "0.9.0"
@@ -86,7 +87,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
-    testImplementation("junit:junit:4.13.2")
+    //testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
@@ -94,6 +95,13 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
-    // Load image from a URL
-    implementation("io.coil-kt:coil-compose:2.4.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.0")
+    testImplementation("org.junit.vintage:junit-vintage-engine:5.10.0")
+    // (Optional) If you need "Parameterized Tests"
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.0")
+
+    // (Optional) If you also have JUnit 4-based tests
+    testImplementation("junit:junit:4.13.2")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.0")
 }
