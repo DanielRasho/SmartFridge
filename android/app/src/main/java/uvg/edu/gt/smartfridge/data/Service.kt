@@ -4,16 +4,14 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.ServerResponseException
-import uvg.edu.gt.smartfridge.models.Ingredient
-import java.lang.Exception
 
 // Representation of an HTTP Service.
 open class Service (protected val client : HttpClient) {
 
     protected suspend inline fun <reified T> handleHttpRequest(
-        requestBlock: suspend () -> List<T>): Result<List<T>> {
+        requestBlock: suspend () -> T): Result<T> {
 
-        val response : List<T> = emptyList()
+        val response : T
 
         try {
             val response =  requestBlock()
@@ -21,15 +19,21 @@ open class Service (protected val client : HttpClient) {
         } catch (e: RedirectResponseException) {
             // 3xx - responses
             println("Error: ${e.response.status.description}")
-            return Result.failure(e)
+            return Result.failure(ResponseException(
+                e.response.status.value,
+                e.response.status.description))
         } catch (e: ClientRequestException) {
             // 4xx - responses
             println("Error: ${e.response.status.description}")
-            return Result.failure(e)
+            return Result.failure(ResponseException(
+                e.response.status.value,
+                e.response.status.description))
         } catch (e: ServerResponseException) {
             // 5xx - responses
             println("Error: ${e.response.status.description}")
-            return Result.failure(e)
+            return Result.failure(ResponseException(
+                e.response.status.value,
+                e.response.status.description))
         } catch (e: Exception) {
             // General Exceptions
             println("Error: ${e.message}")
