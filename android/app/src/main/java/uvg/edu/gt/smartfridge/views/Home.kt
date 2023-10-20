@@ -46,28 +46,28 @@ fun HomeView(navController: NavHostController, modifier: Modifier = Modifier) {
             "Orange Chicken",
             "https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg",
             sequenceOf("Meat", "Chicken", "China"),
-            sequenceOf(Ingredient("Chicken", "Meat", 2f, "Lb", "")),
+            sequenceOf(Ingredient("","Chicken", "Meat", 2f, "Lb", "")),
             "www.google.com"
         ),
         Recipe(
             "Orange Chicken",
             "https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg",
             sequenceOf("Meat", "Chicken", "China"),
-            sequenceOf(Ingredient("Chicken", "Meat", 2f, "Lb", "")),
+            sequenceOf(Ingredient("","Chicken", "Meat", 2f, "Lb", "")),
             "www.google.com"
         ),
         Recipe(
             "Orange Chicken",
             "https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg",
             sequenceOf("Meat", "Chicken", "China"),
-            sequenceOf(Ingredient("Chicken", "Meat", 2f, "Lb", "")),
+            sequenceOf(Ingredient("", "Chicken", "Meat", 2f, "Lb", "")),
             "www.google.com"
         ),
         Recipe(
             "Orange Chicken",
             "https://www.modernhoney.com/wp-content/uploads/2018/01/Chinese-Orange-Chicken-2.jpg",
             sequenceOf("Meat", "Chicken", "China"),
-            sequenceOf(Ingredient("Chicken", "Meat", 2f, "Lb", "")),
+            sequenceOf(Ingredient("","Chicken", "Meat", 2f, "Lb", "")),
             "www.google.com"
         ),
     )

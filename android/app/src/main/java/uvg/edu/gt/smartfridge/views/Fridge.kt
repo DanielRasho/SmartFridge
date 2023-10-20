@@ -54,16 +54,16 @@ fun FridgeView(navHostController: NavHostController) {
     )
 
     val ingredients: List<Ingredient> = listOf(
-        Ingredient("Ingredient1", "Category1", 100.0f, "g", "12/12/2023"),
-        Ingredient("Ingredient2", "Category2", 200.0f, "ml"),
-        Ingredient("Ingredient3", "Category1", 50.0f, "g"),
-        Ingredient("Ingredient4", "Category3", 300.0f, "g"),
-        Ingredient("Ingredient5", "Category2", 150.0f, "ml"),
-        Ingredient("Ingredient1", "Category4", 100.0f, "g", "12/12/2023"),
-        Ingredient("Ingredient2", "Category5", 200.0f, "ml"),
-        Ingredient("Ingredient3", "Category6", 50.0f, "g"),
-        Ingredient("Ingredient4", "Category4", 300.0f, "g"),
-        Ingredient("Ingredient5", "Category5", 150.0f, "bottles")
+        Ingredient("", "Ingredient1", "Category1", 100.0f, "g", "12/12/2023"),
+        Ingredient("","Ingredient2", "Category2", 200.0f, "ml"),
+        Ingredient("","Ingredient3", "Category1", 50.0f, "g"),
+        Ingredient("","Ingredient4", "Category3", 300.0f, "g"),
+        Ingredient("","Ingredient5", "Category2", 150.0f, "ml"),
+        Ingredient("","Ingredient1", "Category4", 100.0f, "g", "12/12/2023"),
+        Ingredient("","Ingredient2", "Category5", 200.0f, "ml"),
+        Ingredient("","Ingredient3", "Category6", 50.0f, "g"),
+        Ingredient("","Ingredient4", "Category4", 300.0f, "g"),
+        Ingredient("","Ingredient5", "Category5", 150.0f, "bottles")
     )
 
     val groupedIngredients: Map<String, List<Ingredient>> = ingredients.groupBy { it.category }
