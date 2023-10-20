@@ -1,7 +1,7 @@
 package uvg.edu.gt.smartfridge.data
 
 object HttpRoutes {
-    private const val BASE_URL = "127.0.0.1"
+    const val BASE_URL = "http://localhost:3000"
 
     // LOGIN REGISTER VIEW
     const val REGISTER= "/user/register"
