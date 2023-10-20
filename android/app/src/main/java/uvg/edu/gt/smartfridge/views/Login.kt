@@ -16,6 +16,7 @@ import androidx.compose.material.icons.rounded.ExitToApp
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,7 +45,8 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
             .padding(16.dp, 0.dp)
-            .height(796.dp)
+            .height(796.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
         Spacer(modifier = Modifier.height(50.dp))
@@ -57,22 +59,20 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
             painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
             modifier = Modifier
-                .width(100.dp)
-                .height(100.dp)
-        )}
+                .width(150.dp)
+                .height(150.dp)
+        ) }
         Spacer(modifier = Modifier.height(10.dp))
+        Text(text = "SmartFridge",
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.displayLarge)
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = modifier.fillMaxWidth()
         ) {
-        Divider(
-            color = MaterialTheme.colorScheme.outline, // Customize the color as needed
-            thickness = 1.dp,   // Customize the thickness as needed
-            modifier = Modifier
-                .padding(vertical = 8.dp)
-                .width(240.dp)
-        )}
+
+        }
 
         Spacer(modifier = Modifier.height(100.dp))
         Row(
