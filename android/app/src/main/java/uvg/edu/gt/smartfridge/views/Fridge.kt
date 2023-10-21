@@ -39,8 +39,8 @@ import androidx.navigation.compose.rememberNavController
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.IconPrimaryButton
 import uvg.edu.gt.smartfridge.components.NavItem
-import uvg.edu.gt.smartfridge.components.SearchBar
 import uvg.edu.gt.smartfridge.components.Title
+import uvg.edu.gt.smartfridge.components.searchBar
 import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 
@@ -78,7 +78,8 @@ fun FridgeView(navHostController: NavHostController) {
         ) {
             Title(text = "Fridge")
             Spacer(modifier = Modifier.height(24.dp))
-            SearchBar()
+            searchBar("Search for Ingredients...")
+            Spacer(modifier = Modifier.height(40.dp))
             for ((categoryName, ingredientList) in groupedIngredients){
                 categoryList(categoryName, ingredientList)
                 Spacer(modifier = Modifier.height(36.dp))

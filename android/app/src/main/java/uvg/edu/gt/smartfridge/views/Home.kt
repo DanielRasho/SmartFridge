@@ -28,8 +28,8 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.NavItem
-import uvg.edu.gt.smartfridge.components.SearchBar
 import uvg.edu.gt.smartfridge.components.Title
+import uvg.edu.gt.smartfridge.components.searchBar
 import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.models.Recipe
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
@@ -80,7 +80,9 @@ fun HomeView(navController: NavHostController, modifier: Modifier = Modifier) {
                 .padding(10.dp, 0.dp)
         ) {
             Title("Home")
-            SearchBar()
+            Spacer(modifier = Modifier.height(24.dp))
+            searchBar("Search for Recipes...")
+            Spacer(modifier = Modifier.height(60.dp))
             LazyColumn {
                 recipes.forEach { recipe ->
                     item {
