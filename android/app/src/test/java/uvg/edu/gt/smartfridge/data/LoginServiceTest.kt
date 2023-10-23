@@ -11,7 +11,7 @@ import org.junit.jupiter.api.BeforeAll
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import uvg.edu.gt.smartfridge.models.Settings
+import uvg.edu.gt.smartfridge.models.UserSettings
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LoginServiceTest {
@@ -35,7 +35,7 @@ class LoginServiceTest {
     fun login() {
         println("HEY THERE!")
         runBlocking {
-            val response : Result<Pair<String, Settings>> = loginService.login(
+            val response : Result<Pair<String, UserSettings>> = loginService.login(
                 "smaugthur", "1234")
             if (response.isSuccess){
                 val (token, settings) = response.getOrThrow()

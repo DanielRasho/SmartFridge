@@ -11,7 +11,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import uvg.edu.gt.smartfridge.models.Settings
+import uvg.edu.gt.smartfridge.models.UserSettings
 
 class SettingsService(client: HttpClient) : Service(client) {
 
@@ -37,13 +37,13 @@ class SettingsService(client: HttpClient) : Service(client) {
         }
     }
 
-    suspend fun saveSettings( JWT_TOKEN : String, settings : Settings) : Result<String>{
+    suspend fun saveSettings(JWT_TOKEN : String, userSettings : UserSettings) : Result<String>{
 
         return handleHttpRequest {
             // Creating Request body
             val requestBody = buildJsonObject {
                 put("token", JWT_TOKEN)
-                put("settings", Json.encodeToString(settings))
+                put("settings", Json.encodeToString(userSettings))
             }.toString()
 
             // Making Request
