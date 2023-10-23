@@ -29,12 +29,14 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 @Composable
 fun PrimaryButton(
     text: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Button(
         onClick = { onClick() },
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
         shape = RoundedCornerShape(10),
+        modifier = modifier
     ) {
         Text(text, color = MaterialTheme.colorScheme.onError)
     }
@@ -54,12 +56,14 @@ fun PrimaryButton(
 fun IconPrimaryButton(
     text: String,
     icon: ImageVector,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Button(
         onClick = { onClick() },
         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
         shape = RoundedCornerShape(10),
+        modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
