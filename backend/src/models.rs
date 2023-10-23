@@ -1,9 +1,11 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use std::str::FromStr;
+use strum::EnumString;
 use uuid::Uuid;
 
 /// Represents the theme of the app the user selected.
-#[derive(Debug, Serialize, Deserialize, Default)]
+#[derive(Debug, Serialize, Deserialize, Default, EnumString)]
 pub enum AppThemes {
     #[default]
     Light,
@@ -23,6 +25,38 @@ pub struct UserSettings {
 
     #[serde(rename = "Theme")]
     theme: AppThemes,
+}
+
+#[derive(Debug)]
+pub enum FromTokioRowToUserSettingsErrors {
+    FailedParsingSettingsId,
+    FailedParsingUserId,
+    FailedParsingTheme,
+}
+
+impl TryFrom<&tokio_postgres::Row> for UserSettings {
+    type Error = FromTokioRowToUserSettingsErrors;
+
+    fn try_from(value: &tokio_postgres::Row) -> Result<Self, Self::Error> {
+        let settings_id: String = value.get("settings_id");
+        let user_id: String = value.get("user_id");
+        let theme: String = value.get("theme");
+
+        let settings_id = settings_id
+            .parse()
+            .map_err(|_| FromTokioRowToUserSettingsErrors::FailedParsingSettingsId)?;
+        let user_id = user_id
+            .parse()
+            .map_err(|_| FromTokioRowToUserSettingsErrors::FailedParsingUserId)?;
+        let theme = AppThemes::from_str(&theme)
+            .map_err(|_| FromTokioRowToUserSettingsErrors::FailedParsingTheme)?;
+
+        Ok(UserSettings {
+            settings_id,
+            user_id,
+            theme,
+        })
+    }
 }
 
 /// Represents an ingredient that the user needs.

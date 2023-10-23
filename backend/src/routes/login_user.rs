@@ -12,8 +12,11 @@ use tokio_postgres::Client;
 use uuid::Uuid;
 
 use crate::{
-    encrypt_password_with_salt, generate_jwt, models::JWT_Token, obtain_salt,
-    responses::ResponseError, APP_SECRET,
+    encrypt_password_with_salt, generate_jwt,
+    models::{JWT_Token, UserSettings},
+    obtain_salt,
+    responses::ResponseError,
+    APP_SECRET,
 };
 
 #[derive(Debug)]
@@ -26,6 +29,9 @@ pub enum LoginUserErrors {
     PasswordsDontMatch,
     ErrorCreatingSession,
     ErrorDecodingSalt,
+    CouldntRetrieveUserSettings,
+    UserHasNoSettingsSaved,
+    UserSettingsCouldntBeParsed,
 }
 
 impl Display for LoginUserErrors {
@@ -38,6 +44,8 @@ impl Display for LoginUserErrors {
 pub struct LoginUserResponse {
     /// The JWT token that was evaluated
     pub token: String,
+    /// The app settings of the user.
+    pub preferences: UserSettings,
 }
 
 #[derive(Debug, Deserialize)]
@@ -159,8 +167,58 @@ pub async fn login_user(
         Err(err)?
     }
 
-    tracing::debug!("{} Passwords match! Generating session...", tracing_prefix);
+    tracing::debug!("{} Passwords match! Getting preferences...", tracing_prefix);
 
+    let preferences = match conn
+        .query("SELECT * FROM sf_settings WHERE user_id=$1", &[&user_id])
+        .await
+    {
+        Ok(rows) => {
+            if rows.is_empty() {
+                tracing::error!(
+                    "{} User `{}` has no settings in DB!",
+                    tracing_prefix,
+                    user_id
+                );
+                let error: ResponseError<_> = (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    LoginUserErrors::UserHasNoSettingsSaved,
+                )
+                    .into();
+                Err(error)?
+            }
+
+            let row = rows.get(0).unwrap();
+            UserSettings::try_from(row).map_err(|e| {
+                tracing::error!(
+                    "{} An error `{:?}` occurred while trying to parse User Settings!",
+                    tracing_prefix,
+                    e
+                );
+                let error: ResponseError<_> = (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    LoginUserErrors::UserSettingsCouldntBeParsed,
+                )
+                    .into();
+                error
+            })?
+        }
+        Err(err) => {
+            tracing::error!(
+                "{} An error `{:?}` occurred while trying to retrieve user preferences!",
+                tracing_prefix,
+                err
+            );
+            let error: ResponseError<_> = (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                LoginUserErrors::CouldntRetrieveUserSettings,
+            )
+                .into();
+            Err(error)?
+        }
+    };
+
+    tracing::debug!("{} Generating session...", tracing_prefix);
     let session_id = Uuid::new_v4().to_string();
     let expire_date = Utc::now() + Duration::days(7);
     if let Err(err) = conn
@@ -217,5 +275,5 @@ pub async fn login_user(
     tracing::debug!("{} JWT generated successfully!", tracing_prefix);
 
     tracing::debug!("{} DONE", tracing_prefix);
-    Ok(Json(LoginUserResponse { token }))
+    Ok(Json(LoginUserResponse { token, preferences }))
 }
