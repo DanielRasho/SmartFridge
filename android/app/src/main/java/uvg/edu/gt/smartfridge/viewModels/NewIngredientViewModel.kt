@@ -1,4 +1,4 @@
-package uvg.edu.gt.smartfridge.views
+package uvg.edu.gt.smartfridge.viewModels
 
 import androidx.lifecycle.ViewModel
 import io.ktor.client.HttpClient

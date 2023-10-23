@@ -13,9 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ExitToApp
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,18 +29,14 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uvg.edu.gt.smartfridge.R
-import uvg.edu.gt.smartfridge.components.IconPrimaryButton
-import uvg.edu.gt.smartfridge.components.IconSecondaryButton
 import uvg.edu.gt.smartfridge.components.PrimaryButton
-import uvg.edu.gt.smartfridge.components.SecondaryButton
 import uvg.edu.gt.smartfridge.components.textField
 import uvg.edu.gt.smartfridge.data.ResponseException
-import uvg.edu.gt.smartfridge.models.UserSettings
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
+import uvg.edu.gt.smartfridge.viewModels.LoginViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
