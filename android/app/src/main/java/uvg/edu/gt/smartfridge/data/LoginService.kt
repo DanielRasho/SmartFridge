@@ -51,7 +51,7 @@ class LoginService (client: HttpClient) : Service(client) {
             // Fetching Data
             val JWToken : String = data.getString("token")
             println("AFTER")
-            val userSettings: UserSettings = Json.decodeFromString(
+            val userSettings = Json.decodeFromString<UserSettings>(
                 data.getJSONObject("preferences").toString())
 
             Pair(JWToken, userSettings)

@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("de.mannodermaus.android-junit5") version "1.9.3.0"
+    kotlin("plugin.serialization") version "1.6.0"
 }
 
 android {
