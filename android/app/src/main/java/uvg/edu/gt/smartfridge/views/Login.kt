@@ -124,10 +124,11 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
                             Log.i("JWT_TOKEN", JWT_TOKEN)
                             Log.i("userSettings", userSettings.toString())
 
-                            /*
+
                             withContext(Dispatchers.Main){
-                                navController.navigate("Principal")
-                            } */
+                                println(navController?.toString())
+                                navController.navigate("Home")
+                            }
 
                         }
                         false -> {
