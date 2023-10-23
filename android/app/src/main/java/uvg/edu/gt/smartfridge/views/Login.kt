@@ -1,6 +1,8 @@
 package uvg.edu.gt.smartfridge.views
 
 import android.annotation.SuppressLint
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,25 +22,38 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uvg.edu.gt.smartfridge.R
 import uvg.edu.gt.smartfridge.components.IconPrimaryButton
 import uvg.edu.gt.smartfridge.components.IconSecondaryButton
 import uvg.edu.gt.smartfridge.components.PrimaryButton
 import uvg.edu.gt.smartfridge.components.SecondaryButton
 import uvg.edu.gt.smartfridge.components.textField
+import uvg.edu.gt.smartfridge.data.ResponseException
+import uvg.edu.gt.smartfridge.models.UserSettings
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
 fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
+    var username = remember { mutableStateOf("") }
+    var password = remember { mutableStateOf("") }
+    val loginViewModel : LoginViewModel = LoginViewModel()
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Column(
 
@@ -80,8 +95,8 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
             modifier = modifier.fillMaxWidth()
         ) {
-            var textSaved = remember { mutableStateOf("") }
-            textField(label = "Username", textValue = textSaved)
+
+            textField(label = "Username", textValue = username)
         }
         Spacer(modifier = Modifier.height(30.dp))
         Row(
@@ -89,8 +104,7 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
             modifier = modifier.fillMaxWidth()
         ) {
-            var textSaved = remember { mutableStateOf("") }
-            textField(label = "Password", textValue = textSaved)
+            textField(label = "Password", textValue = password)
         }
         Spacer(modifier = Modifier.height(70.dp))
         Row(
@@ -98,16 +112,42 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
             horizontalArrangement = Arrangement.Center,
             modifier = modifier.fillMaxWidth()
         ) {
-            PrimaryButton(text = "Back") {
-                navController.navigate("Principal")
-            }
-            Spacer(modifier = Modifier.width(50.dp))
-            SecondaryButton(text = "Log in") {
-                navController.navigate("Home")
+            PrimaryButton(text = "Login",
+                modifier = Modifier.width(300.dp))
+            {
+                coroutineScope.launch(Dispatchers.IO) {
+                    val result = loginViewModel.sendLoginCredentials(username.value, password.value)
+
+                    when(result.isSuccess){
+                        true -> {
+                            val (JWT_TOKEN, userSettings) = result.getOrNull()!!
+                            Log.i("JWT_TOKEN", JWT_TOKEN)
+                            Log.i("userSettings", userSettings.toString())
+
+                            /*
+                            withContext(Dispatchers.Main){
+                                navController.navigate("Principal")
+                            } */
+
+                        }
+                        false -> {
+                            val exception = result.exceptionOrNull() as ResponseException
+                            println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+
+                            withContext(Dispatchers.Main) {
+                                Toast.makeText(context,
+                                    "Error ${exception.statusCode} : ${exception.message}",
+                                    Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
