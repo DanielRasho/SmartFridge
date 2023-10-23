@@ -37,7 +37,10 @@ open class Service (protected val client : HttpClient) {
         } catch (e: Exception) {
             // General Exceptions
             println("Error: ${e.message}")
-            return Result.failure(e)
+            return Result.failure(ResponseException(
+                -1,
+                e.message ?: "Some wrong happen"
+            ))
         }
     }
 }
