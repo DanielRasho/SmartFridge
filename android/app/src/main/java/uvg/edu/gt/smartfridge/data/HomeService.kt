@@ -28,7 +28,7 @@ class HomeService (client: HttpClient) : Service(client) {
             val response : HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.GET_RECIPES
             ){
-                method = HttpMethod.Get
+                method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }
@@ -62,7 +62,7 @@ class HomeService (client: HttpClient) : Service(client) {
             val response : HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.SEARCH_RECIPES
             ){
-                method = HttpMethod.Get
+                method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }
@@ -94,7 +94,7 @@ class HomeService (client: HttpClient) : Service(client) {
             val response : HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.SEARCH_RECIPES
             ){
-                method = HttpMethod.Get
+                method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }

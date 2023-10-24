@@ -32,7 +32,7 @@ class FridgeService(client: HttpClient) : Service(client) {
             val response : HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.GET_INGREDIENTS
             ){
-                method = HttpMethod.Get
+                method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }
@@ -68,7 +68,7 @@ class FridgeService(client: HttpClient) : Service(client) {
             val response : HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.SEARCH_INGREDIENTS
             ){
-                method = HttpMethod.Get
+                method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }
