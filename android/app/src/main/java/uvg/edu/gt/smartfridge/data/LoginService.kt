@@ -26,14 +26,6 @@ class LoginService (client: HttpClient) : Service(client) {
                 put("password", password)
             }.toString()
 
-            // JUST TYPE THE CURREN PRIVATE IP ADDRESS WITH "ip address"
-            val requestUrl = URLBuilder( host = "192.168.0.2", port = 3000,
-                pathSegments = listOf("user", "login")
-            )
-
-            println("HELLO!")
-            println(requestUrl.toString())
-
             // Making Request
             val response : HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.LOGIN){

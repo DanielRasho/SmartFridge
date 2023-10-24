@@ -70,7 +70,7 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
     var ingredients: List<Ingredient> = emptyList()
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
-            val result= fridgeViewModel.getUserIngredients(jwtToken)
+            val result= fridgeViewModel.fetchUserIngredients(jwtToken)
 
             when(result.isSuccess){
                 true -> {
@@ -89,7 +89,8 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
             }
         }
     }
-/*
+
+
     val ingredients: List<Ingredient> = listOf(
         Ingredient("", "Ingredient1", "Category1", 100.0f, "g", "12/12/2023"),
         Ingredient("","Ingredient2", "Category2", 200.0f, "ml"),
@@ -101,12 +102,12 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
         Ingredient("","Ingredient3", "Category6", 50.0f, "g"),
         Ingredient("","Ingredient4", "Category4", 300.0f, "g"),
         Ingredient("","Ingredient5", "Category5", 150.0f, "bottles")
-    )*/
+    )
 
-    val groupedIngredients: Map<String, List<Ingredient>> = ingredients.groupBy { it.category }
+    val groupedIngredients: Map<String, List<Ingredient>> = fridgeViewModel.getIngredients().groupBy { it.category }
 
     Scaffold(bottomBar = { BottomNavBar(items = navItems, navController = navHostController) },
-        floatingActionButton = { addIngredientButton(navHostController) }) {
+        floatingActionButton = { addIngredientButton() }) {
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
@@ -184,9 +185,9 @@ fun ingredientEntry (ingredient : Ingredient){
 }
 
 @Composable
-fun addIngredientButton(navHostController: NavHostController) {
+fun addIngredientButton() {
     FloatingActionButton(
-        onClick = { navHostController.navigate("NewIngredient") },
+        onClick = { /*TODO*/ },
         shape = CircleShape,
         containerColor = MaterialTheme.colorScheme.primary
     ) {
@@ -203,8 +204,7 @@ fun addIngredientButton(navHostController: NavHostController) {
 @Preview
 @Composable
 fun testFridgeView(){
-    val sharedViewModel = SharedViewModel()
     smartFridgeTheme {
-        FridgeView(sharedViewModel,rememberNavController())
+        FridgeView(SharedViewModel(),rememberNavController())
     }
 }

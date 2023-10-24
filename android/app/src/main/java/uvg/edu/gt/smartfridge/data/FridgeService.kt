@@ -38,6 +38,8 @@ class FridgeService(client: HttpClient) : Service(client) {
                 setBody( requestBody )
             }
 
+            println(response.body() as String)
+
             // Translating JSON response
             val data : JSONArray = JSONArray(response.body() as String)
 
