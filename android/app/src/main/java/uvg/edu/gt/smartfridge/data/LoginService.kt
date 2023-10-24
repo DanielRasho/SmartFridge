@@ -22,8 +22,8 @@ class LoginService (client: HttpClient) : Service(client) {
 
             // Creating Request body
             val requestBody = buildJsonObject {
-                put("username", username)
-                put("password", password)
+                put("username", username.trim())
+                put("password", password.trim())
             }.toString()
 
             // Making Request
