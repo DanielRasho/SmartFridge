@@ -37,11 +37,12 @@ import uvg.edu.gt.smartfridge.components.textField
 import uvg.edu.gt.smartfridge.data.ResponseException
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.LoginViewModel
+import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
-fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
+fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
     var username = remember { mutableStateOf("") }
     var password = remember { mutableStateOf("") }
     val loginViewModel : LoginViewModel = LoginViewModel()
@@ -107,7 +108,9 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
         ) {
             PrimaryButton(text = "Login",
                 modifier = Modifier.width(300.dp))
-            {
+            {//sharedViewModel.prueba = username.value
+               // navController.navigate("Home")
+
                 coroutineScope.launch(Dispatchers.IO) {
                     val result = loginViewModel.sendLoginCredentials(username.value, password.value)
 
@@ -117,7 +120,7 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
                             Log.i("JWT_TOKEN", JWT_TOKEN)
                             Log.i("userSettings", userSettings.toString())
 
-
+                            sharedViewModel.jwtToken = JWT_TOKEN
                             withContext(Dispatchers.Main){
                                 println(navController?.toString())
                                 navController.navigate("Home")
@@ -148,7 +151,8 @@ fun LoginView(navController: NavHostController, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun LoginViewPreview() {
+    val sharedViewModel = SharedViewModel()
     smartFridgeTheme {
-        LoginView(rememberNavController())
+        LoginView(sharedViewModel,rememberNavController())
     }
 }

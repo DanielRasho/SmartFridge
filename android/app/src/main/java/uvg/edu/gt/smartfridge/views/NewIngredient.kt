@@ -1,5 +1,7 @@
 package uvg.edu.gt.smartfridge.views
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,24 +31,39 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uvg.edu.gt.smartfridge.components.UnitSelector
 import uvg.edu.gt.smartfridge.components.dateField
 import uvg.edu.gt.smartfridge.components.numberField
 import uvg.edu.gt.smartfridge.components.spinnerField
 import uvg.edu.gt.smartfridge.components.textField
+import uvg.edu.gt.smartfridge.data.ResponseException
+import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
+import uvg.edu.gt.smartfridge.viewModels.LoginViewModel
+import uvg.edu.gt.smartfridge.viewModels.NewIngredientViewModel
+import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 import java.time.LocalDate
 
 @Composable
-fun NewIngredientView(navController: NavController){
+fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavController){
+    val jwtToken = sharedViewModel.jwtToken
+    val newingredientViewModel : NewIngredientViewModel = NewIngredientViewModel()
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     val name = remember { mutableStateOf("") }
     val amount = remember { mutableStateOf("") }
     var measureUnit = remember { mutableStateOf("") }
@@ -78,7 +95,7 @@ fun NewIngredientView(navController: NavController){
 
                 Row (horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically){
-                    IconButton(onClick = { /*TODO*/ },
+                    IconButton(onClick = { navController.navigate("Fridge") },
                         content = {Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)})
                     Text(
                         "Add Ingredient",
@@ -103,7 +120,35 @@ fun NewIngredientView(navController: NavController){
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row {
-                    Button(onClick = { /*TODO*/ },
+                    Button(onClick = {
+                        coroutineScope.launch(Dispatchers.IO) {
+                            val result = newingredientViewModel.addIngredient(jwtToken,
+                                Ingredient("",name.value, category.value, amount.value.toFloat(),measureUnit.value,date.value.toString())
+                            )
+
+                            when(result.isSuccess){
+                                true -> {
+                                    val mensaje = result.getOrNull()!!
+                                    Toast.makeText(context,mensaje,Toast.LENGTH_SHORT).show()
+                                    withContext(Dispatchers.Main){
+                                        println(navController?.toString())
+                                        navController.navigate("Fridge")
+                                    }
+
+                                }
+                                false -> {
+                                    val exception = result.exceptionOrNull() as ResponseException
+                                    println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(context,
+                                            "Error ${exception.statusCode} : ${exception.message}",
+                                            Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                        }
+                    },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error),
                         shape = RoundedCornerShape(5.dp),
@@ -174,7 +219,8 @@ fun muteTextField(label: String, textValue: MutableState<String>, onClick : () -
 @Composable
 fun previewNewIngredient(){
     val controller = rememberNavController()
+    val sharedViewModel = SharedViewModel()
     smartFridgeTheme {
-        NewIngredientView(navController = controller)
+        NewIngredientView(sharedViewModel,navController = controller)
     }
 }

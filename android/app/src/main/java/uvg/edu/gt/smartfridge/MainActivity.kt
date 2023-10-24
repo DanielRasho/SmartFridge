@@ -10,14 +10,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
+import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 import uvg.edu.gt.smartfridge.views.FridgeView
 import uvg.edu.gt.smartfridge.views.HomeView
 import uvg.edu.gt.smartfridge.views.LoginView
+import uvg.edu.gt.smartfridge.views.NewIngredientView
 import uvg.edu.gt.smartfridge.views.PrincipalView
 import uvg.edu.gt.smartfridge.views.RecipeView
 import uvg.edu.gt.smartfridge.views.RegisterView
@@ -27,6 +30,9 @@ class MainActivity : ComponentActivity() {
     @ExperimentalMaterial3Api
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
+
         setContent {
             smartFridgeTheme {
                 // A surface container using the 'background' color from the theme
@@ -34,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainComponent()
+                    MainComponent(sharedViewModel)
                 }
             }
         }
@@ -44,17 +50,19 @@ class MainActivity : ComponentActivity() {
 @ExperimentalMaterial3Api
 @Composable
 fun MainComponent(
-    modifier: Modifier = Modifier,
+    sharedViewModel: SharedViewModel,
     navController: NavHostController = rememberNavController()
 ) {
-    NavHost(navController = navController, startDestination = "Principal", modifier = modifier) {
+
+    NavHost(navController = navController, startDestination = "Principal") {
         composable("Principal") { PrincipalView(navController) }
-        composable("Login") { LoginView(navController) }
+        composable("Login") { LoginView(sharedViewModel,navController) }
         composable("Register") { RegisterView(navController) }
-        composable("Home") { HomeView(navController) }
+        composable("Home") { HomeView(sharedViewModel,navController) }
         composable("Settings") { SettingsView(navController) }
-        composable("Fridge") { FridgeView(navController) }
+        composable("Fridge") { FridgeView(sharedViewModel,navController) }
         composable("Recipe") { RecipeView(navController) }
+        composable("NewIngredient") { NewIngredientView(sharedViewModel,navController) }
     }
 }
 
@@ -62,7 +70,9 @@ fun MainComponent(
 @ExperimentalMaterial3Api
 @Composable
 fun GreetingPreview() {
+    val sharedViewModel = SharedViewModel() // Create a new instance of SharedViewModel for the preview
+
     smartFridgeTheme {
-        MainComponent()
+        MainComponent(sharedViewModel)
     }
 }
