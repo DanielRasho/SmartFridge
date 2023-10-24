@@ -3,6 +3,7 @@ package uvg.edu.gt.smartfridge
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +35,9 @@ class MainActivity : ComponentActivity() {
         val sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
 
         setContent {
-            smartFridgeTheme {
+            smartFridgeTheme(
+                useDarkTheme = sharedViewModel.useDarkTheme
+            ) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),

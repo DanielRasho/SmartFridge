@@ -5,4 +5,5 @@ import androidx.lifecycle.ViewModel
 class SharedViewModel : ViewModel() {
     var jwtToken: String = ""
     var prueba: String=""
+    var useDarkTheme: Boolean = false
 }
