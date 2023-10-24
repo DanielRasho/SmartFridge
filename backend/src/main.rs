@@ -1,7 +1,7 @@
 use std::{io, net::SocketAddr, sync::Arc};
 
 use axum::{
-    routing::{get, post},
+    routing::post,
     Router,
 };
 use backend::routes::{
@@ -118,10 +118,10 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
         .route("/settings/save", post(|p| save_settings(p, db_c_7)))
         // Recipes
         .route("/recipes", post(|p| get_recipes(p, db_c_3)))
-        .route("/recipes/search", get(|p| search_recipes(p, db_c_4)))
-        .route("/recipes/details", get(|p| recipe_details(p, db_c_8)))
+        .route("/recipes/search", post(|p| search_recipes(p, db_c_4)))
+        .route("/recipes/details", post(|p| recipe_details(p, db_c_8)))
         // Ingredients
-        .route("/ingredients", get(|p| get_ingredients(p, db_c_5)))
+        .route("/ingredients", post(|p| get_ingredients(p, db_c_5)))
         .route("/ingredients/add", post(|p| add_ingredient(p, db_c_9)))
         .route("/ingredients/edit", post(|p| edit_ingredient(p, db_c_10)))
         .route(
@@ -130,6 +130,6 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
         )
         .route(
             "/ingredients/search",
-            get(|p| search_ingredients(p, db_c_6)),
+            post(|p| search_ingredients(p, db_c_6)),
         )
 }
