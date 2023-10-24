@@ -67,16 +67,11 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
     val navItems = sequenceOf(
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
-    var ingredients: List<Ingredient> = emptyList()
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
             val result= fridgeViewModel.fetchUserIngredients(jwtToken)
 
-            when(result.isSuccess){
-                true -> {
-                    ingredients = result.getOrNull()!!
-                }
-                false -> {
+            if(result.isFailure){
                     val exception = result.exceptionOrNull() as ResponseException
                     println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
 
@@ -88,8 +83,6 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
                 }
             }
         }
-    }
-
 
     val ingredients: List<Ingredient> = listOf(
         Ingredient("", "Ingredient1", "Category1", 100.0f, "g", "12/12/2023"),
