@@ -9,6 +9,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
@@ -35,17 +37,8 @@ class MainActivity : ComponentActivity() {
         val sharedViewModel = ViewModelProvider(this).get(SharedViewModel::class.java)
 
         setContent {
-            smartFridgeTheme(
-                useDarkTheme = sharedViewModel.useDarkTheme
-            ) {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MainComponent(sharedViewModel)
-                }
-            }
+
+            MainComponent(sharedViewModel)
         }
     }
 }
@@ -56,24 +49,37 @@ fun MainComponent(
     sharedViewModel: SharedViewModel,
     navController: NavHostController = rememberNavController()
 ) {
-
-    NavHost(navController = navController, startDestination = "Principal") {
-        composable("Principal") { PrincipalView(navController) }
-        composable("Login") { LoginView(sharedViewModel,navController) }
-        composable("Register") { RegisterView(navController) }
-        composable("Home") { HomeView(sharedViewModel,navController) }
-        composable("Settings") { SettingsView(navController) }
-        composable("Fridge") { FridgeView(sharedViewModel,navController) }
-        composable("Recipe") { RecipeView(navController) }
-        composable("NewIngredient") { NewIngredientView(sharedViewModel,navController) }
+    val systemInDark = isSystemInDarkTheme()
+    val (useDarkTheme, setUseDarkTheme) = remember { mutableStateOf(systemInDark) }
+    smartFridgeTheme(
+        useDarkTheme = useDarkTheme
+    ) {
+        // A surface container using the 'background' color from the theme
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            NavHost(navController = navController, startDestination = "Principal") {
+                composable("Principal") { PrincipalView(navController) }
+                composable("Login") { LoginView(sharedViewModel, navController) }
+                composable("Register") { RegisterView(navController) }
+                composable("Home") { HomeView(sharedViewModel, navController) }
+                composable("Settings") { SettingsView(useDarkTheme, setUseDarkTheme, navController) }
+                composable("Fridge") { FridgeView(sharedViewModel, navController) }
+                composable("Recipe") { RecipeView(navController) }
+                composable("NewIngredient") { NewIngredientView(sharedViewModel, navController) }
+            }
+        }
     }
+
 }
 
 @Preview(showBackground = true)
 @ExperimentalMaterial3Api
 @Composable
 fun GreetingPreview() {
-    val sharedViewModel = SharedViewModel() // Create a new instance of SharedViewModel for the preview
+    val sharedViewModel =
+        SharedViewModel() // Create a new instance of SharedViewModel for the preview
 
     smartFridgeTheme {
         MainComponent(sharedViewModel)
