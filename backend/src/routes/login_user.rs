@@ -248,7 +248,6 @@ pub async fn login_user(
     );
 
     tracing::debug!("{} Generating JWT...", tracing_prefix);
-    let user_id = Uuid::new_v4().to_string();
     let token = JWT_Token {
         user_id,
         session_id,

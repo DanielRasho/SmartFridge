@@ -117,7 +117,7 @@ fn app(db_client: Arc<Option<Client>>) -> Router {
         .route("/user/logout", post(|p| logout(p, db_c_2)))
         .route("/settings/save", post(|p| save_settings(p, db_c_7)))
         // Recipes
-        .route("/recipes", get(|p| get_recipes(p, db_c_3)))
+        .route("/recipes", post(|p| get_recipes(p, db_c_3)))
         .route("/recipes/search", get(|p| search_recipes(p, db_c_4)))
         .route("/recipes/details", get(|p| recipe_details(p, db_c_8)))
         // Ingredients

@@ -1,5 +1,5 @@
 use base64::{engine::general_purpose, Engine};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, Datelike, Timelike, Utc};
 use hmac::{digest::KeyInit, Hmac};
 use jwt::{SignWithKey, VerifyWithKey};
 use models::JWT_Token;
@@ -120,7 +120,8 @@ async fn is_session_valid(
             user_id,
         });
     }
-    if db_expire_date != expire_date {
+
+    if (db_expire_date - expire_date) > chrono::Duration::minutes(1)   {
         return Err(IsSessionValidErrors::ExpireDateDoesntMatchDBRecord {
             db_expire_date,
             expire_date,

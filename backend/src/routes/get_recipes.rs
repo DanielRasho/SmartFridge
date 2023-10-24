@@ -85,7 +85,7 @@ pub async fn get_recipes(
             Err(error)?
         }
     };
-    tracing::debug!("{} JWT parsed successfully!", tracing_prefix);
+    tracing::debug!("{} JWT parsed successfully! `{:?}`", tracing_prefix, token_info);
 
     if let None = client.as_ref() {
         tracing::error!("{} No DB connection found!", tracing_prefix);
