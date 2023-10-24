@@ -22,6 +22,7 @@ class FridgeService(client: HttpClient) : Service(client) {
 
         return handleHttpRequest {
 
+            println("JWT: $JWT_TOKEN")
             // Creating Request body
             val requestBody = buildJsonObject {
                 put("token", JWT_TOKEN)

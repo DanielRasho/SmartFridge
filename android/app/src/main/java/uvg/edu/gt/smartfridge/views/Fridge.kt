@@ -63,6 +63,7 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
     //var (ingredientes, setIngredients) =
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
+            println("JWT: $jwtToken")
             val result= fridgeViewModel.fetchUserIngredients(jwtToken)
 
             if(result.isFailure){

@@ -41,40 +41,36 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.HomeViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
 fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
     val coroutineScope = rememberCoroutineScope()
-    val homeViewModel : HomeViewModel = HomeViewModel()
+    val homeViewModel = viewModel<HomeViewModel>()
     val context = LocalContext.current
     val navItems = sequenceOf(
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
     val jwtToken = sharedViewModel.jwtToken
-    var recipes: List<Recipe> = emptyList()
-    //val prueba = sharedViewModel.prueba
-   // println(prueba+" from home")
+
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
-            val result= homeViewModel.getRecipesList(jwtToken)
+            println("JWT: $jwtToken")
+            val result= homeViewModel.fetchRecipesList(jwtToken)
 
-            when(result.isSuccess){
-                true -> {
-                    recipes = result.getOrNull()!!
-                }
-                false -> {
-                    val exception = result.exceptionOrNull() as ResponseException
-                    println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+            if(result.isFailure){
+                val exception = result.exceptionOrNull() as ResponseException
+                println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
 
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context,
-                            "Error ${exception.statusCode} : ${exception.message}",
-                            Toast.LENGTH_SHORT).show()
-                    }
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context,
+                        "Error ${exception.statusCode} : ${exception.message}",
+                        Toast.LENGTH_SHORT).show()
                 }
             }
+
         }
     }
     /*
@@ -121,7 +117,7 @@ fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController,
             searchBar("Search for Recipes...")
             Spacer(modifier = Modifier.height(60.dp))
             LazyColumn {
-                recipes.forEach { recipe ->
+                homeViewModel.getRecipesList().forEach { recipe ->
                     item {
                         Card(
                             onClick = { navController.navigate("Recipe") },

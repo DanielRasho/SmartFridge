@@ -18,6 +18,7 @@ import uvg.edu.gt.smartfridge.models.Recipe
 class HomeService (client: HttpClient) : Service(client) {
     suspend fun getRecipes( JWT_TOKEN : String) : Result<List<Recipe>>{
         return handleHttpRequest {
+            println("JWT: $JWT_TOKEN")
             // Creating Request body
             val requestBody = buildJsonObject {
                 put("token", JWT_TOKEN)
@@ -33,6 +34,8 @@ class HomeService (client: HttpClient) : Service(client) {
                 }
                 setBody( requestBody )
             }
+
+            println(response.body() as String)
 
             // Translating JSON response
             val data : JSONArray = JSONArray(response.body() as String)
