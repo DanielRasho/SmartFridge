@@ -122,7 +122,7 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
 
                             sharedViewModel.jwtToken = JWT_TOKEN
                             withContext(Dispatchers.Main){
-                                println(navController?.toString())
+                                println(navController.toString())
                                 navController.navigate("Home")
                             }
 

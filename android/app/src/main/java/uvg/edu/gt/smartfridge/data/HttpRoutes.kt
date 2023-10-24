@@ -4,7 +4,7 @@ object HttpRoutes {
     const val BASE_URL = "http://192.168.0.2:3000"
 
     // LOGIN REGISTER VIEW
-    const val REGISTER= "/user/register"
+    const val REGISTER = "/user/register"
     const val LOGIN = "/user/login"
 
     // HOME VIEW

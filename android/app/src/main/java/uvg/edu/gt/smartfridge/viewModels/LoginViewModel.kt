@@ -16,7 +16,7 @@ class LoginViewModel : ViewModel() {
             logger = Logger.DEFAULT
             filter { request ->  request.url.host.contains("ktor.io")  }
         }
-    };
+    }
 
     private val loginService: LoginService = LoginService(_httpClient)
 

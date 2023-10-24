@@ -131,7 +131,7 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                                     val mensaje = result.getOrNull()!!
                                     Toast.makeText(context,mensaje,Toast.LENGTH_SHORT).show()
                                     withContext(Dispatchers.Main){
-                                        println(navController?.toString())
+                                        println(navController.toString())
                                         navController.navigate("Fridge")
                                     }
 

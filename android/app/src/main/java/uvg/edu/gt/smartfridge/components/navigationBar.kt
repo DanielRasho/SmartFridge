@@ -72,7 +72,7 @@ fun BottomNavBar(
             val isSelected = screen.route == currentRoute
 
             if (isSelected) {
-                Column() {
+                Column {
                     Column(
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -85,9 +85,7 @@ fun BottomNavBar(
                     }
                 }
             } else {
-                Column(
-                    //modifier = Modifier.width(125.3.dp)
-                ) {
+                Column {
                     Column(
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally,

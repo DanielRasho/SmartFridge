@@ -48,7 +48,7 @@ fun spinnerField(label : String, options : List<String>, selectedTextHolder: Mut
             ExposedDropdownMenuBox(expanded = isDropdownExposed,
                 onExpandedChange = { setExpose(it) }
             ) {
-                Row (){
+                Row {
                     BasicTextField( value = selectedTextHolder.value,
                         readOnly = true,
                         onValueChange = {},
@@ -64,7 +64,7 @@ fun spinnerField(label : String, options : List<String>, selectedTextHolder: Mut
                     ExposedDropdownMenu(expanded = isDropdownExposed,
                         onDismissRequest = { setExpose(false) }
                     ) {
-                        options.forEach(){
+                        options.forEach {
                             DropdownMenuItem(
                                 text = { Text(text = it) },
                                 onClick = {
