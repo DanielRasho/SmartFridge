@@ -45,7 +45,7 @@ fun dateField (label: String = "Date", pickedDate : MutableState<LocalDate>) {
     val formattedDate by remember {
         derivedStateOf {
             DateTimeFormatter
-                .ofPattern("MMM dd yyyy")
+                .ofPattern("MMM.dd.yyyy")
                 .format(pickedDate.value)
         }
     }

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,13 +18,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.rounded.ExitToApp
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,27 +30,23 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uvg.edu.gt.smartfridge.components.BottomNavBar
-import uvg.edu.gt.smartfridge.components.IconPrimaryButton
 import uvg.edu.gt.smartfridge.components.NavItem
 import uvg.edu.gt.smartfridge.components.Title
 import uvg.edu.gt.smartfridge.components.searchBar
 import uvg.edu.gt.smartfridge.data.ResponseException
 import uvg.edu.gt.smartfridge.models.Ingredient
-import uvg.edu.gt.smartfridge.models.Recipe
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.FridgeViewModel
-import uvg.edu.gt.smartfridge.viewModels.HomeViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -62,11 +55,12 @@ import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostController) {
     val jwtToken = sharedViewModel.jwtToken
     val coroutineScope = rememberCoroutineScope()
-    val fridgeViewModel : FridgeViewModel = FridgeViewModel()
+    val fridgeViewModel = viewModel<FridgeViewModel>()
     val context = LocalContext.current
     val navItems = sequenceOf(
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
+    //var (ingredientes, setIngredients) =
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
             val result= fridgeViewModel.fetchUserIngredients(jwtToken)
@@ -83,6 +77,7 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
                 }
             }
         }
+    /*
 
     val ingredients: List<Ingredient> = listOf(
         Ingredient("", "Ingredient1", "Category1", 100.0f, "g", "12/12/2023"),
@@ -95,9 +90,10 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
         Ingredient("","Ingredient3", "Category6", 50.0f, "g"),
         Ingredient("","Ingredient4", "Category4", 300.0f, "g"),
         Ingredient("","Ingredient5", "Category5", 150.0f, "bottles")
-    )
+    ) */
 
-    val groupedIngredients: Map<String, List<Ingredient>> = fridgeViewModel.getIngredients().groupBy { it.category }
+    val groupedIngredients: Map<String, List<Ingredient>> =
+        fridgeViewModel.getIngredients().groupBy { it.Category }
 
     Scaffold(bottomBar = { BottomNavBar(items = navItems, navController = navHostController) },
         floatingActionButton = { addIngredientButton() }) {
@@ -149,30 +145,40 @@ fun ingredientEntry (ingredient : Ingredient){
         Row ( verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(2f)
         ){
-            Text(text = ingredient.expireDate,
+            Text(
+                text = ingredient.ExpireDate,
                 color = MaterialTheme.colorScheme.outline,
                 style = MaterialTheme.typography.labelSmall,
-                modifier = Modifier.defaultMinSize(64.dp))
+                modifier = Modifier.defaultMinSize(64.dp)
+            )
             Spacer(modifier = Modifier.width(24.dp))
             Column {
-                Text(text = ingredient.name,
+                Text(
+                    text = ingredient.Name,
                     color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.labelMedium)
-                Text(text = ingredient.category,
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Text(
+                    text = ingredient.Category,
                     color = MaterialTheme.colorScheme.outline,
-                    style = MaterialTheme.typography.labelSmall)
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
         Row (verticalAlignment = Alignment.Bottom,
             modifier = Modifier.weight(1f)){
-            Text(text = ingredient.quantity.toString(),
+            Text(
+                text = ingredient.Quantity.toString(),
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.labelLarge,
-                modifier = Modifier.weight(1f),)
-            Text(text = "    ${ingredient.unit}",
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = "    ${ingredient.Unit}",
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.weight(1f))
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }

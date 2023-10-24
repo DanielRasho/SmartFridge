@@ -1,9 +1,7 @@
 package uvg.edu.gt.smartfridge.views
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,7 +16,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -52,7 +49,6 @@ import uvg.edu.gt.smartfridge.components.textField
 import uvg.edu.gt.smartfridge.data.ResponseException
 import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
-import uvg.edu.gt.smartfridge.viewModels.LoginViewModel
 import uvg.edu.gt.smartfridge.viewModels.NewIngredientViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 import java.time.LocalDate

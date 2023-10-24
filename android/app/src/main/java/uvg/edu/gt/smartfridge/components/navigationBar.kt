@@ -5,12 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -81,7 +78,12 @@ fun BottomNavBar(
                             Icon(screen.icon, null, tint = MaterialTheme.colorScheme.onBackground)
                         }
                         Spacer(modifier = Modifier.width(14.dp))
-                        Text(screen.label, color = MaterialTheme.colorScheme.onBackground,style = MaterialTheme.typography.bodyLarge, fontSize=20.sp)
+                        Text(
+                            screen.label,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontSize = 20.sp
+                        )
                     }
                 }
             } else {
@@ -90,11 +92,19 @@ fun BottomNavBar(
                         verticalArrangement = Arrangement.Top,
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        IconButton(onClick = { navController.navigate(screen.route) }, modifier = Modifier.size(36.dp)) {
+                        IconButton(
+                            onClick = { navController.navigate(screen.route) },
+                            modifier = Modifier.size(36.dp)
+                        ) {
                             Icon(screen.icon, null, tint = MaterialTheme.colorScheme.outlineVariant)
                         }
                         Spacer(modifier = Modifier.width(14.dp))
-                        Text(screen.label, color = MaterialTheme.colorScheme.outlineVariant,style = MaterialTheme.typography.bodyLarge, fontSize=20.sp)
+                        Text(
+                            screen.label,
+                            color = MaterialTheme.colorScheme.outlineVariant,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontSize = 20.sp
+                        )
                     }
                 }
             }

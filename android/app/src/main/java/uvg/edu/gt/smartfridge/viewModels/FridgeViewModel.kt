@@ -1,6 +1,8 @@
 package uvg.edu.gt.smartfridge.viewModels
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -21,16 +23,20 @@ class FridgeViewModel : ViewModel() {
 
     private val fridgeService = FridgeService(_httpClient)
 
-    private var userIngredients = mutableStateOf(emptyList<Ingredient>())
+    private var userIngredients by mutableStateOf(emptyList<Ingredient>())
 
-    fun getIngredients() : List<Ingredient>{
-        return userIngredients.value
+    fun getIngredients() : List<Ingredient> {
+        println("ingredients = $userIngredients")
+        return userIngredients
     }
 
     suspend fun fetchUserIngredients( JWT_TOKEN: String) : Result<List<Ingredient>> {
         val result = fridgeService.getIngredients(JWT_TOKEN)
-        if (result.isSuccess)
-            userIngredients.value = result.getOrNull()!!
+        if (result.isSuccess) {
+            println("Ingredients fetched")
+            userIngredients = result.getOrNull()!!
+            println("Hello ingredients = $userIngredients")
+        }
         return result
     }
 }
