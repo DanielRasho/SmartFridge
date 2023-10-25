@@ -6,6 +6,10 @@
    A companion for your meals</i> </h5>
 </div>
 
+**Demo Video:** [Click Aqui !](https://youtu.be/JOmiLFdczcg?si=IRQpJqVgeiemvmnV)
+
+
+
 Smart Fridge es una aplicación que se encargará de recomendarte recetas de cocina en base a lo que exista en tu refrigerador.
 
 ## Estructura del Proyecto
@@ -46,7 +50,7 @@ Una lista completa de las librerías que utiliza el backend se pueden ver en el 
 
 Una lista de las más destacadas son:
 
-- **Gson**, librería de Google para parsear JSON en kotlin.
-- **OkHttp**, librería usada en el cliente móvil para conectarse al backend.
+- **Json Serializer**, librería de Google para parsear JSON en kotlin.
+- **KTOR**, librería usada en el cliente móvil para conectarse al backend.
 - **Serde**, librería en el backend utilizada para convertir objetos a JSON.
 - **Axum, Tokio, Tower**, librerías que facilitan la creación de una REST-API, se utilizan en el backend.
