@@ -23,7 +23,7 @@ class RegisterService (client: HttpClient) : Service(client) {
 
             // Making Request
             val response : HttpResponse = client.request(
-                HttpRoutes.BASE_URL + HttpRoutes.LOGIN){
+                HttpRoutes.BASE_URL + HttpRoutes.REGISTER){
                 method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
