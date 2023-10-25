@@ -26,6 +26,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
@@ -45,7 +46,7 @@ import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
     var username = remember { mutableStateOf("") }
     var password = remember { mutableStateOf("") }
-    val loginViewModel : LoginViewModel = LoginViewModel()
+    val loginViewModel = viewModel<LoginViewModel>()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
