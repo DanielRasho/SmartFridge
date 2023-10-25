@@ -4,9 +4,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Recipe(
-    val title: String,
-    val banner: String,
-    val tags: Sequence<String>,
-    val ingredients: Sequence<Ingredient>,
-    val source: String
+    val RecipeId : String,
+    val Recipe: String,
+    val Banner: String,
+    val Tags: List<String>,
+    val Ingredients: List<Ingredient>,
+    val Source: String
 )

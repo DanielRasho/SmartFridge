@@ -36,7 +36,6 @@ import uvg.edu.gt.smartfridge.components.NavItem
 import uvg.edu.gt.smartfridge.components.Title
 import uvg.edu.gt.smartfridge.components.searchBar
 import uvg.edu.gt.smartfridge.data.ResponseException
-import uvg.edu.gt.smartfridge.models.Recipe
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.HomeViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
@@ -127,17 +126,17 @@ fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController,
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                         ) {
                             AsyncImage(
-                                model = recipe.banner,
+                                model = recipe.Banner,
                                 contentDescription = "Recipe description"
                             )
                             Text(
-                                recipe.title,
+                                recipe.Recipe,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = modifier.padding(10.dp, 0.dp),
                                 style = MaterialTheme.typography.bodyLarge
                             )
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start, modifier = modifier.padding(10.dp)) {
-                                recipe.tags.forEach { tag ->
+                                recipe.Tags.forEach { tag ->
                                     Text(
                                         tag,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,

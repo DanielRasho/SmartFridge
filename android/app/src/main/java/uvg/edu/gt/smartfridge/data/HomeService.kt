@@ -76,7 +76,10 @@ class HomeService (client: HttpClient) : Service(client) {
 
             // Fetching ingredients.
             for (index in 0 until data.length()){
-                tempRecipes.add(Json.decodeFromString(data.getString(index)))
+                var tempRecipe = data.getJSONArray(index)
+                tempRecipes.add(
+                    Json.decodeFromString(tempRecipe.toString())
+                )
             }
             tempRecipes
         }
