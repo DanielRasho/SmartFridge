@@ -1,16 +1,12 @@
 package uvg.edu.gt.smartfridge.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,6 +34,7 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 @Composable
 fun SecondaryButton(
     text: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     OutlinedButton(
@@ -49,8 +45,13 @@ fun SecondaryButton(
             color = MaterialTheme.colorScheme.outline
         ),
         shape = RoundedCornerShape(10),
+        modifier = modifier
     ) {
-        Text(text, color=MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text,
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
 
@@ -68,7 +69,8 @@ fun SecondaryButton(
 fun IconSecondaryButton(
     text: String,
     icon: Int,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     OutlinedButton(
         onClick = { onClick() },
@@ -78,6 +80,7 @@ fun IconSecondaryButton(
             color = MaterialTheme.colorScheme.outline
         ),
         shape = RoundedCornerShape(10),
+        modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -90,7 +93,11 @@ fun IconSecondaryButton(
                 modifier = Modifier.size(16.dp)
             )
             Spacer(modifier = Modifier.width(10.dp))
-            Text(text, color=MaterialTheme.colorScheme.onSurface,style = MaterialTheme.typography.bodyLarge)
+            Text(
+                text,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 }
