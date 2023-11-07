@@ -48,6 +48,8 @@ import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.FridgeViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +62,6 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
     val navItems = sequenceOf(
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
-    //var (ingredientes, setIngredients) =
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
             println("JWT: $jwtToken")
@@ -78,20 +79,6 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
                 }
             }
         }
-    /*
-
-    val ingredients: List<Ingredient> = listOf(
-        Ingredient("", "Ingredient1", "Category1", 100.0f, "g", "12/12/2023"),
-        Ingredient("","Ingredient2", "Category2", 200.0f, "ml"),
-        Ingredient("","Ingredient3", "Category1", 50.0f, "g"),
-        Ingredient("","Ingredient4", "Category3", 300.0f, "g"),
-        Ingredient("","Ingredient5", "Category2", 150.0f, "ml"),
-        Ingredient("","Ingredient1", "Category4", 100.0f, "g", "12/12/2023"),
-        Ingredient("","Ingredient2", "Category5", 200.0f, "ml"),
-        Ingredient("","Ingredient3", "Category6", 50.0f, "g"),
-        Ingredient("","Ingredient4", "Category4", 300.0f, "g"),
-        Ingredient("","Ingredient5", "Category5", 150.0f, "bottles")
-    ) */
 
     val groupedIngredients: Map<String, List<Ingredient>> =
         fridgeViewModel.getIngredients().groupBy { it.Category }
@@ -147,7 +134,7 @@ fun ingredientEntry (ingredient : Ingredient){
             modifier = Modifier.weight(2f)
         ){
             Text(
-                text = ingredient.ExpireDate,
+                text = formatDateString(ingredient.ExpireDate),
                 color = MaterialTheme.colorScheme.outline,
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.defaultMinSize(64.dp)
@@ -201,10 +188,26 @@ fun addIngredientButton() {
     }
 }
 
+fun formatDateString(inputDateString: String): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'", Locale.getDefault())
+    val outputFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+
+    val date = inputFormat.parse(inputDateString)
+    return outputFormat.format(date)
+}
+
 @Preview
 @Composable
 fun testFridgeView(){
     smartFridgeTheme {
         FridgeView(SharedViewModel(),rememberNavController())
+    }
+}
+
+@Preview
+@Composable
+fun testIngredientItem(){
+    smartFridgeTheme {
+        ingredientEntry(ingredient = Ingredient("32", "Soy Sause", "Souce", 3.0f, "3", "2023-11-03T03:03:49.309844585Z"))
     }
 }
