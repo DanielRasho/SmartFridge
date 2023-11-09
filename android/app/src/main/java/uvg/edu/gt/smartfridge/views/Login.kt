@@ -34,6 +34,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uvg.edu.gt.smartfridge.R
 import uvg.edu.gt.smartfridge.components.PrimaryButton
+import uvg.edu.gt.smartfridge.components.Title
+import uvg.edu.gt.smartfridge.components.passwordField
 import uvg.edu.gt.smartfridge.components.textField
 import uvg.edu.gt.smartfridge.data.ResponseException
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
@@ -54,11 +56,12 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
 
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp, 0.dp)
+            .padding(16.dp)
             .height(796.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        //horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
+        Title("Login")
         Spacer(modifier = Modifier.height(50.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -69,20 +72,10 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
             painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
             modifier = Modifier
-                .width(150.dp)
-                .height(150.dp)
+                .width(50.dp)
+                .height(50.dp)
         ) }
-        Spacer(modifier = Modifier.height(10.dp))
-        Text(text = "SmartFridge",
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.displayLarge)
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = modifier.fillMaxWidth()
-        ) {
 
-        }
 
         Spacer(modifier = Modifier.height(100.dp))
         Row(
@@ -99,7 +92,7 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
             horizontalArrangement = Arrangement.Center,
             modifier = modifier.fillMaxWidth()
         ) {
-            textField(label = "Password", textValue = password)
+            passwordField(label = "Password", textValue = password)
         }
         Spacer(modifier = Modifier.height(70.dp))
         Row(

@@ -35,6 +35,8 @@ import kotlinx.coroutines.withContext
 import uvg.edu.gt.smartfridge.R
 import uvg.edu.gt.smartfridge.components.PrimaryButton
 import uvg.edu.gt.smartfridge.components.SecondaryButton
+import uvg.edu.gt.smartfridge.components.Title
+import uvg.edu.gt.smartfridge.components.passwordField
 import uvg.edu.gt.smartfridge.components.textField
 import uvg.edu.gt.smartfridge.data.ResponseException
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
@@ -60,6 +62,7 @@ fun RegisterView(navController: NavHostController, modifier: Modifier = Modifier
             .height(796.dp)
 
     ) {
+        Title("Register")
         Spacer(modifier = Modifier.height(50.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -70,8 +73,8 @@ fun RegisterView(navController: NavHostController, modifier: Modifier = Modifier
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = null,
                 modifier = Modifier
-                    .width(100.dp)
-                    .height(100.dp)
+                    .width(50.dp)
+                    .height(50.dp)
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
@@ -103,7 +106,7 @@ fun RegisterView(navController: NavHostController, modifier: Modifier = Modifier
             horizontalArrangement = Arrangement.Center,
             modifier = modifier.fillMaxWidth()
         ) {
-            textField(label = "Password", textValue = password)
+            passwordField(label = "Password", textValue = password)
         }
         Spacer(modifier = Modifier.height(70.dp))
         Row(

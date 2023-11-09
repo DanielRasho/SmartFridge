@@ -127,7 +127,8 @@ fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController,
                         ) {
                             AsyncImage(
                                 model = recipe.Banner,
-                                contentDescription = "Recipe description"
+                                contentDescription = "Recipe description",
+                                modifier=modifier.fillMaxWidth()
                             )
                             Text(
                                 recipe.Recipe,
