@@ -51,7 +51,6 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun textField (label : String, textValue: MutableState<String>) {
-    var passwordVisible by rememberSaveable { mutableStateOf(false) }
     // Layout definition
     Row (verticalAlignment = Alignment.CenterVertically){
         Column (modifier = Modifier.weight(2f)) {
