@@ -149,7 +149,7 @@ pub async fn add_ingredient(
         .await
     {
         Ok(rows_modified) => {
-            if rows_modified < 0 {
+            if rows_modified == 0 {
                 tracing::error!(
                     "{} No ingredient inserted into DB! Reason: Unknown",
                     tracing_prefix
