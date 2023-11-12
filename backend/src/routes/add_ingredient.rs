@@ -7,8 +7,11 @@ use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use tokio_postgres::Client;
+use uuid::Uuid;
 
-use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET, is_session_valid};
+use crate::{
+    extract_jwt, is_session_valid, models::Ingredient, responses::ResponseError, APP_SECRET,
+};
 
 #[derive(Debug, Serialize)]
 pub enum AddIngredientErrors {
@@ -16,6 +19,9 @@ pub enum AddIngredientErrors {
     InvalidJWT,
     ErrorCheckingIfSessionIsValid,
     JWTExpired,
+    DBConnectionNotFound,
+    ErrorInsertingIngredientIntoDB,
+    NoIngredientInserted,
 }
 
 impl Display for AddIngredientErrors {
@@ -111,7 +117,78 @@ pub async fn add_ingredient(
             Err(error)?
         }
     };
-    // TODO Add ingredient to DB...
+
+    match client.as_ref() {
+        None => {
+            tracing::error!(
+                "{} DB Connection not found! Couldn't add ingredient `{:?}` into DB!",
+                tracing_prefix,
+                ingredient
+            );
+            let error: ResponseError<_> = (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                AddIngredientErrors::DBConnectionNotFound,
+            )
+                .into();
+            Err(error)?
+        }
+        Some(conn) => {
+            tracing::debug!("{} DB Connection found!", tracing_prefix);
+
+            tracing::debug!("{} Inserting ingredient `{:?}`", tracing_prefix, ingredient);
+            let ingredient_id = Uuid::new_v4().to_string();
+            match conn
+                .execute(
+                    "INSERT INTO sf_ingredient VALUES ($1, $2, $3, $4, $5, $6, $7)",
+                    &[
+                        &ingredient_id,
+                        &ingredient.user_id.to_string(),
+                        &ingredient.name,
+                        &ingredient.expire_date.to_string(),
+                        &ingredient.category,
+                        &ingredient.quantity,
+                        &ingredient.unit,
+                    ],
+                )
+                .await
+            {
+                Ok(rows_modified) => {
+                    if rows_modified < 0 {
+                        tracing::error!(
+                            "{} No ingredient inserted into DB! Reason: Unknown",
+                            tracing_prefix
+                        );
+                        let error: ResponseError<_> = (
+                            StatusCode::INTERNAL_SERVER_ERROR,
+                            AddIngredientErrors::NoIngredientInserted,
+                        )
+                            .into();
+                        Err(error)?
+                    } else {
+                        tracing::debug!(
+                            "{} Ingredient with ID `{}` inserted into DB!",
+                            tracing_prefix,
+                            ingredient_id
+                        );
+                    }
+                }
+                Err(err) => {
+                    tracing::error!(
+                        "{} An error occurred `{:?}` while trying to insert an ingredient `{:?}`!",
+                        tracing_prefix,
+                        err,
+                        ingredient
+                    );
+                    let error: ResponseError<_> = (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        AddIngredientErrors::ErrorInsertingIngredientIntoDB,
+                    )
+                        .into();
+                    Err(error)?
+                }
+            }
+        }
+    }
 
     tracing::debug!("{} DONE!", tracing_prefix);
     Ok(StatusCode::OK)

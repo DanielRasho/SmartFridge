@@ -65,6 +65,9 @@ pub struct Ingredient {
     #[serde(rename = "IngredientId")]
     pub ingredient_id: Uuid,
 
+    #[serde(rename = "UserId")]
+    pub user_id: Uuid,
+
     #[serde(rename = "ExpireDate")]
     pub expire_date: DateTime<Utc>,
 
