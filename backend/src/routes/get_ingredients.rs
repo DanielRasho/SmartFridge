@@ -10,12 +10,18 @@ use serde::Deserialize;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
-use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET};
+use crate::{
+    extract_jwt, is_session_valid, models::Ingredient, responses::ResponseError, APP_SECRET,
+};
 
 #[derive(Debug)]
 pub enum GetIngredientsErrors {
     InvalidPayloadFormat { payload: String },
     InvalidJWT,
+    NoDBConnection,
+    InvalidSession,
+    ErrorCheckingIfSessionIsValid,
+    JWTExpired,
 }
 
 impl Display for GetIngredientsErrors {
@@ -27,6 +33,7 @@ impl Display for GetIngredientsErrors {
 #[derive(Debug, Deserialize)]
 struct GetIngredientsPayload {
     token: String,
+    user_id: String,
 }
 
 static ID: AtomicUsize = AtomicUsize::new(0);
@@ -41,7 +48,7 @@ pub async fn get_ingredients(
     tracing::debug!("{} START", tracing_prefix);
 
     tracing::debug!("{} Parsing payload...", tracing_prefix);
-    let GetIngredientsPayload { token } = match serde_json::from_value(payload.0.clone()) {
+    let GetIngredientsPayload { token, user_id } = match serde_json::from_value(payload.0.clone()) {
         Ok(p) => p,
         Err(err) => {
             tracing::error!(
@@ -79,10 +86,50 @@ pub async fn get_ingredients(
     tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
     // TODO Validate token with DB
+    let conn = client.as_ref().as_ref().ok_or_else(|| {
+        tracing::error!("{} No DB connection found!", tracing_prefix);
+        let error: ResponseError<_> = (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            GetIngredientsErrors::NoDBConnection,
+        )
+            .into();
+        error
+    })?;
 
-    // TODO Get recipes from API
+    match is_session_valid(token_info, conn).await {
+        Ok(false) => {
+            tracing::error!("{} Session is invalid!", tracing_prefix);
+            let error: ResponseError<_> =
+                (StatusCode::UNAUTHORIZED, GetIngredientsErrors::JWTExpired).into();
+            Err(error)?
+        }
+        Err(err) => {
+            tracing::error!(
+                "{} An error `{:?}` occurred while trying to check if session is valid!",
+                tracing_prefix,
+                err
+            );
+            let error: ResponseError<_> =
+                if let crate::IsSessionValidErrors::InternalDBError(_) = err {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        GetIngredientsErrors::ErrorCheckingIfSessionIsValid,
+                    )
+                } else {
+                    (
+                        StatusCode::BAD_REQUEST,
+                        GetIngredientsErrors::ErrorCheckingIfSessionIsValid,
+                    )
+                }
+                .into();
+            Err(error)?
+        }
+        _ => {}
+    }
 
-    let recipes = vec![
+    // TODO Get Ingredients from DB
+
+    let ingredients = vec![
         Ingredient {
             expire_date: Utc::now() + Duration::days(10),
             name: "Eggs".to_string(),
@@ -90,6 +137,7 @@ pub async fn get_ingredients(
             quantity: 10,
             unit: "Units".to_string(),
             ingredient_id: Uuid::new_v4(),
+            user_id: Uuid::new_v4(),
         },
         Ingredient {
             expire_date: Utc::now() + Duration::days(10),
@@ -98,6 +146,7 @@ pub async fn get_ingredients(
             quantity: 10,
             unit: "L".to_string(),
             ingredient_id: Uuid::new_v4(),
+            user_id: Uuid::new_v4(),
         },
         Ingredient {
             expire_date: Utc::now() + Duration::days(10),
@@ -106,6 +155,7 @@ pub async fn get_ingredients(
             quantity: 3,
             unit: "Lb".to_string(),
             ingredient_id: Uuid::new_v4(),
+            user_id: Uuid::new_v4(),
         },
         Ingredient {
             expire_date: Utc::now() + Duration::days(10),
@@ -114,6 +164,7 @@ pub async fn get_ingredients(
             quantity: 5,
             unit: "Lb".to_string(),
             ingredient_id: Uuid::new_v4(),
+            user_id: Uuid::new_v4(),
         },
         Ingredient {
             expire_date: Utc::now() + Duration::days(10),
@@ -122,6 +173,7 @@ pub async fn get_ingredients(
             quantity: 15,
             unit: "Units".to_string(),
             ingredient_id: Uuid::new_v4(),
+            user_id: Uuid::new_v4(),
         },
     ];
 
