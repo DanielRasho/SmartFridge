@@ -7,13 +7,20 @@ use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use tokio_postgres::Client;
+use uuid::Uuid;
 
-use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET};
+use crate::{
+    extract_jwt, is_session_valid, models::Ingredient, responses::ResponseError, APP_SECRET,
+};
 
 #[derive(Debug, Serialize)]
 pub enum RemoveIngredientErrors {
     InvalidPayload { payload: String },
     InvalidJWT,
+    NoDBConnectionFound,
+    ErrorCheckingIfSessionIsValid,
+    JWTExpired,
+    ErrorRemovingIngredient,
 }
 
 impl Display for RemoveIngredientErrors {
@@ -25,7 +32,7 @@ impl Display for RemoveIngredientErrors {
 #[derive(Debug, Deserialize)]
 pub struct RemoveIngredientPayload {
     token: String,
-    ingredient_id: String,
+    ingredient_id: Uuid,
 }
 
 static ID: AtomicUsize = AtomicUsize::new(0);
@@ -81,9 +88,70 @@ pub async fn remove_ingredient(
     };
     tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
-    // TODO Check if token is valid...
+    let conn = client.as_ref().as_ref().ok_or_else(|| {
+        tracing::error!("{} DB connection not found!", tracing_prefix);
 
-    // TODO Remove ingredient from DB...
+        let error: ResponseError<_> = (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            RemoveIngredientErrors::NoDBConnectionFound,
+        )
+            .into();
+        error
+    })?;
+    tracing::debug!("{} DB Connection found!", tracing_prefix);
+
+    tracing::debug!("{} Checking if connection is valid...", tracing_prefix);
+    if let Err(err) = is_session_valid(token_info, conn).await {
+        tracing::error!(
+            "{} An error `{:?}` occurred while checking if session is valid!",
+            tracing_prefix,
+            err
+        );
+        let error: ResponseError<_> = match err {
+            crate::IsSessionValidErrors::InternalDBError(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                RemoveIngredientErrors::ErrorCheckingIfSessionIsValid,
+            ),
+            crate::IsSessionValidErrors::InvalidSessionData {
+                current_date: _,
+                db_expire_date: _,
+            } => (StatusCode::UNAUTHORIZED, RemoveIngredientErrors::JWTExpired),
+            _ => (
+                StatusCode::BAD_REQUEST,
+                RemoveIngredientErrors::ErrorCheckingIfSessionIsValid,
+            ),
+        }
+        .into();
+
+        Err(error)?
+    }
+    tracing::debug!("{} Session is valid!", tracing_prefix);
+
+    tracing::debug!("{} Removing ingredient...", tracing_prefix);
+    if let Err(err) = conn
+        .execute(
+            "REMOVE FROM sf_ingredient WHERE ingredient_id=$1",
+            &[&ingredient_id.to_string()],
+        )
+        .await
+    {
+        tracing::error!(
+            "{} An error `{:?}` occurred while deleting ingredient from DB!",
+            tracing_prefix,
+            err
+        );
+        let error: ResponseError<_> = (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            RemoveIngredientErrors::ErrorRemovingIngredient,
+        )
+            .into();
+        Err(error)?
+    }
+    tracing::debug!(
+        "{} Ingredient with id `{}` removed",
+        tracing_prefix,
+        ingredient_id
+    );
 
     tracing::debug!("{} DONE", tracing_prefix);
     Ok(StatusCode::OK)
