@@ -7,7 +7,7 @@ use axum::{response::IntoResponse, Json};
 use chrono::{Duration, Utc};
 use hyper::StatusCode;
 use serde::Deserialize;
-use tokio_postgres::Client;
+use tokio_postgres::{Client, Row};
 use uuid::Uuid;
 
 use crate::{
@@ -22,6 +22,8 @@ pub enum GetIngredientsErrors {
     InvalidSession,
     ErrorCheckingIfSessionIsValid,
     JWTExpired,
+    CouldntRetrieveRecipesFromDB,
+    InvalidIngredientFormatFromDB,
 }
 
 impl Display for GetIngredientsErrors {
@@ -33,7 +35,7 @@ impl Display for GetIngredientsErrors {
 #[derive(Debug, Deserialize)]
 struct GetIngredientsPayload {
     token: String,
-    user_id: String,
+    user_id: Uuid,
 }
 
 static ID: AtomicUsize = AtomicUsize::new(0);
@@ -97,6 +99,7 @@ pub async fn get_ingredients(
 
     tracing::debug!("{} DB Connection found!", tracing_prefix);
 
+    tracing::debug!("{} Checking if session is valid...", tracing_prefix);
     match is_session_valid(token_info, conn).await {
         Ok(_) => {}
         Err(err) => {
@@ -112,8 +115,8 @@ pub async fn get_ingredients(
                     GetIngredientsErrors::ErrorCheckingIfSessionIsValid,
                 ),
                 crate::IsSessionValidErrors::InvalidSessionData {
-                    current_date,
-                    db_expire_date,
+                    current_date: _,
+                    db_expire_date: _,
                 } => (
                     StatusCode::UNAUTHORIZED,
                     GetIngredientsErrors::InvalidSession,
@@ -128,56 +131,132 @@ pub async fn get_ingredients(
             Err(error)?
         }
     }
+    tracing::debug!("{} Session is valid!", tracing_prefix);
 
-    // TODO Get Ingredients from DB
+    tracing::debug!("{} Getting ingredients from DB...", tracing_prefix);
+    let db_result = conn
+        .query(
+            "SELECT * FROM sf_ingredient WHERE user_id=$1",
+            &[&user_id.to_string()],
+        )
+        .await
+        .map_err(|err| {
+            tracing::error!(
+                "{} An error `{:?}` while trying to get ingredients for user `{}`",
+                tracing_prefix,
+                err,
+                user_id
+            );
+            let error: ResponseError<_> = (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                GetIngredientsErrors::CouldntRetrieveRecipesFromDB,
+            )
+                .into();
+            error
+        })?;
+    tracing::debug!("{} Got ingredients from user!", tracing_prefix);
 
-    let ingredients = vec![
-        Ingredient {
-            expire_date: Utc::now() + Duration::days(10),
-            name: "Eggs".to_string(),
-            category: "Dairy".to_string(),
-            quantity: 10,
-            unit: "Units".to_string(),
-            ingredient_id: Uuid::new_v4(),
-            user_id: Uuid::new_v4(),
-        },
-        Ingredient {
-            expire_date: Utc::now() + Duration::days(10),
-            name: "Milk".to_string(),
-            category: "Dairy".to_string(),
-            quantity: 10,
-            unit: "L".to_string(),
-            ingredient_id: Uuid::new_v4(),
-            user_id: Uuid::new_v4(),
-        },
-        Ingredient {
-            expire_date: Utc::now() + Duration::days(10),
-            name: "Steak".to_string(),
-            category: "Meat".to_string(),
-            quantity: 3,
-            unit: "Lb".to_string(),
-            ingredient_id: Uuid::new_v4(),
-            user_id: Uuid::new_v4(),
-        },
-        Ingredient {
-            expire_date: Utc::now() + Duration::days(10),
-            name: "Chicken".to_string(),
-            category: "Meat".to_string(),
-            quantity: 5,
-            unit: "Lb".to_string(),
-            ingredient_id: Uuid::new_v4(),
-            user_id: Uuid::new_v4(),
-        },
-        Ingredient {
-            expire_date: Utc::now() + Duration::days(10),
-            name: "Oranges".to_string(),
-            category: "Fruit".to_string(),
-            quantity: 15,
-            unit: "Units".to_string(),
-            ingredient_id: Uuid::new_v4(),
-            user_id: Uuid::new_v4(),
-        },
-    ];
+    tracing::debug!("{} Parsing ingredients from db...", tracing_prefix);
+    let parse_string = |row: &Row, index: &str| -> Result<String, _> {
+        tracing::error!(
+            "{} An error occurred while parsing row field `{}`",
+            tracing_prefix,
+            index
+        );
+
+        row.try_get(index).map_err(|_| {
+            let error: ResponseError<_> = (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                GetIngredientsErrors::InvalidIngredientFormatFromDB,
+            )
+                .into();
+            error
+        })
+    };
+
+    let parse_date = |row: &Row, index: &str| -> Result<chrono::DateTime<Utc>, _> {
+        tracing::error!(
+            "{} An error occurred while parsing row field `{}`",
+            tracing_prefix,
+            index
+        );
+
+        row.try_get(index).map_err(|_| {
+            let error: ResponseError<_> = (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                GetIngredientsErrors::InvalidIngredientFormatFromDB,
+            )
+                .into();
+            error
+        })
+    };
+
+    let parse_u32 = |row: &Row, index: &str| -> Result<u32, _> {
+        tracing::error!(
+            "{} An error occurred while parsing row field `{}`",
+            tracing_prefix,
+            index
+        );
+
+        row.try_get(index).map_err(|_| {
+            let error: ResponseError<_> = (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                GetIngredientsErrors::InvalidIngredientFormatFromDB,
+            )
+                .into();
+            error
+        })
+    };
+
+    let parse_uuid =
+        |row: &Row, index: &str| -> Result<Uuid, ResponseError<GetIngredientsErrors>> {
+            tracing::error!(
+                "{} An error occurred while parsing row field `{}`",
+                tracing_prefix,
+                index
+            );
+
+            row.try_get::<&str, &str>(index)
+                .map_err(|_| {
+                    let error: ResponseError<_> = (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        GetIngredientsErrors::InvalidIngredientFormatFromDB,
+                    )
+                        .into();
+                    error
+                })?
+                .parse()
+                .map_err(|_| {
+                    let error: ResponseError<_> = (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        GetIngredientsErrors::InvalidIngredientFormatFromDB,
+                    )
+                        .into();
+                    error
+                })
+        };
+
+    let mut ingredients = Vec::with_capacity(db_result.len());
+    for row in db_result {
+        let ingredient_id = parse_uuid(&row, "ingredient_id")?;
+        let user_id = parse_uuid(&row, "user_id")?;
+        let name = parse_string(&row, "name")?;
+        let expire_date = parse_date(&row, "expire_date")?;
+        let category = parse_string(&row, "category")?;
+        let quantity = parse_u32(&row, "quantity")?;
+        let unit = parse_string(&row, "unit")?;
+
+        ingredients.push(Ingredient {
+            ingredient_id,
+            user_id,
+            expire_date,
+            name,
+            category,
+            quantity,
+            unit,
+        });
+    }
+    tracing::debug!("{} Ingredients parsed!", tracing_prefix);
 
     tracing::debug!("{} DONE", tracing_prefix);
     Ok(Json(ingredients))
