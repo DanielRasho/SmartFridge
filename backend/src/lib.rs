@@ -1,11 +1,19 @@
+use std::{
+    fmt::{Debug, Display},
+    str::FromStr,
+};
+
 use base64::{engine::general_purpose, Engine};
 use chrono::{DateTime, Datelike, Timelike, Utc};
 use hmac::{digest::KeyInit, Hmac};
+use hyper::StatusCode;
 use jwt::{SignWithKey, VerifyWithKey};
-use models::JWT_Token;
+use models::{JWT_Token, Ingredient};
 use rand::{thread_rng, Rng};
+use responses::ResponseError;
 use sha2::{Digest, Sha256};
-use tokio_postgres::Client;
+use tokio_postgres::{Client, Row};
+use uuid::Uuid;
 
 mod models;
 mod responses;
@@ -83,7 +91,10 @@ enum IsSessionValidErrors {
         db_expire_date: chrono::DateTime<Utc>,
         expire_date: chrono::DateTime<Utc>,
     },
-    InvalidSessionData { current_date: DateTime<Utc>, db_expire_date: DateTime<Utc> },
+    InvalidSessionData {
+        current_date: DateTime<Utc>,
+        db_expire_date: DateTime<Utc>,
+    },
 }
 
 /// Checks if the given JWT represents a valid session with the given connection.
@@ -121,7 +132,7 @@ async fn is_session_valid(
         });
     }
 
-    if (db_expire_date - expire_date) > chrono::Duration::minutes(1)   {
+    if (db_expire_date - expire_date) > chrono::Duration::minutes(1) {
         return Err(IsSessionValidErrors::ExpireDateDoesntMatchDBRecord {
             db_expire_date,
             expire_date,
@@ -131,9 +142,116 @@ async fn is_session_valid(
     if current_date > db_expire_date {
         return Err(IsSessionValidErrors::InvalidSessionData {
             current_date,
-            db_expire_date
-        })
+            db_expire_date,
+        });
     }
 
     Ok(())
+}
+
+/// Converts a value in the given index from a DB row into a value of type T.
+fn from_db_to_value<T, E>(
+    row: &Row,
+    index: &str,
+    tracing_prefix: &str,
+    error_val: E,
+) -> Result<T, ResponseError<E>>
+where
+    T: FromStr,
+    <T as FromStr>::Err: Debug,
+    E: Display,
+{
+    row.try_get::<&str, &str>(index)
+        .map_err(|err| {
+            tracing::error!(
+                "{} An error `{:?}` occurred while parsing row field `{}`",
+                tracing_prefix,
+                err,
+                index
+            );
+
+            let error: ResponseError<_> = (StatusCode::INTERNAL_SERVER_ERROR, error_val).into();
+            error
+        })?
+        .parse()
+        .map_err(|err| {
+            tracing::error!(
+                "{} An error `{:?}` occurred while parsing row field `{}`",
+                tracing_prefix,
+                err,
+                index
+            );
+
+            let error: ResponseError<_> = (StatusCode::INTERNAL_SERVER_ERROR, error_val).into();
+            error
+        })
+}
+
+/// Parses an Ingredient from a DB Row.
+fn parse_db_ingredient<E>(
+    row: &Row,
+    tracing_prefix: &str,
+    error_val: E,
+) -> Result<Ingredient, ResponseError<E>>
+where
+    E: Display,
+{
+    let ingredient_id = from_db_to_value(
+        row,
+        "ingredient_id",
+        &tracing_prefix,
+        error_val,
+    )?;
+
+    let user_id = from_db_to_value(
+        row,
+        "user_id",
+        &tracing_prefix,
+        error_val,
+    )?;
+
+    let name = from_db_to_value(
+        row,
+        "name",
+        &tracing_prefix,
+        error_val,
+    )?;
+
+    let expire_date = from_db_to_value(
+        row,
+        "expire_date",
+        &tracing_prefix,
+        error_val,
+    )?;
+
+    let category = from_db_to_value(
+        row,
+        "category",
+        &tracing_prefix,
+        error_val,
+    )?;
+
+    let quantity = from_db_to_value(
+        row,
+        "quantity",
+        &tracing_prefix,
+        error_val,
+    )?;
+
+    let unit = from_db_to_value(
+        row,
+        "unit",
+        &tracing_prefix,
+        error_val,
+    )?;
+
+    Ok(Ingredient {
+        ingredient_id,
+        user_id,
+        expire_date,
+        name,
+        category,
+        quantity,
+        unit,
+    })
 }

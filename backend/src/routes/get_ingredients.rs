@@ -11,7 +11,8 @@ use tokio_postgres::{Client, Row};
 use uuid::Uuid;
 
 use crate::{
-    extract_jwt, is_session_valid, models::Ingredient, responses::ResponseError, APP_SECRET,
+    extract_jwt, from_db_to_value, is_session_valid, models::Ingredient, parse_db_ingredient,
+    responses::ResponseError, APP_SECRET,
 };
 
 #[derive(Debug)]
@@ -157,118 +158,16 @@ pub async fn get_ingredients(
     tracing::debug!("{} Got ingredients from user!", tracing_prefix);
 
     tracing::debug!("{} Parsing ingredients from db...", tracing_prefix);
-    let parse_string = |row: &Row, index: &str| -> Result<String, _> {
-        row.try_get(index).map_err(|err| {
-            tracing::error!(
-                "{} An error `{:?}` occurred while parsing row field `{}`",
-                tracing_prefix,
-                err,
-                index
-            );
-
-            let error: ResponseError<_> = (
-                StatusCode::INTERNAL_SERVER_ERROR,
+    let ingredients = db_result
+        .iter()
+        .map(|row| {
+            parse_db_ingredient(
+                row,
+                &tracing_prefix,
                 GetIngredientsErrors::InvalidIngredientFormatFromDB,
             )
-                .into();
-            error
         })
-    };
-
-    let parse_date = |row: &Row, index: &str| -> Result<chrono::DateTime<Utc>, _> {
-        row.try_get(index).map_err(|err| {
-            tracing::error!(
-                "{} An error `{:?}` occurred while parsing row field `{}`",
-                tracing_prefix,
-                err,
-                index
-            );
-
-            let error: ResponseError<_> = (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                GetIngredientsErrors::InvalidIngredientFormatFromDB,
-            )
-                .into();
-            error
-        })
-    };
-
-    let parse_u16 = |row: &Row, index: &str| -> Result<u16, _> {
-        row.try_get(index)
-            .map_err(|err| {
-                tracing::error!(
-                    "{} An error `{:?}` occurred while parsing row field `{}`",
-                    tracing_prefix,
-                    err,
-                    index
-                );
-
-                let error: ResponseError<_> = (
-                    StatusCode::INTERNAL_SERVER_ERROR,
-                    GetIngredientsErrors::InvalidIngredientFormatFromDB,
-                )
-                    .into();
-                error
-            })
-            .map(|v: i16| v as u16)
-    };
-
-    let parse_uuid =
-        |row: &Row, index: &str| -> Result<Uuid, ResponseError<GetIngredientsErrors>> {
-            row.try_get::<&str, &str>(index)
-                .map_err(|err| {
-                    tracing::error!(
-                        "{} An error `{:?}` occurred while parsing row field `{}`",
-                        tracing_prefix,
-                        err,
-                        index
-                    );
-
-                    let error: ResponseError<_> = (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        GetIngredientsErrors::InvalidIngredientFormatFromDB,
-                    )
-                        .into();
-                    error
-                })?
-                .parse()
-                .map_err(|err| {
-                    tracing::error!(
-                        "{} An error `{:?}` occurred while parsing row field `{}`",
-                        tracing_prefix,
-                        err,
-                        index
-                    );
-
-                    let error: ResponseError<_> = (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        GetIngredientsErrors::InvalidIngredientFormatFromDB,
-                    )
-                        .into();
-                    error
-                })
-        };
-
-    let mut ingredients = Vec::with_capacity(db_result.len());
-    for row in db_result {
-        let ingredient_id = parse_uuid(&row, "ingredient_id")?;
-        let user_id = parse_uuid(&row, "user_id")?;
-        let name = parse_string(&row, "name")?;
-        let expire_date = parse_date(&row, "expire_date")?;
-        let category = parse_string(&row, "category")?;
-        let quantity = parse_u16(&row, "quantity")?;
-        let unit = parse_string(&row, "unit")?;
-
-        ingredients.push(Ingredient {
-            ingredient_id,
-            user_id,
-            expire_date,
-            name,
-            category,
-            quantity,
-            unit,
-        });
-    }
+        .collect::<Result<Vec<Ingredient>, ResponseError<GetIngredientsErrors>>>()?;
     tracing::debug!("{} Ingredients parsed!", tracing_prefix);
 
     tracing::debug!("{} DONE", tracing_prefix);
