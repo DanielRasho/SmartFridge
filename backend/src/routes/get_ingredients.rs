@@ -158,14 +158,14 @@ pub async fn get_ingredients(
 
     tracing::debug!("{} Parsing ingredients from db...", tracing_prefix);
     let parse_string = |row: &Row, index: &str| -> Result<String, _> {
-        tracing::error!(
-            "{} An error occurred while parsing row field `{}`",
-            tracing_prefix,
-            index
-        );
-
         row.try_get(index).map_err(|err| {
-            tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
+            tracing::error!(
+                "{} An error `{:?}` occurred while parsing row field `{}`",
+                tracing_prefix,
+                err,
+                index
+            );
+
             let error: ResponseError<_> = (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 GetIngredientsErrors::InvalidIngredientFormatFromDB,
@@ -176,14 +176,14 @@ pub async fn get_ingredients(
     };
 
     let parse_date = |row: &Row, index: &str| -> Result<chrono::DateTime<Utc>, _> {
-        tracing::error!(
-            "{} An error occurred while parsing row field `{}`",
-            tracing_prefix,
-            index
-        );
-
         row.try_get(index).map_err(|err| {
-            tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
+            tracing::error!(
+                "{} An error `{:?}` occurred while parsing row field `{}`",
+                tracing_prefix,
+                err,
+                index
+            );
+
             let error: ResponseError<_> = (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 GetIngredientsErrors::InvalidIngredientFormatFromDB,
@@ -194,34 +194,36 @@ pub async fn get_ingredients(
     };
 
     let parse_u16 = |row: &Row, index: &str| -> Result<u16, _> {
-        tracing::error!(
-            "{} An error occurred while parsing row field `{}`",
-            tracing_prefix,
-            index
-        );
+        row.try_get(index)
+            .map_err(|err| {
+                tracing::error!(
+                    "{} An error `{:?}` occurred while parsing row field `{}`",
+                    tracing_prefix,
+                    err,
+                    index
+                );
 
-        row.try_get(index).map_err(|err| {
-            tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
-            let error: ResponseError<_> = (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                GetIngredientsErrors::InvalidIngredientFormatFromDB,
-            )
-                .into();
-            error
-        }).map(|v: i16| v as u16)
+                let error: ResponseError<_> = (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    GetIngredientsErrors::InvalidIngredientFormatFromDB,
+                )
+                    .into();
+                error
+            })
+            .map(|v: i16| v as u16)
     };
 
     let parse_uuid =
         |row: &Row, index: &str| -> Result<Uuid, ResponseError<GetIngredientsErrors>> {
-            tracing::error!(
-                "{} An error occurred while parsing row field `{}`",
-                tracing_prefix,
-                index
-            );
-
             row.try_get::<&str, &str>(index)
                 .map_err(|err| {
-                    tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
+                    tracing::error!(
+                        "{} An error `{:?}` occurred while parsing row field `{}`",
+                        tracing_prefix,
+                        err,
+                        index
+                    );
+
                     let error: ResponseError<_> = (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         GetIngredientsErrors::InvalidIngredientFormatFromDB,
@@ -231,7 +233,13 @@ pub async fn get_ingredients(
                 })?
                 .parse()
                 .map_err(|err| {
-                    tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
+                    tracing::error!(
+                        "{} An error `{:?}` occurred while parsing row field `{}`",
+                        tracing_prefix,
+                        err,
+                        index
+                    );
+
                     let error: ResponseError<_> = (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         GetIngredientsErrors::InvalidIngredientFormatFromDB,
