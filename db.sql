@@ -1,4 +1,4 @@
-DROP DATABASE smart_fridge;
+DROP DATABASE IF EXISTS smart_fridge;
 
 CREATE DATABASE smart_fridge;
 \c smart_fridge;
@@ -33,3 +33,11 @@ CREATE TABLE sf_ingredient (
 	unit varchar(64),
 	PRIMARY KEY( ingredient_id )
 );
+
+-- Enabling Fuzzy search with extension
+CREATE EXTENSION pg_trgm;
+
+-- Creating default user
+-- Username: EL
+-- Password: 1234
+INSERT INTO sf_user VALUES ('81770b26-a1ce-47e6-a7a0-231c64aaeaef', 'EL', 'rE6Ex3ELU+pY763tIvyZJQOsZ0IW8+Fcdh7hpeJV8GeVNiPIs4i0RZ4T+XjXyEb0')
