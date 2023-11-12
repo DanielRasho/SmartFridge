@@ -5,16 +5,25 @@ use std::{
 
 use axum::{response::IntoResponse, Json};
 use hyper::StatusCode;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use tokio_postgres::Client;
+use uuid::Uuid;
 
-use crate::{extract_jwt, models::UserSettings, responses::ResponseError, APP_SECRET};
+use crate::{
+    extract_jwt, is_session_valid,
+    models::{AppThemes, UserSettings},
+    responses::ResponseError,
+    APP_SECRET,
+};
 
 #[derive(Debug)]
 pub enum SaveSettingsErrors {
     InvalidPayload { payload: String },
     NoDBConnection,
     InvalidJWT,
+    ErrorCheckingIfSessionIsValid,
+    JWTExpired,
+    ErrorSavingSettings,
 }
 
 impl Display for SaveSettingsErrors {
@@ -26,7 +35,17 @@ impl Display for SaveSettingsErrors {
 #[derive(Debug, Deserialize)]
 struct SaveSettingsPayload {
     token: String,
-    settings: UserSettings,
+    settings: UserSettingsPayload,
+}
+
+/// Contains the theme id and all the options the user is allowed to change.
+#[derive(Debug, Serialize, Deserialize)]
+struct UserSettingsPayload {
+    #[serde(rename = "SettingsId")]
+    settings_id: Uuid,
+
+    #[serde(rename = "Theme")]
+    theme: AppThemes,
 }
 
 static ID: AtomicUsize = AtomicUsize::new(0);
@@ -78,9 +97,66 @@ pub async fn save_settings(
     };
     tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
-    // TODO Check if token is valid...
+    tracing::debug!("{} Checking DB connection...", tracing_prefix);
+    let conn = client.as_ref().as_ref().ok_or_else(|_| {
+        tracing::error!("{} No DB connection found!", tracing_prefix);
+        let error: ResponseError<_> = (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            SaveSettingsErrors::NoDBConnection,
+        )
+            .into();
+        error
+    })?;
+    tracing::debug!("{} DB connection found!", tracing_prefix);
 
-    // TODO Save settings in DB...
+    tracing::debug!("{} Checking if session is valid...", tracing_prefix);
+    if let Err(err) = is_session_valid(token_info, conn).await {
+        tracing::error!(
+            "{} An error `{:?}` occurred while checking if session is valid!",
+            tracing_prefix,
+            err
+        );
+        let error: ResponseError<_> = match err {
+            crate::IsSessionValidErrors::InternalDBError(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                SaveSettingsErrors::ErrorCheckingIfSessionIsValid,
+            ),
+            crate::IsSessionValidErrors::InvalidSessionData {
+                current_date,
+                db_expire_date,
+            } => (StatusCode::UNAUTHORIZED, SaveSettingsErrors::JWTExpired),
+            _ => (
+                StatusCode::BAD_REQUEST,
+                SaveSettingsErrors::ErrorCheckingIfSessionIsValid,
+            ),
+        }
+        .into();
+        Err(error)?
+    };
+    tracing::debug!("{} Session is valid!", tracing_prefix);
+
+    tracing::debug!("{} Saving settings in DB...", tracing_prefix);
+    let theme = format!("{:?}", settings.theme);
+    if let Err(err) = conn
+        .execute(
+            "UPDATE sf_settings WHERE settings_id=$1 SET theme=$2",
+            &[&settings.settings_id.to_string(), &theme],
+        )
+        .await
+    {
+        tracing::error!(
+            "{} An error `{:?}` occurred while updating settings `{}`",
+            tracing_prefix,
+            err,
+            settings.settings_id
+        );
+        let error: ResponseError<_> = (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            SaveSettingsErrors::ErrorSavingSettings,
+        )
+            .into();
+        Err(error)?
+    }
 
     tracing::debug!("{} DONE", tracing_prefix);
     Ok(StatusCode::OK)
