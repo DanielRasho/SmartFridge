@@ -8,12 +8,14 @@ use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 use tokio_postgres::Client;
 
-use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET};
+use crate::{extract_jwt, models::Ingredient, responses::ResponseError, APP_SECRET, is_session_valid};
 
 #[derive(Debug, Serialize)]
 pub enum AddIngredientErrors {
     InvalidPayload { payload: String },
     InvalidJWT,
+    ErrorCheckingIfSessionIsValid,
+    JWTExpired,
 }
 
 impl Display for AddIngredientErrors {
@@ -79,8 +81,36 @@ pub async fn add_ingredient(
     };
     tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
-    // TODO Check if token is valid...
-
+    match is_session_valid(token_info, client.as_ref().as_ref().unwrap()).await {
+        Ok(true) => {}
+        Ok(false) => {
+            tracing::error!("{} The JWT already expired!", tracing_prefix);
+            let error: ResponseError<_> =
+                (StatusCode::UNAUTHORIZED, AddIngredientErrors::JWTExpired).into();
+            Err(error)?
+        }
+        Err(err) => {
+            tracing::error!(
+                "{} An error `{:?}` occurred while checking if session is valid!",
+                tracing_prefix,
+                err
+            );
+            let error: ResponseError<_> =
+                if let crate::IsSessionValidErrors::InternalDBError(_) = err {
+                    (
+                        StatusCode::INTERNAL_SERVER_ERROR,
+                        AddIngredientErrors::ErrorCheckingIfSessionIsValid,
+                    )
+                } else {
+                    (
+                        StatusCode::BAD_REQUEST,
+                        AddIngredientErrors::ErrorCheckingIfSessionIsValid,
+                    )
+                }
+                .into();
+            Err(error)?
+        }
+    };
     // TODO Add ingredient to DB...
 
     tracing::debug!("{} DONE!", tracing_prefix);
