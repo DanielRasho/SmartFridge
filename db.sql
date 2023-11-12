@@ -27,7 +27,7 @@ CREATE TABLE sf_ingredient (
 	ingredient_id varchar(64) UNIQUE NOT NULL,
 	user_id varchar(64) NOT NULL REFERENCES sf_user(user_id),
 	name varchar(64),
-	expire_date date,
+	expire_date TIMESTAMP WITH TIME ZONE NOT NULL,
 	category varchar(64),
 	quantity smallint,
 	unit varchar(64),
