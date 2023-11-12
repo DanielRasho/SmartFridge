@@ -33,7 +33,32 @@ impl Display for AddIngredientErrors {
 #[derive(Debug, Deserialize)]
 pub struct AddIngredientPayload {
     token: String,
-    ingredient: Ingredient,
+    ingredient: IngredientPayload,
+}
+
+/// Represents an ingredient that will be created.
+///
+/// Creating the ingredient id shouldn't be a responsibility of the client.
+/// That's why this object doesn't have that.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct IngredientPayload {
+    #[serde(rename = "UserId")]
+    pub user_id: Uuid,
+
+    #[serde(rename = "ExpireDate")]
+    pub expire_date: chrono::DateTime<chrono::Utc>,
+
+    #[serde(rename = "Name")]
+    pub name: String,
+
+    #[serde(rename = "Category")]
+    pub category: String,
+
+    #[serde(rename = "Quantity")]
+    pub quantity: u32,
+
+    #[serde(rename = "Unit")]
+    pub unit: String,
 }
 
 static ID: AtomicUsize = AtomicUsize::new(0);
@@ -135,14 +160,14 @@ pub async fn add_ingredient(
     let ingredient_id = Uuid::new_v4().to_string();
     match conn
         .execute(
-            "INSERT INTO sf_ingredient VALUES ($1, $2, $3, $4, $5, $6, $7)",
+            "INSERT INTO sf_ingredient (ingredient_id, user_id, name, expire_date, category, quantity, unit) VALUES ($1, $2, $3, $4, $5, $6, $7)",
             &[
                 &ingredient_id,
                 &ingredient.user_id.to_string(),
                 &ingredient.name,
-                &ingredient.expire_date.to_string(),
+                &ingredient.expire_date,
                 &ingredient.category,
-                &ingredient.quantity,
+                &(ingredient.quantity as i16),
                 &ingredient.unit,
             ],
         )

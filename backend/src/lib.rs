@@ -128,7 +128,7 @@ async fn is_session_valid(
         });
     }
 
-    if current_date < db_expire_date {
+    if current_date > db_expire_date {
         return Err(IsSessionValidErrors::InvalidSessionData {
             current_date,
             db_expire_date
