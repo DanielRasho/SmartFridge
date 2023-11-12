@@ -193,6 +193,9 @@ pub async fn register_user(
                 tracing_prefix,
                 username
             );
+
+            let error: ResponseError<_> = (StatusCode::INTERNAL_SERVER_ERROR, RegisterUserErrors::NoDBConnection).into();
+            Err(error)?
         }
     }
 
