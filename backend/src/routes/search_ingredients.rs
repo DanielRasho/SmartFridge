@@ -87,7 +87,7 @@ pub async fn search_ingredients(
 
     // TODO Get recipes from API
 
-    let recipes = vec![
+    let ingredients = vec![
         Ingredient {
             ingredient_id: Uuid::new_v4(),
             expire_date: Utc::now() + Duration::days(10),
@@ -95,6 +95,7 @@ pub async fn search_ingredients(
             category: "Meat".to_string(),
             quantity: 3,
             unit: "Lb".to_string(),
+            user_id: Uuid::new_v4(),
         },
         Ingredient {
             ingredient_id: Uuid::new_v4(),
@@ -103,6 +104,7 @@ pub async fn search_ingredients(
             category: "Meat".to_string(),
             quantity: 5,
             unit: "Lb".to_string(),
+            user_id: Uuid::new_v4(),
         },
         Ingredient {
             ingredient_id: Uuid::new_v4(),
@@ -111,9 +113,10 @@ pub async fn search_ingredients(
             category: "Fruit".to_string(),
             quantity: 15,
             unit: "Units".to_string(),
+            user_id: Uuid::new_v4(),
         },
     ];
 
     tracing::debug!("{} DONE", tracing_prefix);
-    Ok(Json(recipes))
+    Ok(Json(ingredients))
 }

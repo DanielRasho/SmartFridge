@@ -85,48 +85,47 @@ pub async fn get_recipes(
             Err(error)?
         }
     };
-    tracing::debug!("{} JWT parsed successfully! `{:?}`", tracing_prefix, token_info);
+    tracing::debug!(
+        "{} JWT parsed successfully! `{:?}`",
+        tracing_prefix,
+        token_info
+    );
 
-    if let None = client.as_ref() {
+    let conn = client.as_ref().as_ref().ok_or_else(|| {
         tracing::error!("{} No DB connection found!", tracing_prefix);
         let error: ResponseError<_> = (
             StatusCode::INTERNAL_SERVER_ERROR,
             GetRecipesError::NoDBConnectionFound,
         )
             .into();
+        error
+    })?;
+
+    tracing::debug!("{} DB Connection found!", tracing_prefix);
+
+    if let Err(err) = is_session_valid(token_info, conn).await {
+        tracing::error!(
+            "{} An error `{:?}` occurred while checkinf if session is valid!",
+            tracing_prefix,
+            err
+        );
+        let error: ResponseError<_> = match err {
+            crate::IsSessionValidErrors::InternalDBError(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                GetRecipesError::ErrorCheckingIfSessionIsValid,
+            ),
+            crate::IsSessionValidErrors::InvalidSessionData {
+                current_date,
+                db_expire_date,
+            } => (StatusCode::UNAUTHORIZED, GetRecipesError::JWTExpired),
+            _ => (
+                StatusCode::BAD_REQUEST,
+                GetRecipesError::ErrorCheckingIfSessionIsValid,
+            ),
+        }
+        .into();
         Err(error)?
     }
-
-    match is_session_valid(token_info, client.as_ref().as_ref().unwrap()).await {
-        Ok(true) => {}
-        Ok(false) => {
-            tracing::error!("{} The JWT already expired!", tracing_prefix);
-            let error: ResponseError<_> =
-                (StatusCode::UNAUTHORIZED, GetRecipesError::JWTExpired).into();
-            Err(error)?
-        }
-        Err(err) => {
-            tracing::error!(
-                "{} An error `{:?}` occurred while checking if session is valid!",
-                tracing_prefix,
-                err
-            );
-            let error: ResponseError<_> =
-                if let crate::IsSessionValidErrors::InternalDBError(_) = err {
-                    (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        GetRecipesError::ErrorCheckingIfSessionIsValid,
-                    )
-                } else {
-                    (
-                        StatusCode::BAD_REQUEST,
-                        GetRecipesError::ErrorCheckingIfSessionIsValid,
-                    )
-                }
-                .into();
-            Err(error)?
-        }
-    };
 
     let recipes = match get_recipes_from_api().await {
         Ok(r) => r,
@@ -29479,7 +29478,7 @@ async fn get_recipes_from_api() -> Result<Vec<Recipe>, GetRecipesFromAPIErrors> 
             title: "Test Recipe #1".to_string(),
             banner: "https://lh3.googleusercontent.com/uSzqXtfkILNLvbaIhzU8LK-iKCOG6w60AXCXEhWNzY-UrUaLypLSpH10MoloHfa96NPONh19gIz0ebK-XL7v".to_string(),
             tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
+            ingredients: vec![Ingredient {user_id: Uuid::new_v4(), expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
             source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
         },
         Recipe {
@@ -29487,7 +29486,7 @@ async fn get_recipes_from_api() -> Result<Vec<Recipe>, GetRecipesFromAPIErrors> 
             title: "Test Recipe #2".to_string(),
             banner: "https://lh3.googleusercontent.com/uSzqXtfkILNLvbaIhzU8LK-iKCOG6w60AXCXEhWNzY-UrUaLypLSpH10MoloHfa96NPONh19gIz0ebK-XL7v".to_string(),
             tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
+            ingredients: vec![Ingredient {user_id: Uuid::new_v4(), expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
             source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
         },
         Recipe {
@@ -29495,7 +29494,7 @@ async fn get_recipes_from_api() -> Result<Vec<Recipe>, GetRecipesFromAPIErrors> 
             title: "Test Recipe #3".to_string(),
             banner: "https://lh3.googleusercontent.com/efGuFTcoR-Atb8-OgBL8PMCVbPwRQANTX0ZVgllhlzBkVc92d0G9LkapW1TiNmTL4iZJNlPIkyGKS1ODOUNCOxM".to_string(),
             tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
+            ingredients: vec![Ingredient {user_id: Uuid::new_v4(), expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
             source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
         },
         Recipe {
@@ -29503,7 +29502,7 @@ async fn get_recipes_from_api() -> Result<Vec<Recipe>, GetRecipesFromAPIErrors> 
             title: "Test Recipe #4".to_string(),
             banner: "https://lh3.googleusercontent.com/JumnqUM5mRUraff-j2tx7Oy1c9oXbGJP8ba4fDcF3OqYC2W_2R_Tug1AVJhbwtZcJqaVf5MpVGAfHP1VtHIKzw".to_string(),
             tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4()}],
+            ingredients: vec![Ingredient {user_id: Uuid::new_v4(), expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4()}],
             source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
         },
     ];

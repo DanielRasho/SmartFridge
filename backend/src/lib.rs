@@ -83,21 +83,21 @@ enum IsSessionValidErrors {
         db_expire_date: chrono::DateTime<Utc>,
         expire_date: chrono::DateTime<Utc>,
     },
+    InvalidSessionData { current_date: DateTime<Utc>, db_expire_date: DateTime<Utc> },
 }
 
 /// Checks if the given JWT represents a valid session with the given connection.
 ///
-/// This method returns true if the connection is valid and false if the current date is less than
-/// the expired date of the token.
+/// The method returns an error if the session is invalid, or nothing if it's ok.
 async fn is_session_valid(
     JWT_Token {
         user_id,
         session_id,
         expire_date,
-        username,
+        username: _,
     }: JWT_Token,
     conn: &Client,
-) -> Result<bool, IsSessionValidErrors> {
+) -> Result<(), IsSessionValidErrors> {
     let current_date = Utc::now();
     let rows = conn
         .query(
@@ -128,5 +128,12 @@ async fn is_session_valid(
         });
     }
 
-    Ok(current_date < db_expire_date)
+    if current_date < db_expire_date {
+        return Err(IsSessionValidErrors::InvalidSessionData {
+            current_date,
+            db_expire_date
+        })
+    }
+
+    Ok(())
 }

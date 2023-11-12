@@ -101,38 +101,35 @@ pub async fn add_ingredient(
         error
     })?;
 
+    tracing::debug!("{} DB Connection found!", tracing_prefix);
+
     match is_session_valid(token_info, conn).await {
-        Ok(true) => {}
-        Ok(false) => {
-            tracing::error!("{} The JWT already expired!", tracing_prefix);
-            let error: ResponseError<_> =
-                (StatusCode::UNAUTHORIZED, AddIngredientErrors::JWTExpired).into();
-            Err(error)?
-        }
+        Ok(_) => {}
         Err(err) => {
             tracing::error!(
-                "{} An error `{:?}` occurred while checking if session is valid!",
+                "{} An error occurred `{:?}` while checkinf if session is valid!",
                 tracing_prefix,
                 err
             );
-            let error: ResponseError<_> =
-                if let crate::IsSessionValidErrors::InternalDBError(_) = err {
-                    (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        AddIngredientErrors::ErrorCheckingIfSessionIsValid,
-                    )
-                } else {
-                    (
-                        StatusCode::BAD_REQUEST,
-                        AddIngredientErrors::ErrorCheckingIfSessionIsValid,
-                    )
-                }
-                .into();
+            let error: ResponseError<_> = match err {
+                crate::IsSessionValidErrors::InternalDBError(_) => (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    AddIngredientErrors::ErrorCheckingIfSessionIsValid,
+                ),
+                crate::IsSessionValidErrors::InvalidSessionData {
+                    current_date: _,
+                    db_expire_date: _,
+                } => (StatusCode::UNAUTHORIZED, AddIngredientErrors::JWTExpired),
+                _ => (
+                    StatusCode::BAD_REQUEST,
+                    AddIngredientErrors::ErrorCheckingIfSessionIsValid,
+                ),
+            }
+            .into();
+
             Err(error)?
         }
-    };
-
-    tracing::debug!("{} DB Connection found!", tracing_prefix);
+    }
 
     tracing::debug!("{} Inserting ingredient `{:?}`", tracing_prefix, ingredient);
     let ingredient_id = Uuid::new_v4().to_string();

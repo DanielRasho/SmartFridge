@@ -85,7 +85,6 @@ pub async fn get_ingredients(
     };
     tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
-    // TODO Validate token with DB
     let conn = client.as_ref().as_ref().ok_or_else(|| {
         tracing::error!("{} No DB connection found!", tracing_prefix);
         let error: ResponseError<_> = (
@@ -96,35 +95,38 @@ pub async fn get_ingredients(
         error
     })?;
 
+    tracing::debug!("{} DB Connection found!", tracing_prefix);
+
     match is_session_valid(token_info, conn).await {
-        Ok(false) => {
-            tracing::error!("{} Session is invalid!", tracing_prefix);
-            let error: ResponseError<_> =
-                (StatusCode::UNAUTHORIZED, GetIngredientsErrors::JWTExpired).into();
-            Err(error)?
-        }
+        Ok(_) => {}
         Err(err) => {
             tracing::error!(
                 "{} An error `{:?}` occurred while trying to check if session is valid!",
                 tracing_prefix,
                 err
             );
-            let error: ResponseError<_> =
-                if let crate::IsSessionValidErrors::InternalDBError(_) = err {
-                    (
-                        StatusCode::INTERNAL_SERVER_ERROR,
-                        GetIngredientsErrors::ErrorCheckingIfSessionIsValid,
-                    )
-                } else {
-                    (
-                        StatusCode::BAD_REQUEST,
-                        GetIngredientsErrors::ErrorCheckingIfSessionIsValid,
-                    )
-                }
-                .into();
+
+            let error: ResponseError<_> = match err {
+                crate::IsSessionValidErrors::InternalDBError(_) => (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    GetIngredientsErrors::ErrorCheckingIfSessionIsValid,
+                ),
+                crate::IsSessionValidErrors::InvalidSessionData {
+                    current_date,
+                    db_expire_date,
+                } => (
+                    StatusCode::UNAUTHORIZED,
+                    GetIngredientsErrors::InvalidSession,
+                ),
+                _ => (
+                    StatusCode::BAD_REQUEST,
+                    GetIngredientsErrors::ErrorCheckingIfSessionIsValid,
+                ),
+            }
+            .into();
+
             Err(error)?
         }
-        _ => {}
     }
 
     // TODO Get Ingredients from DB
@@ -178,5 +180,5 @@ pub async fn get_ingredients(
     ];
 
     tracing::debug!("{} DONE", tracing_prefix);
-    Ok(Json(recipes))
+    Ok(Json(ingredients))
 }
