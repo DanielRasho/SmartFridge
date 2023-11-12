@@ -164,7 +164,8 @@ pub async fn get_ingredients(
             index
         );
 
-        row.try_get(index).map_err(|_| {
+        row.try_get(index).map_err(|err| {
+            tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
             let error: ResponseError<_> = (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 GetIngredientsErrors::InvalidIngredientFormatFromDB,
@@ -181,7 +182,8 @@ pub async fn get_ingredients(
             index
         );
 
-        row.try_get(index).map_err(|_| {
+        row.try_get(index).map_err(|err| {
+            tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
             let error: ResponseError<_> = (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 GetIngredientsErrors::InvalidIngredientFormatFromDB,
@@ -191,21 +193,22 @@ pub async fn get_ingredients(
         })
     };
 
-    let parse_u32 = |row: &Row, index: &str| -> Result<u32, _> {
+    let parse_u16 = |row: &Row, index: &str| -> Result<u16, _> {
         tracing::error!(
             "{} An error occurred while parsing row field `{}`",
             tracing_prefix,
             index
         );
 
-        row.try_get(index).map_err(|_| {
+        row.try_get(index).map_err(|err| {
+            tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
             let error: ResponseError<_> = (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 GetIngredientsErrors::InvalidIngredientFormatFromDB,
             )
                 .into();
             error
-        })
+        }).map(|v: i16| v as u16)
     };
 
     let parse_uuid =
@@ -217,7 +220,8 @@ pub async fn get_ingredients(
             );
 
             row.try_get::<&str, &str>(index)
-                .map_err(|_| {
+                .map_err(|err| {
+                    tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
                     let error: ResponseError<_> = (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         GetIngredientsErrors::InvalidIngredientFormatFromDB,
@@ -226,7 +230,8 @@ pub async fn get_ingredients(
                     error
                 })?
                 .parse()
-                .map_err(|_| {
+                .map_err(|err| {
+                    tracing::error!("{} The error is: `{:?}`", tracing_prefix, err);
                     let error: ResponseError<_> = (
                         StatusCode::INTERNAL_SERVER_ERROR,
                         GetIngredientsErrors::InvalidIngredientFormatFromDB,
@@ -243,7 +248,7 @@ pub async fn get_ingredients(
         let name = parse_string(&row, "name")?;
         let expire_date = parse_date(&row, "expire_date")?;
         let category = parse_string(&row, "category")?;
-        let quantity = parse_u32(&row, "quantity")?;
+        let quantity = parse_u16(&row, "quantity")?;
         let unit = parse_string(&row, "unit")?;
 
         ingredients.push(Ingredient {
