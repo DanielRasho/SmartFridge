@@ -16,7 +16,7 @@ use crate::{
 };
 
 #[derive(Debug)]
-pub enum SearchRandomIngredientsErrors {
+pub enum SearchIngredientErrors {
     InvalidPayloadFormat { payload: String },
     InvalidJWT,
     NoDBConnectionFound,
@@ -26,7 +26,7 @@ pub enum SearchRandomIngredientsErrors {
     InvalidIngredientFormatFromDB,
 }
 
-impl Display for SearchRandomIngredientsErrors {
+impl Display for SearchIngredientErrors {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self)
     }
@@ -44,7 +44,7 @@ static ID: AtomicUsize = AtomicUsize::new(0);
 pub async fn search_ingredients(
     payload: Json<serde_json::Value>,
     client: Arc<Option<Client>>,
-) -> Result<impl IntoResponse, ResponseError<SearchRandomIngredientsErrors>> {
+) -> Result<impl IntoResponse, ResponseError<SearchIngredientErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
     let tracing_prefix = format!("/ingredients/search - {}:", id);
 
@@ -66,7 +66,7 @@ pub async fn search_ingredients(
             );
             let error: ResponseError<_> = (
                 StatusCode::BAD_REQUEST,
-                SearchRandomIngredientsErrors::InvalidPayloadFormat {
+                SearchIngredientErrors::InvalidPayloadFormat {
                     payload: payload.0.to_string(),
                 },
             )
@@ -88,7 +88,7 @@ pub async fn search_ingredients(
             );
             let error: ResponseError<_> = (
                 StatusCode::BAD_REQUEST,
-                SearchRandomIngredientsErrors::InvalidJWT,
+                SearchIngredientErrors::InvalidJWT,
             )
                 .into();
             Err(error)?
@@ -101,7 +101,7 @@ pub async fn search_ingredients(
         tracing::error!("{} No DB connection found!", tracing_prefix);
         let error: ResponseError<_> = (
             StatusCode::INTERNAL_SERVER_ERROR,
-            SearchRandomIngredientsErrors::NoDBConnectionFound,
+            SearchIngredientErrors::NoDBConnectionFound,
         )
             .into();
         error
@@ -119,18 +119,18 @@ pub async fn search_ingredients(
         let error: ResponseError<_> = match err {
             crate::IsSessionValidErrors::InternalDBError(_) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                SearchRandomIngredientsErrors::ErrorCheckingIfSessionIsValid,
+                SearchIngredientErrors::ErrorCheckingIfSessionIsValid,
             ),
             crate::IsSessionValidErrors::InvalidSessionData {
                 current_date: _,
                 db_expire_date: _,
             } => (
                 StatusCode::UNAUTHORIZED,
-                SearchRandomIngredientsErrors::JWTExpired,
+                SearchIngredientErrors::JWTExpired,
             ),
             _ => (
                 StatusCode::BAD_REQUEST,
-                SearchRandomIngredientsErrors::ErrorCheckingIfSessionIsValid,
+                SearchIngredientErrors::ErrorCheckingIfSessionIsValid,
             ),
         }
         .into();
@@ -154,7 +154,7 @@ pub async fn search_ingredients(
             );
             let error: ResponseError<_> = (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                SearchRandomIngredientsErrors::ErrorRetrievingIngredients,
+                SearchIngredientErrors::ErrorRetrievingIngredients,
             )
                 .into();
             error
@@ -168,10 +168,10 @@ pub async fn search_ingredients(
             parse_db_ingredient(
                 row,
                 &tracing_prefix,
-                SearchRandomIngredientsErrors::InvalidIngredientFormatFromDB,
+                SearchIngredientErrors::InvalidIngredientFormatFromDB,
             )
         })
-        .collect::<Result<Vec<Ingredient>, ResponseError<SearchRandomIngredientsErrors>>>()?;
+        .collect::<Result<Vec<Ingredient>, ResponseError<SearchIngredientErrors>>>()?;
     tracing::debug!("{} DONE", tracing_prefix);
 
     Ok(Json(ingredients))
