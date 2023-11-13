@@ -41,3 +41,4 @@ CREATE EXTENSION pg_trgm;
 -- Username: EL
 -- Password: 1234
 INSERT INTO sf_user VALUES ('81770b26-a1ce-47e6-a7a0-231c64aaeaef', 'EL', 'rE6Ex3ELU+pY763tIvyZJQOsZ0IW8+Fcdh7hpeJV8GeVNiPIs4i0RZ4T+XjXyEb0')
+INSERT INTO sf_settings VALUES ('1f52e19d-7147-4393-9567-e7fbbd8e0d66', '81770b26-a1ce-47e6-a7a0-231c64aaeaef', 'DARK');
