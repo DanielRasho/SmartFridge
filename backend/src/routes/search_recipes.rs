@@ -105,7 +105,7 @@ pub async fn search_recipes(
     tracing::debug!("{} Checking if session is valid...", tracing_prefix);
     if let Err(err) = is_session_valid(token_info, conn).await {
         tracing::error!(
-            "{} An error `{:?}` occurred while checkinf if session is valid!",
+            "{} An error `{:?}` occurred while checking if session is valid!",
             tracing_prefix,
             err
         );
