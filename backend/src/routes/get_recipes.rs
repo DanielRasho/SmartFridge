@@ -93,6 +93,7 @@ pub async fn get_recipes(
         token_info
     );
 
+    tracing::debug!("{} Checking if DB connection exists...", tracing_prefix);
     let conn = client.as_ref().as_ref().ok_or_else(|| {
         tracing::error!("{} No DB connection found!", tracing_prefix);
         let error: ResponseError<_> = (
@@ -102,9 +103,9 @@ pub async fn get_recipes(
             .into();
         error
     })?;
-
     tracing::debug!("{} DB Connection found!", tracing_prefix);
 
+    tracing::debug!("{} Checking if session is valid...", tracing_prefix);
     if let Err(err) = is_session_valid(token_info, conn).await {
         tracing::error!(
             "{} An error `{:?}` occurred while checkinf if session is valid!",
@@ -128,7 +129,9 @@ pub async fn get_recipes(
         .into();
         Err(error)?
     }
+    tracing::debug!("{} Session is valid!", tracing_prefix);
 
+    tracing::debug!("{} Getting recipes from API...", tracing_prefix);
     let recipes = get_recipes_from_api(&params.rapid_api_key, &params.rapid_api_host)
         .await
         .map_err(|err| {
