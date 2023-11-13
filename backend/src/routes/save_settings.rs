@@ -10,10 +10,7 @@ use tokio_postgres::Client;
 use uuid::Uuid;
 
 use crate::{
-    extract_jwt, is_session_valid,
-    models::{AppThemes},
-    responses::ResponseError,
-    APP_SECRET,
+    extract_jwt, is_session_valid, models::AppThemes, responses::ResponseError, APP_SECRET,
 };
 
 #[derive(Debug)]

@@ -9,7 +9,6 @@ use hyper::StatusCode;
 use serde::Deserialize;
 use tokio_postgres::Client;
 
-
 use crate::{
     extract_jwt,
     models::{Recipe, RecipeIngredient},
@@ -48,8 +47,10 @@ pub async fn recipe_details(
     tracing::debug!("{} START", tracing_prefix);
 
     tracing::debug!("{} Parsing payload...", tracing_prefix);
-    let RecipeDetailsPayload { token, recipe_id: _ } = match serde_json::from_value(payload.0.clone())
-    {
+    let RecipeDetailsPayload {
+        token,
+        recipe_id: _,
+    } = match serde_json::from_value(payload.0.clone()) {
         Ok(p) => p,
         Err(err) => {
             tracing::error!(

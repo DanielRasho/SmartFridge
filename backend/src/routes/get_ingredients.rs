@@ -7,7 +7,7 @@ use axum::{response::IntoResponse, Json};
 
 use hyper::StatusCode;
 use serde::Deserialize;
-use tokio_postgres::{Client};
+use tokio_postgres::Client;
 use uuid::Uuid;
 
 use crate::{

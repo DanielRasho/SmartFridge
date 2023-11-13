@@ -9,11 +9,7 @@ use serde::Deserialize;
 use tokio_postgres::Client;
 use uuid::Uuid;
 
-use crate::{
-    encrypt_password,
-    models::{AppThemes},
-    responses::ResponseError,
-};
+use crate::{encrypt_password, models::AppThemes, responses::ResponseError};
 
 #[derive(Debug)]
 pub enum RegisterUserErrors {

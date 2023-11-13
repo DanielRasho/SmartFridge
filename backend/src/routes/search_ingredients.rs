@@ -1,5 +1,5 @@
 use std::{
-    fmt::{Display},
+    fmt::Display,
     sync::{atomic::AtomicUsize, Arc},
 };
 

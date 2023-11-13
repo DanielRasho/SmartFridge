@@ -10,10 +10,10 @@ use serde::Deserialize;
 use serde_json::{Map, Value};
 use tokio_postgres::Client;
 
-
 use crate::{
     extract_jwt, is_session_valid,
     models::{Recipe, RecipeIngredient},
+    parse_api_recipe_from_value,
     responses::ResponseError,
     Params, APP_SECRET,
 };
@@ -222,117 +222,4 @@ async fn get_recipes_from_api(
         .collect();
 
     Ok(recipes)
-}
-
-fn parse_api_recipe_from_value(value: &Map<String, Value>) -> Option<Recipe> {
-    if let Some(serde_json::Value::Object(_)) = value.get("seo") {
-        let recipe_id = if let serde_json::Value::String(a) = value.get("tracking-id")? {
-            a.to_string()
-        } else {
-            None?
-        };
-
-        let content = if let serde_json::Value::Object(a) = value.get("content")? {
-            a
-        } else {
-            None?
-        };
-
-        let details = if let Value::Object(a) = content.get("details")? {
-            a
-        } else {
-            None?
-        };
-
-        let tags: Vec<String> = if let Value::Array(a) = details.get("keywords")? {
-            a
-        } else {
-            None?
-        }
-        .iter()
-        .filter_map(|v| {
-            if let Value::String(b) = v {
-                Some(b.to_string())
-            } else {
-                None
-            }
-        })
-        .take(2)
-        .collect();
-
-        let title = if let Value::String(a) = details.get("name")? {
-            a.to_string()
-        } else {
-            None?
-        };
-
-        let images = if let Value::Array(a) = details.get("images")? {
-            a
-        } else {
-            None?
-        };
-
-        let banner = if let Value::Object(a) = images.get(0)? {
-            a
-        } else {
-            None?
-        };
-        let banner = if let Value::String(a) = banner.get("hostedLargeUrl")? {
-            a.to_string()
-        } else {
-            None?
-        };
-
-        let source = if let Value::String(a) = details.get("directionsUrl")? {
-            a.to_string()
-        } else {
-            None?
-        };
-
-        let ingredients: Vec<RecipeIngredient> =
-            if let Value::Array(a) = content.get("ingredientLines")? {
-                a
-            } else {
-                None?
-            }
-            .iter()
-            .filter_map(|json_ingredient| {
-                let display = if let Value::String(a) = json_ingredient.get("wholeLine")? {
-                    a.to_string()
-                } else {
-                    None?
-                };
-
-                let name = if let Value::String(a) = json_ingredient.get("ingredient")? {
-                    a.to_string()
-                } else {
-                    None?
-                };
-
-                Some(RecipeIngredient { name, display })
-            })
-            .collect();
-
-        Some(Recipe {
-            recipe_id,
-            title,
-            banner,
-            tags,
-            ingredients,
-            source,
-        })
-    } else {
-        let content = if let Value::Object(a) = value.get("content")? {
-            a
-        } else {
-            None?
-        };
-        let matches = if let Value::Object(a) = content.get("matches")? {
-            a
-        } else {
-            None?
-        };
-
-        parse_api_recipe_from_value(matches)
-    }
 }

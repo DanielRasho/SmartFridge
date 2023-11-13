@@ -1,10 +1,5 @@
 #![recursion_limit = "512"]
-use std::{
-    fmt::{Debug},
-    io,
-    net::SocketAddr,
-    str::FromStr,
-};
+use std::{fmt::Debug, io, net::SocketAddr, str::FromStr};
 
 use base64::{engine::general_purpose, Engine};
 use chrono::{DateTime, Utc};
@@ -12,12 +7,12 @@ use clap::Parser;
 use hmac::{digest::KeyInit, Hmac};
 
 use jwt::{SignWithKey, VerifyWithKey};
-use models::{Ingredient, JWT_Token};
+use models::{Ingredient, JWT_Token, Recipe, RecipeIngredient};
 use rand::{thread_rng, Rng};
 
+use serde_json::{Map, Value};
 use sha2::{Digest, Sha256};
 use tokio_postgres::{Client, Row};
-
 
 mod models;
 mod responses;
@@ -252,4 +247,118 @@ fn parse_db_ingredient(row: &Row, tracing_prefix: &str) -> Option<Ingredient> {
         quantity,
         unit,
     })
+}
+
+/// Parse a recipe from the response of WorldWide Recipes of RapidAPI
+fn parse_api_recipe_from_value(value: &Map<String, Value>) -> Option<Recipe> {
+    if let Some(serde_json::Value::Object(_)) = value.get("seo") {
+        let recipe_id = if let serde_json::Value::String(a) = value.get("tracking-id")? {
+            a.to_string()
+        } else {
+            None?
+        };
+
+        let content = if let serde_json::Value::Object(a) = value.get("content")? {
+            a
+        } else {
+            None?
+        };
+
+        let details = if let Value::Object(a) = content.get("details")? {
+            a
+        } else {
+            None?
+        };
+
+        let tags: Vec<String> = if let Value::Array(a) = details.get("keywords")? {
+            a
+        } else {
+            None?
+        }
+        .iter()
+        .filter_map(|v| {
+            if let Value::String(b) = v {
+                Some(b.to_string())
+            } else {
+                None
+            }
+        })
+        .take(2)
+        .collect();
+
+        let title = if let Value::String(a) = details.get("name")? {
+            a.to_string()
+        } else {
+            None?
+        };
+
+        let images = if let Value::Array(a) = details.get("images")? {
+            a
+        } else {
+            None?
+        };
+
+        let banner = if let Value::Object(a) = images.get(0)? {
+            a
+        } else {
+            None?
+        };
+        let banner = if let Value::String(a) = banner.get("hostedLargeUrl")? {
+            a.to_string()
+        } else {
+            None?
+        };
+
+        let source = if let Value::String(a) = details.get("directionsUrl")? {
+            a.to_string()
+        } else {
+            None?
+        };
+
+        let ingredients: Vec<RecipeIngredient> =
+            if let Value::Array(a) = content.get("ingredientLines")? {
+                a
+            } else {
+                None?
+            }
+            .iter()
+            .filter_map(|json_ingredient| {
+                let display = if let Value::String(a) = json_ingredient.get("wholeLine")? {
+                    a.to_string()
+                } else {
+                    None?
+                };
+
+                let name = if let Value::String(a) = json_ingredient.get("ingredient")? {
+                    a.to_string()
+                } else {
+                    None?
+                };
+
+                Some(RecipeIngredient { name, display })
+            })
+            .collect();
+
+        Some(Recipe {
+            recipe_id,
+            title,
+            banner,
+            tags,
+            ingredients,
+            source,
+        })
+    } else {
+        let content = if let Value::Object(a) = value.get("content")? {
+            a
+        } else {
+            None?
+        };
+        let matches = if let Value::Object(a) = content.get("matches")? {
+            a
+        } else {
+            None?
+        };
+
+        parse_api_recipe_from_value(matches)
+    }
 }
