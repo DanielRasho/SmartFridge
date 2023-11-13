@@ -12,7 +12,7 @@ use uuid::Uuid;
 
 use crate::{
     extract_jwt,
-    models::{Ingredient, Recipe},
+    models::{Ingredient, Recipe, RecipeIngredient},
     responses::ResponseError,
     APP_SECRET,
 };
@@ -91,11 +91,11 @@ pub async fn recipe_details(
     // TODO Get recipe from API
 
     let recipe = Recipe {
-            recipe_id: Uuid::new_v4(),
+            recipe_id: "recipe:Plant-Based-Breakfast-Bowl-9118197,recipe,list.recipe.trending".to_owned(),
             title: "Test Recipe #3".to_string(),
             banner: "https://lh3.googleusercontent.com/efGuFTcoR-Atb8-OgBL8PMCVbPwRQANTX0ZVgllhlzBkVc92d0G9LkapW1TiNmTL4iZJNlPIkyGKS1ODOUNCOxM".to_string(),
             tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient { expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4(), user_id: Uuid::new_v4()}],
+            ingredients: vec![RecipeIngredient { display: "½ cup riced sweet potato".to_owned(), name: "Lime Juice".to_owned() }],
             source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
         };
 

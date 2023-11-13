@@ -7,12 +7,13 @@ use axum::{response::IntoResponse, Json};
 use chrono::Utc;
 use hyper::StatusCode;
 use serde::Deserialize;
+use serde_json::{json, Map, Value};
 use tokio_postgres::Client;
 use uuid::Uuid;
 
 use crate::{
     extract_jwt, is_session_valid,
-    models::{Ingredient, Recipe},
+    models::{Ingredient, Recipe, RecipeIngredient},
     responses::ResponseError,
     APP_SECRET,
 };
@@ -149,7 +150,12 @@ pub async fn get_recipes(
 }
 
 #[derive(Debug)]
-enum GetRecipesFromAPIErrors {}
+enum GetRecipesFromAPIErrors {
+    APIFormatHaschanged {
+        reason: String,
+        api_response: String,
+    },
+}
 
 async fn get_recipes_from_api() -> Result<Vec<Recipe>, GetRecipesFromAPIErrors> {
     // TODO call world recipes API
@@ -188,7 +194,7 @@ async fn get_recipes_from_api() -> Result<Vec<Recipe>, GetRecipesFromAPIErrors> 
             "image-url": "https://lh3.googleusercontent.com/uSzqXtfkILNLvbaIhzU8LK-iKCOG6w60AXCXEhWNzY-UrUaLypLSpH10MoloHfa96NPONh19gIz0ebK-XL7v"
           },
           "spotlightSearch": {
-            "keywords": [ // TAKE THE FIRST TWO
+            "keywords": [
               "plant based",
               "egg plant",
               "plant based recipes",
@@ -29470,42 +29476,151 @@ async fn get_recipes_from_api() -> Result<Vec<Recipe>, GetRecipesFromAPIErrors> 
 }
 "##;
 
-    // TODO Parse API response into Vec<Recipe>
-
-    let recipes = vec![
-        Recipe {
-            recipe_id: Uuid::new_v4(),
-            title: "Test Recipe #1".to_string(),
-            banner: "https://lh3.googleusercontent.com/uSzqXtfkILNLvbaIhzU8LK-iKCOG6w60AXCXEhWNzY-UrUaLypLSpH10MoloHfa96NPONh19gIz0ebK-XL7v".to_string(),
-            tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient {user_id: Uuid::new_v4(), expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
-            source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
-        },
-        Recipe {
-            recipe_id: Uuid::new_v4(),
-            title: "Test Recipe #2".to_string(),
-            banner: "https://lh3.googleusercontent.com/uSzqXtfkILNLvbaIhzU8LK-iKCOG6w60AXCXEhWNzY-UrUaLypLSpH10MoloHfa96NPONh19gIz0ebK-XL7v".to_string(),
-            tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient {user_id: Uuid::new_v4(), expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
-            source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
-        },
-        Recipe {
-            recipe_id: Uuid::new_v4(),
-            title: "Test Recipe #3".to_string(),
-            banner: "https://lh3.googleusercontent.com/efGuFTcoR-Atb8-OgBL8PMCVbPwRQANTX0ZVgllhlzBkVc92d0G9LkapW1TiNmTL4iZJNlPIkyGKS1ODOUNCOxM".to_string(),
-            tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient {user_id: Uuid::new_v4(), expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4() }],
-            source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
-        },
-        Recipe {
-            recipe_id: Uuid::new_v4(),
-            title: "Test Recipe #4".to_string(),
-            banner: "https://lh3.googleusercontent.com/JumnqUM5mRUraff-j2tx7Oy1c9oXbGJP8ba4fDcF3OqYC2W_2R_Tug1AVJhbwtZcJqaVf5MpVGAfHP1VtHIKzw".to_string(),
-            tags: vec!["Breakfast".to_string(), "Egg".to_string()],
-            ingredients: vec![Ingredient {user_id: Uuid::new_v4(), expire_date: Utc::now(), name: "Eggs".to_string(), category: "Dairy".to_string(), quantity: 2, unit: "Eggs".to_string(), ingredient_id: Uuid::new_v4()}],
-            source: "http://www.yummly.com/recipe/Plant-Based-Breakfast-Bowl-9118197".to_string(),
-        },
-    ];
+    let json_recipes = json!(api_response);
+    let json_recipes = match json_recipes {
+        serde_json::Value::Object(obj) => obj,
+        _ => Err(GetRecipesFromAPIErrors::APIFormatHaschanged {
+            reason: "Response was not an object!".to_owned(),
+            api_response: api_response.to_owned(),
+        })?,
+    };
+    let json_recipes = match json_recipes.get("results") {
+        Some(serde_json::Value::Object(obj)) => obj,
+        _ => Err(GetRecipesFromAPIErrors::APIFormatHaschanged {
+            reason: "results object not found!".to_owned(),
+            api_response: api_response.to_owned(),
+        })?,
+    };
+    let json_recipes = match json_recipes.get("feed") {
+        Some(serde_json::Value::Array(arr)) => arr,
+        _ => Err(GetRecipesFromAPIErrors::APIFormatHaschanged {
+            reason: "feed array not found!".to_owned(),
+            api_response: api_response.to_owned(),
+        })?,
+    };
+    let recipes: Vec<Recipe> = json_recipes
+        .into_iter()
+        .filter_map(|v| {
+            if let Value::Object(a) = v {
+                parse_api_recipe_from_value(a)
+            } else {
+                None
+            }
+        })
+        .collect();
 
     Ok(recipes)
+}
+
+fn parse_api_recipe_from_value(value: &Map<String, Value>) -> Option<Recipe> {
+    if let Some(serde_json::Value::Object(_)) = value.get("seo") {
+        let recipe_id = if let serde_json::Value::String(a) = value.get("tracking-id")? {
+            a.to_string()
+        } else {
+            None?
+        };
+
+        let content = if let serde_json::Value::Object(a) = value.get("content")? {
+            a
+        } else {
+            None?
+        };
+
+        let details = if let Value::Object(a) = content.get("details")? {
+            a
+        } else {
+            None?
+        };
+
+        let tags: Vec<String> = if let Value::Array(a) = details.get("keywords")? {
+            a
+        } else {
+            None?
+        }
+        .into_iter()
+        .filter_map(|v| {
+            if let Value::String(b) = v {
+                Some(b.to_string())
+            } else {
+                None
+            }
+        })
+        .take(2)
+        .collect();
+
+        let title = if let Value::String(a) = details.get("displayName")? {
+            a.to_string()
+        } else {
+            None?
+        };
+
+        let images = if let Value::Array(a) = details.get("images")? {
+            a
+        } else {
+            None?
+        };
+
+        let banner = if let Value::Object(a) = images.get(0)? {
+            a
+        } else {
+            None?
+        };
+        let banner = if let Value::String(a) = banner.get("hostedLargeUrl")? {
+            a.to_string()
+        } else {
+            None?
+        };
+
+        let source = if let Value::String(a) = details.get("directionsUrl")? {
+            a.to_string()
+        } else {
+            None?
+        };
+
+        let ingredients: Vec<RecipeIngredient> =
+            if let Value::Array(a) = content.get("ingredientLines")? {
+                a
+            } else {
+                None?
+            }
+            .into_iter()
+            .filter_map(|json_ingredient| {
+                let display = if let Value::String(a) = json_ingredient.get("wholeLine")? {
+                    a.to_string()
+                } else {
+                    None?
+                };
+
+                let name = if let Value::String(a) = json_ingredient.get("ingredient")? {
+                    a.to_string()
+                } else {
+                    None?
+                };
+
+                Some(RecipeIngredient { name, display })
+            })
+            .collect();
+
+        Some(Recipe {
+            recipe_id,
+            title,
+            banner,
+            tags,
+            ingredients,
+            source,
+        })
+    } else {
+        let content = if let Value::Object(a) = value.get("content")? {
+            a
+        } else {
+            None?
+        };
+        let matches = if let Value::Object(a) = content.get("matches")? {
+            a
+        } else {
+            None?
+        };
+
+        parse_api_recipe_from_value(matches)
+    }
 }
