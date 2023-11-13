@@ -98,7 +98,7 @@ pub async fn save_settings(
     tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
     tracing::debug!("{} Checking DB connection...", tracing_prefix);
-    let conn = client.as_ref().as_ref().ok_or_else(|_| {
+    let conn = client.as_ref().as_ref().ok_or_else(|| {
         tracing::error!("{} No DB connection found!", tracing_prefix);
         let error: ResponseError<_> = (
             StatusCode::INTERNAL_SERVER_ERROR,
