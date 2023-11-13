@@ -4,16 +4,16 @@ use std::{
 };
 
 use axum::{response::IntoResponse, Json};
-use chrono::Utc;
+
 use hyper::StatusCode;
 use serde::Deserialize;
-use serde_json::{json, Map, Value};
+use serde_json::{Map, Value};
 use tokio_postgres::Client;
-use uuid::Uuid;
+
 
 use crate::{
     extract_jwt, is_session_valid,
-    models::{Ingredient, Recipe, RecipeIngredient},
+    models::{Recipe, RecipeIngredient},
     responses::ResponseError,
     Params, APP_SECRET,
 };
@@ -117,8 +117,8 @@ pub async fn get_recipes(
                 GetRecipesErrors::ErrorCheckingIfSessionIsValid,
             ),
             crate::IsSessionValidErrors::InvalidSessionData {
-                current_date,
-                db_expire_date,
+                current_date: _,
+                db_expire_date: _,
             } => (StatusCode::UNAUTHORIZED, GetRecipesErrors::JWTExpired),
             _ => (
                 StatusCode::BAD_REQUEST,
@@ -208,7 +208,7 @@ async fn get_recipes_from_api(
         })?,
     };
     let recipes: Vec<Recipe> = json_recipes
-        .into_iter()
+        .iter()
         .filter_map(|v| {
             if let Value::Object(a) = v {
                 parse_api_recipe_from_value(a)
@@ -246,7 +246,7 @@ fn parse_api_recipe_from_value(value: &Map<String, Value>) -> Option<Recipe> {
         } else {
             None?
         }
-        .into_iter()
+        .iter()
         .filter_map(|v| {
             if let Value::String(b) = v {
                 Some(b.to_string())
@@ -292,7 +292,7 @@ fn parse_api_recipe_from_value(value: &Map<String, Value>) -> Option<Recipe> {
             } else {
                 None?
             }
-            .into_iter()
+            .iter()
             .filter_map(|json_ingredient| {
                 let display = if let Value::String(a) = json_ingredient.get("wholeLine")? {
                     a.to_string()

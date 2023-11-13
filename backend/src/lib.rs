@@ -1,23 +1,23 @@
 #![recursion_limit = "512"]
 use std::{
-    fmt::{Debug, Display},
+    fmt::{Debug},
     io,
     net::SocketAddr,
     str::FromStr,
 };
 
 use base64::{engine::general_purpose, Engine};
-use chrono::{DateTime, Datelike, Timelike, Utc};
+use chrono::{DateTime, Utc};
 use clap::Parser;
 use hmac::{digest::KeyInit, Hmac};
-use hyper::StatusCode;
+
 use jwt::{SignWithKey, VerifyWithKey};
 use models::{Ingredient, JWT_Token};
 use rand::{thread_rng, Rng};
-use responses::ResponseError;
+
 use sha2::{Digest, Sha256};
 use tokio_postgres::{Client, Row};
-use uuid::Uuid;
+
 
 mod models;
 mod responses;
@@ -161,7 +161,7 @@ async fn is_session_valid(
             &[&session_id],
         )
         .await
-        .map_err(|err| IsSessionValidErrors::InternalDBError(err))?;
+        .map_err(IsSessionValidErrors::InternalDBError)?;
     if rows.is_empty() {
         return Err(IsSessionValidErrors::NoSessionWithId(session_id));
     }
@@ -229,19 +229,19 @@ where
 
 /// Parses an Ingredient from a DB Row.
 fn parse_db_ingredient(row: &Row, tracing_prefix: &str) -> Option<Ingredient> {
-    let ingredient_id = from_db_to_value(row, "ingredient_id", &tracing_prefix)?;
+    let ingredient_id = from_db_to_value(row, "ingredient_id", tracing_prefix)?;
 
-    let user_id = from_db_to_value(row, "user_id", &tracing_prefix)?;
+    let user_id = from_db_to_value(row, "user_id", tracing_prefix)?;
 
-    let name = from_db_to_value(row, "name", &tracing_prefix)?;
+    let name = from_db_to_value(row, "name", tracing_prefix)?;
 
-    let expire_date = from_db_to_value(row, "expire_date", &tracing_prefix)?;
+    let expire_date = from_db_to_value(row, "expire_date", tracing_prefix)?;
 
-    let category = from_db_to_value(row, "category", &tracing_prefix)?;
+    let category = from_db_to_value(row, "category", tracing_prefix)?;
 
-    let quantity = from_db_to_value(row, "quantity", &tracing_prefix)?;
+    let quantity = from_db_to_value(row, "quantity", tracing_prefix)?;
 
-    let unit = from_db_to_value(row, "unit", &tracing_prefix)?;
+    let unit = from_db_to_value(row, "unit", tracing_prefix)?;
 
     Some(Ingredient {
         ingredient_id,

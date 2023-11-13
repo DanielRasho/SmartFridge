@@ -4,15 +4,15 @@ use std::{
 };
 
 use axum::{response::IntoResponse, Json};
-use chrono::Utc;
+
 use hyper::StatusCode;
 use serde::Deserialize;
 use tokio_postgres::Client;
-use uuid::Uuid;
+
 
 use crate::{
     extract_jwt,
-    models::{Ingredient, Recipe, RecipeIngredient},
+    models::{Recipe, RecipeIngredient},
     responses::ResponseError,
     APP_SECRET,
 };
@@ -40,7 +40,7 @@ static ID: AtomicUsize = AtomicUsize::new(0);
 
 pub async fn recipe_details(
     payload: Json<serde_json::Value>,
-    client: Arc<Option<Client>>,
+    _client: Arc<Option<Client>>,
 ) -> Result<impl IntoResponse, ResponseError<RecipeDetailsErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
     let tracing_prefix = format!("/recipes/details - {}:", id);
@@ -48,7 +48,7 @@ pub async fn recipe_details(
     tracing::debug!("{} START", tracing_prefix);
 
     tracing::debug!("{} Parsing payload...", tracing_prefix);
-    let RecipeDetailsPayload { token, recipe_id } = match serde_json::from_value(payload.0.clone())
+    let RecipeDetailsPayload { token, recipe_id: _ } = match serde_json::from_value(payload.0.clone())
     {
         Ok(p) => p,
         Err(err) => {
@@ -71,7 +71,7 @@ pub async fn recipe_details(
     tracing::debug!("{} Payload parsed!", tracing_prefix);
 
     tracing::debug!("{} Extracting JWT...", tracing_prefix);
-    let token_info = match extract_jwt(APP_SECRET, &token) {
+    let _token_info = match extract_jwt(APP_SECRET, &token) {
         Ok(t) => t,
         Err(_) => {
             tracing::error!(

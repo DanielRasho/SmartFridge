@@ -1,5 +1,5 @@
 #![recursion_limit = "256"]
-use std::{io, net::SocketAddr, sync::Arc};
+use std::{net::SocketAddr, sync::Arc};
 
 use axum::{routing::post, Router};
 use backend::{

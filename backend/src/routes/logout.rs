@@ -78,7 +78,7 @@ pub async fn logout(
     };
     tracing::debug!("{} JWT extracted!", tracing_prefix);
 
-    if let None = client.as_ref() {
+    if client.as_ref().is_none() {
         tracing::error!("{} No DB connection found!", tracing_prefix);
         let err: ResponseError<_> = (
             StatusCode::INTERNAL_SERVER_ERROR,

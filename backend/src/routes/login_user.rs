@@ -4,7 +4,7 @@ use std::{
 };
 
 use axum::{response::IntoResponse, Json};
-use base64::{engine::general_purpose, Engine};
+
 use chrono::{Duration, Utc};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
@@ -88,7 +88,7 @@ pub async fn login_user(
     tracing::debug!("{} Payload parsed successfully!", tracing_prefix);
 
     tracing::debug!("{} Checking if we have a DB connection...", tracing_prefix);
-    if let None = client.as_ref() {
+    if client.as_ref().is_none() {
         let error: ResponseError<_> = (
             StatusCode::INTERNAL_SERVER_ERROR,
             LoginUserErrors::NoDBConnection,

@@ -11,7 +11,7 @@ use uuid::Uuid;
 
 use crate::{
     encrypt_password,
-    models::{AppThemes, UserSettings},
+    models::{AppThemes},
     responses::ResponseError,
 };
 

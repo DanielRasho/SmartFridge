@@ -1,10 +1,10 @@
 use std::{
-    fmt::{format, Display},
+    fmt::{Display},
     sync::{atomic::AtomicUsize, Arc},
 };
 
 use axum::{response::IntoResponse, Json};
-use chrono::{Duration, Utc};
+
 use hyper::StatusCode;
 use serde::Deserialize;
 use tokio_postgres::Client;

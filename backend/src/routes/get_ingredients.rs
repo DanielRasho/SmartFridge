@@ -4,14 +4,14 @@ use std::{
 };
 
 use axum::{response::IntoResponse, Json};
-use chrono::{Duration, Utc};
+
 use hyper::StatusCode;
 use serde::Deserialize;
-use tokio_postgres::{Client, Row};
+use tokio_postgres::{Client};
 use uuid::Uuid;
 
 use crate::{
-    extract_jwt, from_db_to_value, is_session_valid, models::Ingredient, parse_db_ingredient,
+    extract_jwt, is_session_valid, models::Ingredient, parse_db_ingredient,
     responses::ResponseError, APP_SECRET,
 };
 

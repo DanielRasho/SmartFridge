@@ -11,7 +11,7 @@ use uuid::Uuid;
 
 use crate::{
     extract_jwt, is_session_valid,
-    models::{AppThemes, UserSettings},
+    models::{AppThemes},
     responses::ResponseError,
     APP_SECRET,
 };
@@ -122,8 +122,8 @@ pub async fn save_settings(
                 SaveSettingsErrors::ErrorCheckingIfSessionIsValid,
             ),
             crate::IsSessionValidErrors::InvalidSessionData {
-                current_date,
-                db_expire_date,
+                current_date: _,
+                db_expire_date: _,
             } => (StatusCode::UNAUTHORIZED, SaveSettingsErrors::JWTExpired),
             _ => (
                 StatusCode::BAD_REQUEST,
