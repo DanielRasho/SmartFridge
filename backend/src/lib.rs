@@ -8,7 +8,7 @@ use chrono::{DateTime, Datelike, Timelike, Utc};
 use hmac::{digest::KeyInit, Hmac};
 use hyper::StatusCode;
 use jwt::{SignWithKey, VerifyWithKey};
-use models::{JWT_Token, Ingredient};
+use models::{Ingredient, JWT_Token};
 use rand::{thread_rng, Rng};
 use responses::ResponseError;
 use sha2::{Digest, Sha256};
@@ -150,102 +150,59 @@ async fn is_session_valid(
 }
 
 /// Converts a value in the given index from a DB row into a value of type T.
-fn from_db_to_value<T, E>(
-    row: &Row,
-    index: &str,
-    tracing_prefix: &str,
-    error_val: E,
-) -> Result<T, ResponseError<E>>
+fn from_db_to_value<T>(row: &Row, index: &str, tracing_prefix: &str) -> Option<T>
 where
     T: FromStr,
     <T as FromStr>::Err: Debug,
-    E: Display,
 {
-    row.try_get::<&str, &str>(index)
-        .map_err(|err| {
+    let value = match row.try_get::<&str, &str>(index) {
+        Ok(v) => v,
+        Err(err) => {
             tracing::error!(
                 "{} An error `{:?}` occurred while parsing row field `{}`",
                 tracing_prefix,
                 err,
                 index
             );
+            None?
+        }
+    };
 
-            let error: ResponseError<_> = (StatusCode::INTERNAL_SERVER_ERROR, error_val).into();
-            error
-        })?
-        .parse()
-        .map_err(|err| {
+    match value.parse() {
+        Ok(v) => Some(v),
+        Err(err) => {
             tracing::error!(
                 "{} An error `{:?}` occurred while parsing row field `{}`",
                 tracing_prefix,
                 err,
                 index
             );
-
-            let error: ResponseError<_> = (StatusCode::INTERNAL_SERVER_ERROR, error_val).into();
-            error
-        })
+            None?
+        }
+    }
 }
 
 /// Parses an Ingredient from a DB Row.
-fn parse_db_ingredient<E>(
+fn parse_db_ingredient(
     row: &Row,
     tracing_prefix: &str,
-    error_val: E,
-) -> Result<Ingredient, ResponseError<E>>
-where
-    E: Display,
+) -> Option<Ingredient>
 {
-    let ingredient_id = from_db_to_value(
-        row,
-        "ingredient_id",
-        &tracing_prefix,
-        error_val,
-    )?;
+    let ingredient_id = from_db_to_value(row, "ingredient_id", &tracing_prefix)?;
 
-    let user_id = from_db_to_value(
-        row,
-        "user_id",
-        &tracing_prefix,
-        error_val,
-    )?;
+    let user_id = from_db_to_value(row, "user_id", &tracing_prefix)?;
 
-    let name = from_db_to_value(
-        row,
-        "name",
-        &tracing_prefix,
-        error_val,
-    )?;
+    let name = from_db_to_value(row, "name", &tracing_prefix)?;
 
-    let expire_date = from_db_to_value(
-        row,
-        "expire_date",
-        &tracing_prefix,
-        error_val,
-    )?;
+    let expire_date = from_db_to_value(row, "expire_date", &tracing_prefix)?;
 
-    let category = from_db_to_value(
-        row,
-        "category",
-        &tracing_prefix,
-        error_val,
-    )?;
+    let category = from_db_to_value(row, "category", &tracing_prefix)?;
 
-    let quantity = from_db_to_value(
-        row,
-        "quantity",
-        &tracing_prefix,
-        error_val,
-    )?;
+    let quantity = from_db_to_value(row, "quantity", &tracing_prefix)?;
 
-    let unit = from_db_to_value(
-        row,
-        "unit",
-        &tracing_prefix,
-        error_val,
-    )?;
+    let unit = from_db_to_value(row, "unit", &tracing_prefix)?;
 
-    Ok(Ingredient {
+    Some(Ingredient {
         ingredient_id,
         user_id,
         expire_date,

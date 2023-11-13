@@ -86,11 +86,8 @@ pub async fn search_ingredients(
                 err,
                 token
             );
-            let error: ResponseError<_> = (
-                StatusCode::BAD_REQUEST,
-                SearchIngredientErrors::InvalidJWT,
-            )
-                .into();
+            let error: ResponseError<_> =
+                (StatusCode::BAD_REQUEST, SearchIngredientErrors::InvalidJWT).into();
             Err(error)?
         }
     };
@@ -124,10 +121,7 @@ pub async fn search_ingredients(
             crate::IsSessionValidErrors::InvalidSessionData {
                 current_date: _,
                 db_expire_date: _,
-            } => (
-                StatusCode::UNAUTHORIZED,
-                SearchIngredientErrors::JWTExpired,
-            ),
+            } => (StatusCode::UNAUTHORIZED, SearchIngredientErrors::JWTExpired),
             _ => (
                 StatusCode::BAD_REQUEST,
                 SearchIngredientErrors::ErrorCheckingIfSessionIsValid,
@@ -165,11 +159,14 @@ pub async fn search_ingredients(
     let ingredients = ingredients
         .iter()
         .map(|row| {
-            parse_db_ingredient(
-                row,
-                &tracing_prefix,
-                SearchIngredientErrors::InvalidIngredientFormatFromDB,
-            )
+            parse_db_ingredient(row, &tracing_prefix).ok_or_else(|| {
+                let error: ResponseError<_> = (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    SearchIngredientErrors::InvalidIngredientFormatFromDB,
+                )
+                    .into();
+                error
+            })
         })
         .collect::<Result<Vec<Ingredient>, ResponseError<SearchIngredientErrors>>>()?;
     tracing::debug!("{} DONE", tracing_prefix);

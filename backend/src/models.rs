@@ -87,8 +87,9 @@ pub struct Ingredient {
 /// Represents a Food Recipe in the app.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Recipe {
+    /// The tracking Id of the recipe.
     #[serde(rename = "RecipeId")]
-    pub recipe_id: Uuid,
+    pub recipe_id: String,
 
     #[serde(rename = "Recipe")]
     pub title: String,
@@ -100,10 +101,19 @@ pub struct Recipe {
     pub tags: Vec<String>,
 
     #[serde(rename = "Ingredients")]
-    pub ingredients: Vec<Ingredient>,
+    pub ingredients: Vec<RecipeIngredient>,
 
     #[serde(rename = "Source")]
     pub source: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct RecipeIngredient {
+    #[serde(rename = "Name")]
+    pub name: String,
+
+    #[serde(rename = "Display")]
+    pub display: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]

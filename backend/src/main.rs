@@ -1,9 +1,6 @@
 use std::{io, net::SocketAddr, sync::Arc};
 
-use axum::{
-    routing::post,
-    Router,
-};
+use axum::{routing::post, Router};
 use backend::routes::{
     add_ingredient::add_ingredient, edit_ingredient::edit_ingredient,
     get_ingredients::get_ingredients, get_recipes::get_recipes, login_user::login_user,

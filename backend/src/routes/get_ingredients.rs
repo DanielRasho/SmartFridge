@@ -161,11 +161,14 @@ pub async fn get_ingredients(
     let ingredients = db_result
         .iter()
         .map(|row| {
-            parse_db_ingredient(
-                row,
-                &tracing_prefix,
-                GetIngredientsErrors::InvalidIngredientFormatFromDB,
-            )
+            parse_db_ingredient(row, &tracing_prefix).ok_or_else(|| {
+                let error: ResponseError<_> = (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    GetIngredientsErrors::InvalidIngredientFormatFromDB,
+                )
+                    .into();
+                error
+            })
         })
         .collect::<Result<Vec<Ingredient>, ResponseError<GetIngredientsErrors>>>()?;
     tracing::debug!("{} Ingredients parsed!", tracing_prefix);
