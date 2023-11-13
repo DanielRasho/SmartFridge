@@ -1,3 +1,4 @@
+#![recursion_limit = "512"]
 use std::{
     fmt::{Debug, Display},
     str::FromStr,
