@@ -194,7 +194,11 @@ pub async fn register_user(
                 username
             );
 
-            let error: ResponseError<_> = (StatusCode::INTERNAL_SERVER_ERROR, RegisterUserErrors::NoDBConnection).into();
+            let error: ResponseError<_> = (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                RegisterUserErrors::NoDBConnection,
+            )
+                .into();
             Err(error)?
         }
     }

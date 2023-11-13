@@ -1,11 +1,14 @@
 #![recursion_limit = "512"]
 use std::{
     fmt::{Debug, Display},
+    io,
+    net::SocketAddr,
     str::FromStr,
 };
 
 use base64::{engine::general_purpose, Engine};
 use chrono::{DateTime, Datelike, Timelike, Utc};
+use clap::Parser;
 use hmac::{digest::KeyInit, Hmac};
 use hyper::StatusCode;
 use jwt::{SignWithKey, VerifyWithKey};
@@ -21,6 +24,47 @@ mod responses;
 pub mod routes;
 
 pub const APP_SECRET: &[u8] = b"super-secret-key";
+
+#[derive(Debug, Parser)]
+#[command(author, version, about, long_about = None)]
+pub struct Params {
+    /// The host to start the server on. Check the port is free before starting the server.
+    #[arg(short, long, env, default_value = "127.0.0.1:3000", value_parser = resolve_host)]
+    pub server_host: SocketAddr,
+
+    /// The connection string to connect to the database.
+    #[arg(
+        short,
+        long,
+        env,
+        default_value = "host=localhost port=5432 user=postgres dbname=smart_fridge connect_timeout=10"
+    )]
+    pub db_connection: String,
+
+    /// The WorldWide Recipes API Key, can be obtained from:
+    /// https://rapidapi.com/ptwebsolution/api/worldwide-recipes1.
+    #[arg(
+        long,
+        env,
+        default_value = "f365167e3emsh42cd1be186db2d8p1b9c87jsn49c9b494e5ac"
+    )]
+    pub rapid_api_key: String,
+
+    /// The WorldWide Recipes API Host, can be obtained from:
+    /// https://rapidapi.com/ptwebsolution/api/worldwide-recipes1.
+    #[arg(long, env, default_value = "worldwide-recipes1.p.rapidapi.com")]
+    pub rapid_api_host: String,
+}
+
+fn resolve_host(host: &str) -> io::Result<SocketAddr> {
+    let host: SocketAddr = host.parse().map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::AddrNotAvailable,
+            format!("Couldn't find destination {host}"),
+        )
+    })?;
+    Ok(host)
+}
 
 #[derive(Debug)]
 pub enum GenerateJWTErrors {
@@ -184,11 +228,7 @@ where
 }
 
 /// Parses an Ingredient from a DB Row.
-fn parse_db_ingredient(
-    row: &Row,
-    tracing_prefix: &str,
-) -> Option<Ingredient>
-{
+fn parse_db_ingredient(row: &Row, tracing_prefix: &str) -> Option<Ingredient> {
     let ingredient_id = from_db_to_value(row, "ingredient_id", &tracing_prefix)?;
 
     let user_id = from_db_to_value(row, "user_id", &tracing_prefix)?;

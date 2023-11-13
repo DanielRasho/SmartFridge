@@ -14,7 +14,7 @@ use crate::{
     extract_jwt,
     models::{Ingredient, Recipe, RecipeIngredient},
     responses::ResponseError,
-    APP_SECRET,
+    Params, APP_SECRET,
 };
 
 #[derive(Debug)]
@@ -40,6 +40,7 @@ static ID: AtomicUsize = AtomicUsize::new(0);
 pub async fn search_recipes(
     payload: Json<serde_json::Value>,
     client: Arc<Option<Client>>,
+    params: Arc<Params>,
 ) -> Result<impl IntoResponse, ResponseError<SearchRecipesErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
     let tracing_prefix = format!("/recipes/search - {}:", id);

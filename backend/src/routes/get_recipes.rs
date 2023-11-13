@@ -15,7 +15,7 @@ use crate::{
     extract_jwt, is_session_valid,
     models::{Ingredient, Recipe, RecipeIngredient},
     responses::ResponseError,
-    APP_SECRET,
+    Params, APP_SECRET,
 };
 
 #[derive(Debug)]
@@ -44,6 +44,7 @@ static ID: AtomicUsize = AtomicUsize::new(0);
 pub async fn get_recipes(
     payload: Json<serde_json::Value>,
     client: Arc<Option<Client>>,
+    params: Arc<Params>,
 ) -> Result<impl IntoResponse, ResponseError<GetRecipesErrors>> {
     let id = ID.fetch_add(1, std::sync::atomic::Ordering::AcqRel);
     let tracing_prefix = format!("/recipes - {}:", id);
@@ -128,19 +129,21 @@ pub async fn get_recipes(
         Err(error)?
     }
 
-    let recipes = get_recipes_from_api().await.map_err(|err| {
-        tracing::error!(
-            "{} An error `{:?}` occurred while getting recipes from API!",
-            tracing_prefix,
-            err
-        );
-        let error: ResponseError<_> = (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            GetRecipesErrors::CouldntRetrieveRecipesFromAPI,
-        )
-            .into();
-        error
-    })?;
+    let recipes = get_recipes_from_api(&params.rapid_api_key, &params.rapid_api_host)
+        .await
+        .map_err(|err| {
+            tracing::error!(
+                "{} An error `{:?}` occurred while getting recipes from API!",
+                tracing_prefix,
+                err
+            );
+            let error: ResponseError<_> = (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                GetRecipesErrors::CouldntRetrieveRecipesFromAPI,
+            )
+                .into();
+            error
+        })?;
 
     tracing::debug!("{} DONE", tracing_prefix);
     Ok(Json(recipes))
@@ -161,15 +164,15 @@ enum GetRecipesFromAPIErrors {
     },
 }
 
-async fn get_recipes_from_api() -> Result<Vec<Recipe>, GetRecipesFromAPIErrors> {
+async fn get_recipes_from_api(
+    api_key: &str,
+    api_host: &str,
+) -> Result<Vec<Recipe>, GetRecipesFromAPIErrors> {
     let client = reqwest::Client::new();
     let response = client
         .get("https://worldwide-recipes1.p.rapidapi.com/api/explore")
-        .header(
-            "X-RapidAPI-Key",
-            "f365167e3emsh42cd1be186db2d8p1b9c87jsn49c9b494e5ac",
-        )
-        .header("X-RapidAPI-Host", "worldwide-recipes1.p.rapidapi.com")
+        .header("X-RapidAPI-Key", api_key)
+        .header("X-RapidAPI-Host", api_host)
         .send()
         .await
         .map_err(|err| GetRecipesFromAPIErrors::APIError { error: err })?
