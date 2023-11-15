@@ -1,6 +1,5 @@
 package uvg.edu.gt.smartfridge
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,18 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
-import uvg.edu.gt.smartfridge.viewModels.TokenManager
 import uvg.edu.gt.smartfridge.views.FridgeView
 import uvg.edu.gt.smartfridge.views.HomeView
 import uvg.edu.gt.smartfridge.views.LoginView
@@ -43,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            MainComponent(sharedViewModel,context = LocalContext.current)
+            MainComponent(sharedViewModel)
         }
     }
 }
@@ -52,8 +47,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainComponent(
     sharedViewModel: SharedViewModel,
-    navController: NavHostController = rememberNavController(),
-    context: Context
+    navController: NavHostController = rememberNavController()
 ) {
     val systemInDark = isSystemInDarkTheme()
     val (useDarkTheme, setUseDarkTheme) = remember { mutableStateOf(systemInDark) }
@@ -65,24 +59,15 @@ fun MainComponent(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            val tokenManager = TokenManager(LocalContext.current)
-            val jwtToken = tokenManager.getJwtToken()
-
-            // Set the start destination based on the presence of the JWT token
-            val startDestination = if (jwtToken != null) "Home" else "Principal"
-            if(jwtToken!=null){
-                sharedViewModel.jwtToken = jwtToken
-            }
-            NavHost(navController = navController, startDestination = startDestination) {
+            NavHost(navController = navController, startDestination = "Principal") {
                 composable("Principal") { PrincipalView(navController) }
                 composable("Login") { LoginView(sharedViewModel, navController) }
                 composable("Register") { RegisterView(navController) }
                 composable("Home") { HomeView(sharedViewModel, navController) }
-                composable("Settings") { SettingsView(useDarkTheme, setUseDarkTheme, navController,context = context,startDestination) }
+                composable("Settings") { SettingsView(useDarkTheme, setUseDarkTheme, navController) }
                 composable("Fridge") { FridgeView(sharedViewModel, navController) }
                 composable("Recipe") { RecipeView(navController) }
                 composable("NewIngredient") { NewIngredientView(sharedViewModel, navController) }
-
             }
         }
     }
@@ -97,6 +82,6 @@ fun GreetingPreview() {
         SharedViewModel() // Create a new instance of SharedViewModel for the preview
 
     smartFridgeTheme {
-        MainComponent(sharedViewModel,context = LocalContext.current)
+        MainComponent(sharedViewModel)
     }
 }
