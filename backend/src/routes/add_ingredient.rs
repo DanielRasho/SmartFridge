@@ -130,7 +130,7 @@ pub async fn add_ingredient(
         Ok(_) => {}
         Err(err) => {
             tracing::error!(
-                "{} An error occurred `{:?}` while checkinf if session is valid!",
+                "{} An error occurred `{:?}` while checking if session is valid!",
                 tracing_prefix,
                 err
             );

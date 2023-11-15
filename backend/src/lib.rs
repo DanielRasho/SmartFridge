@@ -270,7 +270,7 @@ fn parse_api_recipe_from_value(value: &Map<String, Value>) -> Option<Recipe> {
             None?
         };
 
-        let tags: Vec<String> = if let Value::Array(a) = details.get("keywords")? {
+        let mut tags: Vec<(String, usize)> = if let Value::Array(a) = details.get("keywords")? {
             a
         } else {
             None?
@@ -278,13 +278,14 @@ fn parse_api_recipe_from_value(value: &Map<String, Value>) -> Option<Recipe> {
         .iter()
         .filter_map(|v| {
             if let Value::String(b) = v {
-                Some(b.to_string())
+                Some((b.to_string(), b.len()))
             } else {
                 None
             }
         })
-        .take(2)
         .collect();
+        tags.sort_by(|a, b| a.1.cmp(&b.1));
+        let tags: Vec<String> = tags.into_iter().map(|(tag, _)| tag).take(2).collect();
 
         let title = if let Value::String(a) = details.get("name")? {
             a.to_string()
