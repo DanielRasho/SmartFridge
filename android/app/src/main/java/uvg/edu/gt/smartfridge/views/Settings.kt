@@ -1,6 +1,7 @@
 package uvg.edu.gt.smartfridge.views
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -29,6 +31,7 @@ import uvg.edu.gt.smartfridge.components.IconPrimaryButton
 import uvg.edu.gt.smartfridge.components.NavItem
 import uvg.edu.gt.smartfridge.components.Title
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
+import uvg.edu.gt.smartfridge.viewModels.TokenManager
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +40,8 @@ fun SettingsView(
     useDarkTheme: Boolean,
     setUseDarkTheme: (Boolean) -> Unit,
     navController: NavHostController,
+    context: Context,
+    startDestination:String,
     modifier: Modifier = Modifier
 ) {
     val navItems = sequenceOf(
@@ -85,7 +90,14 @@ fun SettingsView(
                 modifier = modifier.fillMaxWidth()
             ) {
                 IconPrimaryButton(text = "Logout", icon = Icons.Rounded.ExitToApp) {
-                    navController.navigate("Principal")
+                    val tokenManager = TokenManager(context)
+                    tokenManager.clearJwtToken()
+                    navController.navigate("Principal") {
+                        // Clear the back stack to prevent going back to Login
+                        popUpTo(startDestination) {
+                            inclusive = true
+                        }
+                    }
                 }
             }
         }
@@ -95,7 +107,8 @@ fun SettingsView(
 @Preview
 @Composable
 fun SettingsViewPreview() {
+
     smartFridgeTheme {
-        SettingsView(false, {}, rememberNavController())
+        SettingsView(false, {}, rememberNavController(), context = LocalContext.current,"Home")
     }
 }

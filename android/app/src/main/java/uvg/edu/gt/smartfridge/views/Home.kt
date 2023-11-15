@@ -53,6 +53,7 @@ fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController,
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
     val jwtToken = sharedViewModel.jwtToken
+    //println("Hi "+jwtToken)
 
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {

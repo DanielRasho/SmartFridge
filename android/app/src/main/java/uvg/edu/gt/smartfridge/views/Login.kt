@@ -1,6 +1,7 @@
 package uvg.edu.gt.smartfridge.views
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -41,6 +42,7 @@ import uvg.edu.gt.smartfridge.data.ResponseException
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.LoginViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
+import uvg.edu.gt.smartfridge.viewModels.TokenManager
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
@@ -102,8 +104,17 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
         ) {
             PrimaryButton(text = "Login",
                 modifier = Modifier.width(300.dp))
-            {//sharedViewModel.prueba = username.value
+            {/*sharedViewModel.jwtToken = username.value
                // navController.navigate("Home")
+                navController.navigate("Home") {
+                    // Clear the back stack up to Principal to prevent going back to Login
+                    popUpTo("Principal") {
+                        inclusive = true
+                    }
+                }
+               // navController.navigate("AfterLogin/${username.value}")
+                val tokenManager = TokenManager(context)
+                tokenManager.saveJwtToken(username.value)*/
 
                 coroutineScope.launch(Dispatchers.IO) {
                     val result = loginViewModel.sendLoginCredentials(username.value, password.value)
@@ -115,9 +126,20 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
                             Log.i("userSettings", userSettings.toString())
 
                             sharedViewModel.jwtToken = JWT_TOKEN
+
+                            val tokenManager = TokenManager(context)
+                            tokenManager.saveJwtToken(JWT_TOKEN)
+
                             withContext(Dispatchers.Main){
                                 println(navController.toString())
-                                navController.navigate("Home")
+
+                                navController.navigate("Home") {
+                                    // Clear the back stack to prevent going back to Login
+                                    popUpTo("Principal") {
+                                        inclusive = true
+                                    }
+                                }
+
                             }
 
                         }
@@ -137,6 +159,7 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
         }
     }
 }
+
 
 
 
