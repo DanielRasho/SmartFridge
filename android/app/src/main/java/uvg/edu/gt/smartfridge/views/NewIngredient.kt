@@ -51,48 +51,64 @@ import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.NewIngredientViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
+import java.text.SimpleDateFormat
 import java.time.LocalDate
+import java.util.Locale
 
 @Composable
-fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavController){
+fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavController) {
     val jwtToken = sharedViewModel.jwtToken
-    val newingredientViewModel : NewIngredientViewModel = NewIngredientViewModel()
+    val newIngredientViewModel: NewIngredientViewModel = NewIngredientViewModel()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
     val name = remember { mutableStateOf("") }
     val amount = remember { mutableStateOf("") }
     var measureUnit = remember { mutableStateOf("") }
-    var date = remember { mutableStateOf(LocalDate.now())}
+    var date = remember { mutableStateOf(LocalDate.now()) }
     val category = remember { mutableStateOf("") }
 
     var (exposeUnitSelector, setExposeUnitSelector) = remember { mutableStateOf(false) }
 
-    var navigateBack : () -> Unit = { /*TODO: implement when navGraph is created*/ }
+    var navigateBack: () -> Unit = { /*TODO: implement when navGraph is created*/ }
 
     val unitCategories = mapOf(
         "Weight" to listOf("Kg", "g", "Lb"),
         "Volume" to listOf("L", "mL", "Cups"),
         "Miscellaneous" to listOf("Bags", "Bottles")
     )
-    val itemCategories = listOf<String>("Fruits", "Vegetables", "Meat", "SeaFood", "Dairy & Alternatives",
+    val itemCategories = listOf<String>(
+        "Fruits", "Vegetables", "Meat", "SeaFood", "Dairy & Alternatives",
         "Grains and Cereals", "Sweets and Desserts", "Beverages", "Condiments", "Sauces",
-        "Herbs", "Oils and Fats", "Packaged Foods", "Baking Supplies")
+        "Herbs", "Oils and Fats", "Packaged Foods", "Baking Supplies"
+    )
 
-    Surface (color = MaterialTheme.colorScheme.background){
+    Surface(color = MaterialTheme.colorScheme.background) {
 
-        Column ( verticalArrangement = Arrangement.SpaceBetween,
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .fillMaxSize()){
+                .fillMaxSize()
+        ) {
 
-            Column ( modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
 
-                Row (horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically){
+                Row(
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     IconButton(onClick = { navController.navigate("Fridge") },
-                        content = {Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)})
+                        content = {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onBackground
+                            )
+                        })
                     Text(
                         "Add Ingredient",
                         style = MaterialTheme.typography.displayMedium
@@ -107,54 +123,76 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                 dateField("Date", date)
                 Spacer(modifier = Modifier.height(16.dp))
                 muteTextField(label = "Unit", textValue = measureUnit) {
-                    setExposeUnitSelector(true) }
+                    setExposeUnitSelector(true)
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 numberField(label = "Amount", numberValue = amount)
                 Spacer(modifier = Modifier.height(16.dp))
-                spinnerField(label = "Category", options = itemCategories, selectedTextHolder = category)
+                spinnerField(
+                    label = "Category",
+                    options = itemCategories,
+                    selectedTextHolder = category
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Row {
-                    Button(onClick = {
-                        coroutineScope.launch(Dispatchers.IO) {
-                            val result = newingredientViewModel.addIngredient(jwtToken,
-                                Ingredient("",name.value, category.value, amount.value.toFloat(),measureUnit.value,date.value.toString())
-                            )
+                    Button(
+                        onClick = {
+                            coroutineScope.launch(Dispatchers.IO) {
+                                val result = newIngredientViewModel.addIngredient(
+                                    jwtToken,
+                                    Ingredient(
+                                        "",
+                                        name.value,
+                                        category.value,
+                                        amount.value.toFloat(),
+                                        measureUnit.value,
+                                        formatStringToDate(date.value.toString())
+                                    )
+                                )
 
-                            when(result.isSuccess){
-                                true -> {
-                                    val mensaje = result.getOrNull()!!
-                                    Toast.makeText(context,mensaje,Toast.LENGTH_SHORT).show()
-                                    withContext(Dispatchers.Main){
-                                        println(navController.toString())
-                                        navController.navigate("Fridge")
+                                when (result.isSuccess) {
+                                    true -> {
+                                        val message = result.getOrNull()!!
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                            println(navController.toString())
+                                            navController.navigate("Fridge")
+                                        }
+
                                     }
 
-                                }
-                                false -> {
-                                    val exception = result.exceptionOrNull() as ResponseException
-                                    println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+                                    false -> {
+                                        val exception =
+                                            result.exceptionOrNull() as ResponseException
+                                        println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
 
-                                    withContext(Dispatchers.Main) {
-                                        Toast.makeText(context,
-                                            "Error ${exception.statusCode} : ${exception.message}",
-                                            Toast.LENGTH_SHORT).show()
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(
+                                                context,
+                                                "Error ${exception.statusCode} : ${exception.message}",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
                                     }
                                 }
                             }
-                        }
-                    },
+                        },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.error),
+                            containerColor = MaterialTheme.colorScheme.error
+                        ),
                         shape = RoundedCornerShape(5.dp),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = "Save",
-                            color = MaterialTheme.colorScheme.onError)
+                        Text(
+                            text = "Save",
+                            color = MaterialTheme.colorScheme.onError
+                        )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
-                    Button(onClick = { /*TODO*/ },
+                    Button(
+                        onClick = { /*TODO*/ },
                         border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
                         shape = RoundedCornerShape(5.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
@@ -162,8 +200,10 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                         ),
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = "Continue",
-                            color = MaterialTheme.colorScheme.outline)
+                        Text(
+                            text = "Continue",
+                            color = MaterialTheme.colorScheme.outline
+                        )
                     }
                 }
             }
@@ -171,7 +211,8 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                 UnitSelector(title = "Unit", categories = unitCategories,
                     onSelected = {
                         measureUnit.value = it
-                        setExposeUnitSelector(false)},
+                        setExposeUnitSelector(false)
+                    },
                     onCloseButtonClick = { setExposeUnitSelector(false) })
 
         }
@@ -181,19 +222,24 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
 // Executes onClick function when pressed,
 // and displays the value given on texValue.
 @Composable
-fun muteTextField(label: String, textValue: MutableState<String>, onClick : () -> Unit ){
+fun muteTextField(label: String, textValue: MutableState<String>, onClick: () -> Unit) {
     // Layout definition
-    Row (verticalAlignment = Alignment.CenterVertically){
-        Column (modifier = Modifier.weight(2f)) {
-            Text(text = label,
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.weight(2f)) {
+            Text(
+                text = label,
                 style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.outlineVariant)
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
             Spacer(modifier = Modifier.height(8.dp))
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Column (modifier = Modifier.weight(5f),
-            horizontalAlignment = Alignment.CenterHorizontally){
-            BasicTextField(value = textValue.value,
+        Column(
+            modifier = Modifier.weight(5f),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            BasicTextField(
+                value = textValue.value,
                 onValueChange = { },
                 enabled = false,
                 modifier = Modifier
@@ -211,12 +257,20 @@ fun muteTextField(label: String, textValue: MutableState<String>, onClick : () -
     }
 }
 
+fun formatStringToDate(inputDateString: String): String {
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    val outputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'", Locale.getDefault())
+
+    val date = inputFormat.parse(inputDateString)
+    println(outputFormat.format(date))
+    return outputFormat.format(date)
+}
 @Preview
 @Composable
-fun previewNewIngredient(){
+fun previewNewIngredient() {
     val controller = rememberNavController()
     val sharedViewModel = SharedViewModel()
     smartFridgeTheme {
-        NewIngredientView(sharedViewModel,navController = controller)
+        NewIngredientView(sharedViewModel, navController = controller)
     }
 }

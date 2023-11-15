@@ -84,7 +84,7 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
             modifier = modifier.fillMaxWidth()
         ) {
 
-            textField(label = "Username", textValue = username)
+            textField(label = "User", textValue = username)
         }
         Spacer(modifier = Modifier.height(30.dp))
         Row(

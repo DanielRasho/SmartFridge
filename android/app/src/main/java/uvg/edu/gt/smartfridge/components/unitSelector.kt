@@ -138,7 +138,8 @@ fun UnitSelector(
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.outline)
                 Column (verticalArrangement = Arrangement.Top,
-                    modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    modifier = Modifier.verticalScroll(rememberScrollState()))
+                {
                     selectedCategoryItems?.forEach {
                         if(it == selectedUnit)
                         Button(
@@ -146,6 +147,7 @@ fun UnitSelector(
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.outline),
                             shape = RectangleShape,
                             modifier = modifier.width(screenWidth / 2),
+                            contentPadding = PaddingValues(0.dp)
                         ) {
                             Text(it, color = MaterialTheme.colorScheme.onBackground)
                         }
@@ -155,6 +157,7 @@ fun UnitSelector(
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.background),
                                 shape = RectangleShape,
                                 modifier = modifier.width(screenWidth / 2),
+                                contentPadding = PaddingValues(0.dp)
                             ) {
                                 Text(it, color = MaterialTheme.colorScheme.onBackground)
                             }

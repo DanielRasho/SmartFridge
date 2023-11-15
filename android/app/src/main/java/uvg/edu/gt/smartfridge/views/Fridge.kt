@@ -84,7 +84,7 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
         fridgeViewModel.getIngredients().groupBy { it.Category }
 
     Scaffold(bottomBar = { BottomNavBar(items = navItems, navController = navHostController) },
-        floatingActionButton = { addIngredientButton() }) {
+        floatingActionButton = { addIngredientButton(navHostController) }) {
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
@@ -172,9 +172,9 @@ fun ingredientEntry (ingredient : Ingredient){
 }
 
 @Composable
-fun addIngredientButton() {
+fun addIngredientButton( navHostController: NavHostController) {
     FloatingActionButton(
-        onClick = { /*TODO*/ },
+        onClick = { navHostController.navigate("NewIngredient") },
         shape = CircleShape,
         containerColor = MaterialTheme.colorScheme.primary
     ) {

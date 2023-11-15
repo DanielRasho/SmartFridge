@@ -13,12 +13,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.json.JSONArray
+import org.json.JSONObject
 import uvg.edu.gt.smartfridge.models.Ingredient
 
 class FridgeService(client: HttpClient) : Service(client) {
 
     // TODO
-    suspend fun getIngredients(JWT_TOKEN : String) : Result<List<Ingredient>>{
+    suspend fun getIngredients(JWT_TOKEN: String): Result<List<Ingredient>> {
 
         return handleHttpRequest {
 
@@ -29,25 +30,25 @@ class FridgeService(client: HttpClient) : Service(client) {
             }.toString()
 
             // Making Request
-            val response : HttpResponse = client.request(
+            val response: HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.GET_INGREDIENTS
-            ){
+            ) {
                 method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }
-                setBody( requestBody )
+                setBody(requestBody)
             }
 
             println(response.body() as String)
 
             // Translating JSON response
-            val data : JSONArray = JSONArray(response.body() as String)
+            val data: JSONArray = JSONArray(response.body() as String)
 
             val tempIngredients = ArrayList<Ingredient>()
 
             // Fetching ingredients.
-            for (index in 0 until data.length()){
+            for (index in 0 until data.length()) {
                 tempIngredients.add(Json.decodeFromString<Ingredient>(data.getString(index)))
             }
             tempIngredients
@@ -55,7 +56,7 @@ class FridgeService(client: HttpClient) : Service(client) {
     }
 
     // TODO
-    suspend fun searchIngredients(JWT_TOKEN : String, query : String) : Result<List<Ingredient>>{
+    suspend fun searchIngredients(JWT_TOKEN: String, query: String): Result<List<Ingredient>> {
         return handleHttpRequest {
 
             // Creating Request body
@@ -65,53 +66,62 @@ class FridgeService(client: HttpClient) : Service(client) {
             }.toString()
 
             // Making Request
-            val response : HttpResponse = client.request(
+            val response: HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.SEARCH_INGREDIENTS
-            ){
+            ) {
                 method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }
-                setBody( requestBody )
+                setBody(requestBody)
             }
 
             // Translating JSON response
-            val data : JSONArray = JSONArray(response.body() as String)
+            val data: JSONArray = JSONArray(response.body() as String)
 
             val tempIngredients = ArrayList<Ingredient>()
 
             // Fetching ingredients.
-            for (index in 0 until data.length()){
+            for (index in 0 until data.length()) {
                 tempIngredients.add(Json.decodeFromString<Ingredient>(data.getString(index)))
             }
             tempIngredients
         }
     }
 
-    suspend fun addIngredient( JWT_TOKEN: String , ingredient : Ingredient) : Result<String>{
+    suspend fun addIngredient(JWT_TOKEN: String, ingredient: Ingredient): Result<String> {
 
         return handleHttpRequest {
-            // Creating Request body
+
+            // removing undesired field
+            val requestIngredient = JSONObject(Json.encodeToString(ingredient))
+            requestIngredient.remove("IngredientId")
+
+            println(requestIngredient.toString())
+
             val requestBody = buildJsonObject {
                 put("token", JWT_TOKEN)
-                put("ingredient", Json.encodeToString(ingredient))
-            }.toString()
+                put("ingredient", requestIngredient.toString())
+            }.toString().replace("\\", "") // Removing extra backslashes.
+
+            println(requestBody)
 
             // Making Request
-            val response : HttpResponse = client.request(
+            val response: HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.ADD_INGREDIENT
-            ){
+            ) {
                 method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }
-                setBody( requestBody )
+                setBody(requestBody)
             }
-            "Ingredient added"
+            "Ingredient ${ingredient.Name} added!"
         }
     }
 
-    suspend fun editIngredient( JWT_TOKEN: String , ingredient : Ingredient) : Result<String>{
+
+    suspend fun editIngredient(JWT_TOKEN: String, ingredient: Ingredient): Result<String> {
 
         return handleHttpRequest {
             // Creating Request body
@@ -121,20 +131,20 @@ class FridgeService(client: HttpClient) : Service(client) {
             }.toString()
 
             // Making Request
-            val response : HttpResponse = client.request(
+            val response: HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.EDIT_INGREDIENT
-            ){
+            ) {
                 method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }
-                setBody( requestBody )
+                setBody(requestBody)
             }
             "Ingredient edited"
         }
     }
 
-    suspend fun deleteIngredient( JWT_TOKEN: String , ingredientID : String) : Result<String>{
+    suspend fun deleteIngredient(JWT_TOKEN: String, ingredientID: String): Result<String> {
 
         return handleHttpRequest {
             // Creating Request body
@@ -144,14 +154,14 @@ class FridgeService(client: HttpClient) : Service(client) {
             }.toString()
 
             // Making Request
-            val response : HttpResponse = client.request(
+            val response: HttpResponse = client.request(
                 HttpRoutes.BASE_URL + HttpRoutes.DELETE_INGREDIENT
-            ){
+            ) {
                 method = HttpMethod.Post
                 headers {
                     append(HttpHeaders.ContentType, "application/json")
                 }
-                setBody( requestBody )
+                setBody(requestBody)
             }
             "Ingredient removed"
         }
