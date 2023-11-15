@@ -23,8 +23,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -39,13 +41,16 @@ import uvg.edu.gt.smartfridge.data.ResponseException
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.HomeViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
-import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
-fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController, modifier: Modifier = Modifier) {
+fun HomeView(
+    sharedViewModel: SharedViewModel,
+    setUseDarkTheme: (Boolean) -> Unit,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     val coroutineScope = rememberCoroutineScope()
     val homeViewModel = viewModel<HomeViewModel>()
     val context = LocalContext.current
@@ -56,18 +61,23 @@ fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController,
     //println("Hi "+jwtToken)
 
     LaunchedEffect(Unit) {
+
+        setUseDarkTheme(sharedViewModel.useDarkTheme);
+
         coroutineScope.launch(Dispatchers.IO) {
             println("JWT: $jwtToken")
-            val result= homeViewModel.fetchRecipesList(jwtToken)
+            val result = homeViewModel.fetchRecipesList(jwtToken)
 
-            if(result.isFailure){
+            if (result.isFailure) {
                 val exception = result.exceptionOrNull() as ResponseException
                 println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
 
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(context,
+                    Toast.makeText(
+                        context,
                         "Error ${exception.statusCode} : ${exception.message}",
-                        Toast.LENGTH_SHORT).show()
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -129,7 +139,7 @@ fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController,
                             AsyncImage(
                                 model = recipe.Banner,
                                 contentDescription = "Recipe description",
-                                modifier=modifier.fillMaxWidth()
+                                modifier = modifier.fillMaxWidth()
                             )
                             Text(
                                 recipe.Recipe,
@@ -137,7 +147,11 @@ fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController,
                                 modifier = modifier.padding(10.dp, 0.dp),
                                 style = MaterialTheme.typography.bodyLarge
                             )
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start, modifier = modifier.padding(10.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Start,
+                                modifier = modifier.padding(10.dp)
+                            ) {
                                 recipe.Tags.forEach { tag ->
                                     Text(
                                         tag,
@@ -165,6 +179,6 @@ fun HomeView(sharedViewModel: SharedViewModel, navController: NavHostController,
 fun HomeViewPreview() {
     val sharedViewModel = SharedViewModel()
     smartFridgeTheme {
-        HomeView(sharedViewModel,navController = rememberNavController())
+        HomeView(sharedViewModel, {} ,navController = rememberNavController())
     }
 }
