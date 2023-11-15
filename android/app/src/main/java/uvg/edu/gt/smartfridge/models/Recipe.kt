@@ -8,6 +8,6 @@ data class Recipe(
     val Recipe: String,
     val Banner: String,
     val Tags: List<String>,
-    val Ingredients: List<Ingredient>,
+    val Ingredients: List<LightIngredient>,
     val Source: String
 )
