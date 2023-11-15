@@ -77,7 +77,7 @@ fun MainComponent(
                 composable("Principal") { PrincipalView(navController) }
                 composable("Login") { LoginView(sharedViewModel, navController) }
                 composable("Register") { RegisterView(navController) }
-                composable("Home") { HomeView(sharedViewModel, navController) }
+                composable("Home") { HomeView(sharedViewModel, setUseDarkTheme,navController) }
                 composable("Settings") { SettingsView(useDarkTheme, setUseDarkTheme, navController,context = context,startDestination) }
                 composable("Fridge") { FridgeView(sharedViewModel, navController) }
                 composable("Recipe") { RecipeView(navController) }
