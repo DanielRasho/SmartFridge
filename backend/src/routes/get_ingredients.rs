@@ -36,7 +36,6 @@ impl Display for GetIngredientsErrors {
 #[derive(Debug, Deserialize)]
 struct GetIngredientsPayload {
     token: String,
-    user_id: Uuid,
 }
 
 static ID: AtomicUsize = AtomicUsize::new(0);
@@ -51,7 +50,7 @@ pub async fn get_ingredients(
     tracing::debug!("{} START", tracing_prefix);
 
     tracing::debug!("{} Parsing payload...", tracing_prefix);
-    let GetIngredientsPayload { token, user_id } = match serde_json::from_value(payload.0.clone()) {
+    let GetIngredientsPayload { token } = match serde_json::from_value(payload.0.clone()) {
         Ok(p) => p,
         Err(err) => {
             tracing::error!(
@@ -86,6 +85,7 @@ pub async fn get_ingredients(
             Err(error)?
         }
     };
+    let user_id = token_info.user_id.clone();
     tracing::debug!("{} JWT extracted successfully!", tracing_prefix);
 
     let conn = client.as_ref().as_ref().ok_or_else(|| {
