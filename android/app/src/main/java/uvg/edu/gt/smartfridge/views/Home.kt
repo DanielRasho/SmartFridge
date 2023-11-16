@@ -23,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -139,6 +140,7 @@ fun HomeView(
                             AsyncImage(
                                 model = recipe.Banner,
                                 contentDescription = "Recipe description",
+                                contentScale = ContentScale.Crop,
                                 modifier = modifier.fillMaxWidth()
                             )
                             Text(
