@@ -12,7 +12,7 @@ use rand::{thread_rng, Rng};
 
 use serde_json::{Map, Value};
 use sha2::{Digest, Sha256};
-use tokio_postgres::{Client, Row};
+use tokio_postgres::{types::FromSql, Client, Row};
 
 mod models;
 mod responses;
@@ -190,25 +190,11 @@ async fn is_session_valid(
 }
 
 /// Converts a value in the given index from a DB row into a value of type T.
-fn from_db_to_value<T>(row: &Row, index: &str, tracing_prefix: &str) -> Option<T>
+fn from_db_to_value<'a, T>(row: &'a Row, index: &str, tracing_prefix: &str) -> Option<T>
 where
-    T: FromStr,
-    <T as FromStr>::Err: Debug,
+    T: FromSql<'a>,
 {
-    let value = match row.try_get::<&str, &str>(index) {
-        Ok(v) => v,
-        Err(err) => {
-            tracing::error!(
-                "{} An error `{:?}` occurred while parsing row field `{}`",
-                tracing_prefix,
-                err,
-                index
-            );
-            None?
-        }
-    };
-
-    match value.parse() {
+    match row.try_get(index) {
         Ok(v) => Some(v),
         Err(err) => {
             tracing::error!(
@@ -224,9 +210,27 @@ where
 
 /// Parses an Ingredient from a DB Row.
 fn parse_db_ingredient(row: &Row, tracing_prefix: &str) -> Option<Ingredient> {
-    let ingredient_id = from_db_to_value(row, "ingredient_id", tracing_prefix)?;
+    let ingredient_id = from_db_to_value::<&str>(row, "ingredient_id", tracing_prefix)?
+        .parse()
+        .map_err(|err| {
+            tracing::error!(
+                "{} An error `{:?}` occurred while parsing row field `{}`",
+                tracing_prefix,
+                err,
+                "user_id"
+            );
+        }).ok()?;
 
-    let user_id = from_db_to_value(row, "user_id", tracing_prefix)?;
+    let user_id = from_db_to_value::<&str>(row, "user_id", tracing_prefix)?
+        .parse()
+        .map_err(|err| {
+            tracing::error!(
+                "{} An error `{:?}` occurred while parsing row field `{}`",
+                tracing_prefix,
+                err,
+                "user_id"
+            );
+        }).ok()?;
 
     let name = from_db_to_value(row, "name", tracing_prefix)?;
 
@@ -234,7 +238,7 @@ fn parse_db_ingredient(row: &Row, tracing_prefix: &str) -> Option<Ingredient> {
 
     let category = from_db_to_value(row, "category", tracing_prefix)?;
 
-    let quantity = from_db_to_value(row, "quantity", tracing_prefix)?;
+    let quantity = from_db_to_value::<i16>(row, "quantity", tracing_prefix)? as u16;
 
     let unit = from_db_to_value(row, "unit", tracing_prefix)?;
 
