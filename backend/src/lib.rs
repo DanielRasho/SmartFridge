@@ -219,7 +219,8 @@ fn parse_db_ingredient(row: &Row, tracing_prefix: &str) -> Option<Ingredient> {
                 err,
                 "user_id"
             );
-        }).ok()?;
+        })
+        .ok()?;
 
     let user_id = from_db_to_value::<&str>(row, "user_id", tracing_prefix)?
         .parse()
@@ -230,7 +231,8 @@ fn parse_db_ingredient(row: &Row, tracing_prefix: &str) -> Option<Ingredient> {
                 err,
                 "user_id"
             );
-        }).ok()?;
+        })
+        .ok()?;
 
     let name = from_db_to_value(row, "name", tracing_prefix)?;
 
@@ -238,7 +240,7 @@ fn parse_db_ingredient(row: &Row, tracing_prefix: &str) -> Option<Ingredient> {
 
     let category = from_db_to_value(row, "category", tracing_prefix)?;
 
-    let quantity = from_db_to_value::<i16>(row, "quantity", tracing_prefix)? as u16;
+    let quantity = from_db_to_value(row, "quantity", tracing_prefix)?;
 
     let unit = from_db_to_value(row, "unit", tracing_prefix)?;
 

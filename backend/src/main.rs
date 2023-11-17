@@ -13,6 +13,7 @@ use backend::{
     Params,
 };
 use clap::Parser;
+use hyper::StatusCode;
 use tokio_postgres::{Client, Error};
 use tower_http::cors::{Any, CorsLayer};
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
@@ -112,4 +113,5 @@ fn app(db_client: Arc<Option<Client>>, params: Arc<Params>) -> Router {
             "/ingredients/search",
             post(|p| search_ingredients(p, db_c_6)),
         )
+        .fallback(|| (StatusCode::NOT_FOUND, "¡Route not found!"))
 }

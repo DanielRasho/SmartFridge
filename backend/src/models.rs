@@ -78,7 +78,7 @@ pub struct Ingredient {
     pub category: String,
 
     #[serde(rename = "Quantity")]
-    pub quantity: u16,
+    pub quantity: f32,
 
     #[serde(rename = "Unit")]
     pub unit: String,

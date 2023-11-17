@@ -53,7 +53,7 @@ pub struct IngredientPayload {
     pub category: String,
 
     #[serde(rename = "Quantity")]
-    pub quantity: u16,
+    pub quantity: f32,
 
     #[serde(rename = "Unit")]
     pub unit: String,
@@ -165,7 +165,7 @@ pub async fn add_ingredient(
                 &ingredient.name,
                 &ingredient.expire_date,
                 &ingredient.category,
-                &(ingredient.quantity as i16),
+                &ingredient.quantity,
                 &ingredient.unit,
             ],
         )
