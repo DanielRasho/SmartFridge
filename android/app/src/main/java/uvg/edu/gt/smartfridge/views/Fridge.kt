@@ -189,7 +189,7 @@ fun addIngredientButton( navHostController: NavHostController) {
 }
 
 fun formatDateString(inputDateString: String): String {
-    val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'", Locale.getDefault())
+    val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
     val outputFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
 
     val date = inputFormat.parse(inputDateString)
