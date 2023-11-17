@@ -208,6 +208,6 @@ fun testFridgeView(){
 @Composable
 fun testIngredientItem(){
     smartFridgeTheme {
-        ingredientEntry(ingredient = Ingredient("32", "Soy Sause", "Souce", 3.0f, "3", "2023-11-03T03:03:49.309844585Z"))
+        ingredientEntry(ingredient = Ingredient("32", "UserID", "Soy Sause", "Souce", 3.0f, "3", "2023-11-03T03:03:49.309844585Z"))
     }
 }

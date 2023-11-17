@@ -126,6 +126,7 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
                             Log.i("userSettings", userSettings.toString())
 
                             sharedViewModel.jwtToken = JWT_TOKEN
+                            sharedViewModel.preferences = userSettings
 
                             val tokenManager = TokenManager(context)
                             tokenManager.saveJwtToken(JWT_TOKEN)

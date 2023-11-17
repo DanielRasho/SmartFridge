@@ -6,6 +6,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import kotlinx.serialization.Serializable
 import uvg.edu.gt.smartfridge.data.FridgeService
 import uvg.edu.gt.smartfridge.models.Ingredient
 
@@ -21,7 +22,16 @@ class NewIngredientViewModel : ViewModel() {
     private val fridgeService = FridgeService(_httpClient)
 
     suspend fun addIngredient( JWT_TOKEN : String, ingredient: Ingredient) : Result<String> {
-        return fridgeService.addIngredient(JWT_TOKEN, ingredient)
+        val payload = AddIngredientRequestPayload(ingredient.UserId, ingredient.Name, ingredient.Category, ingredient.Quantity, ingredient.Unit, ingredient.ExpireDate)
+        return fridgeService.addIngredient(JWT_TOKEN, payload)
     }
 
 }
+
+@Serializable
+class AddIngredientRequestPayload(val UserId: String,
+                                  val Name: String,
+                                  val Category: String,
+                                  val Quantity: Float,
+                                  val Unit: String,
+                                  val ExpireDate: String = "")

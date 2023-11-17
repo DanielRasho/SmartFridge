@@ -1,5 +1,6 @@
 package uvg.edu.gt.smartfridge.data
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -11,10 +12,12 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import org.json.JSONArray
 import org.json.JSONObject
 import uvg.edu.gt.smartfridge.models.Ingredient
+import uvg.edu.gt.smartfridge.viewModels.AddIngredientRequestPayload
 
 class FridgeService(client: HttpClient) : Service(client) {
 
@@ -49,7 +52,7 @@ class FridgeService(client: HttpClient) : Service(client) {
 
             // Fetching ingredients.
             for (index in 0 until data.length()) {
-                tempIngredients.add(Json.decodeFromString<Ingredient>(data.getString(index)))
+                tempIngredients.add(Json{ignoreUnknownKeys = true}.decodeFromString<Ingredient>(data.getString(index)))
             }
             tempIngredients
         }
@@ -89,20 +92,15 @@ class FridgeService(client: HttpClient) : Service(client) {
         }
     }
 
-    suspend fun addIngredient(JWT_TOKEN: String, ingredient: Ingredient): Result<String> {
+    suspend fun addIngredient(JWT_TOKEN: String, ingredient: AddIngredientRequestPayload): Result<String> {
 
         return handleHttpRequest {
-
-            // removing undesired field
-            val requestIngredient = JSONObject(Json.encodeToString(ingredient))
-            requestIngredient.remove("IngredientId")
-
-            println(requestIngredient.toString())
+            val reqIngredient = Json.encodeToJsonElement(ingredient)
 
             val requestBody = buildJsonObject {
                 put("token", JWT_TOKEN)
-                put("ingredient", requestIngredient.toString())
-            }.toString().replace("\\", "") // Removing extra backslashes.
+                put("ingredient", reqIngredient)
+            }.toString()
 
             println(requestBody)
 
@@ -116,6 +114,11 @@ class FridgeService(client: HttpClient) : Service(client) {
                 }
                 setBody(requestBody)
             }
+
+            val body = response.body() as String
+            println("The response body is: " + body.toString())
+            println(HttpRoutes.BASE_URL + HttpRoutes.ADD_INGREDIENT + ": Sending data: " + requestBody)
+
             "Ingredient ${ingredient.Name} added!"
         }
     }
@@ -140,6 +143,7 @@ class FridgeService(client: HttpClient) : Service(client) {
                 }
                 setBody(requestBody)
             }
+
             "Ingredient edited"
         }
     }

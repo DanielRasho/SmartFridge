@@ -58,6 +58,7 @@ import java.util.Locale
 @Composable
 fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavController) {
     val jwtToken = sharedViewModel.jwtToken
+    val userId = sharedViewModel.preferences.UserId
     val newIngredientViewModel: NewIngredientViewModel = NewIngredientViewModel()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -144,6 +145,7 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                                     jwtToken,
                                     Ingredient(
                                         "",
+                                        userId,
                                         name.value,
                                         category.value,
                                         amount.value.toFloat(),
