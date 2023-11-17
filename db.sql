@@ -26,11 +26,11 @@ CREATE TABLE sf_session (
 CREATE TABLE sf_ingredient (
 	ingredient_id varchar(64) UNIQUE NOT NULL,
 	user_id varchar(64) NOT NULL REFERENCES sf_user(user_id),
-	name varchar(64),
+	name varchar(64) NOT NULL,
 	expire_date TIMESTAMP WITH TIME ZONE NOT NULL,
-	category varchar(64),
-	quantity smallint,
-	unit varchar(64),
+	category varchar(64) NOT NULL,
+	quantity float(4) NOT NULL,
+	unit varchar(64) NOT NULL,
 	PRIMARY KEY( ingredient_id )
 );
 
