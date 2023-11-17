@@ -1,7 +1,7 @@
 #![recursion_limit = "256"]
 use std::{net::SocketAddr, sync::Arc};
 
-use axum::{routing::post, Router};
+use axum::{routing::post, Router, response::IntoResponse};
 use backend::{
     routes::{
         add_ingredient::add_ingredient, edit_ingredient::edit_ingredient,
@@ -113,5 +113,9 @@ fn app(db_client: Arc<Option<Client>>, params: Arc<Params>) -> Router {
             "/ingredients/search",
             post(|p| search_ingredients(p, db_c_6)),
         )
-        .fallback(|| (StatusCode::NOT_FOUND, "¡Route not found!"))
+        .fallback(handle_404)
+}
+
+async fn handle_404() -> impl IntoResponse {
+    (StatusCode::NOT_FOUND, "¡Route not found!")
 }
