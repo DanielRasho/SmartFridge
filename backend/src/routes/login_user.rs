@@ -220,7 +220,11 @@ pub async fn login_user(
 
     tracing::debug!("{} Generating session...", tracing_prefix);
     let session_id = Uuid::new_v4().to_string();
-    let expire_date = Utc::now() + Duration::days(7);
+    let expire_date = if cfg!(debug_assertions) {
+        Utc::now() + Duration::seconds(30)
+    } else {
+        Utc::now() + Duration::days(7)
+    };
     if let Err(err) = conn
         .execute(
             "INSERT INTO sf_session(session_id, user_id, expire_date) VALUES ($1, $2, $3)",
