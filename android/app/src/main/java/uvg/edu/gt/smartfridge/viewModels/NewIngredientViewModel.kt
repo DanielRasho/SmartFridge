@@ -13,25 +13,34 @@ import uvg.edu.gt.smartfridge.models.Ingredient
 class NewIngredientViewModel : ViewModel() {
 
     private val _httpClient = HttpClient(CIO) {
-        install (Logging) {
+        install(Logging) {
             logger = Logger.DEFAULT
-            filter { request ->  request.url.host.contains("ktor.io")  }
+            filter { request -> request.url.host.contains("ktor.io") }
         }
     }
 
     private val fridgeService = FridgeService(_httpClient)
 
-    suspend fun addIngredient( JWT_TOKEN : String, ingredient: Ingredient) : Result<String> {
-        val payload = AddIngredientRequestPayload(ingredient.UserId, ingredient.Name, ingredient.Category, ingredient.Quantity, ingredient.Unit, ingredient.ExpireDate)
+    suspend fun addIngredient(JWT_TOKEN: String, ingredient: Ingredient): Result<String> {
+        val payload = AddIngredientRequestPayload(
+            ingredient.UserId,
+            ingredient.Name,
+            ingredient.Category,
+            ingredient.Quantity,
+            ingredient.Unit,
+            ingredient.ExpireDate
+        )
         return fridgeService.addIngredient(JWT_TOKEN, payload)
     }
 
 }
 
 @Serializable
-class AddIngredientRequestPayload(val UserId: String,
-                                  val Name: String,
-                                  val Category: String,
-                                  val Quantity: Float,
-                                  val Unit: String,
-                                  val ExpireDate: String = "")
+class AddIngredientRequestPayload(
+    val UserId: String,
+    val Name: String,
+    val Category: String,
+    val Quantity: Float,
+    val Unit: String,
+    val ExpireDate: String = ""
+)
