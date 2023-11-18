@@ -42,6 +42,7 @@ import uvg.edu.gt.smartfridge.data.ResponseException
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.HomeViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
+import uvg.edu.gt.smartfridge.viewModels.TokenManager
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
@@ -55,6 +56,7 @@ fun HomeView(
     val coroutineScope = rememberCoroutineScope()
     val homeViewModel = viewModel<HomeViewModel>()
     val context = LocalContext.current
+    var code:String =""
     val navItems = sequenceOf(
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
@@ -72,7 +74,8 @@ fun HomeView(
             if (result.isFailure) {
                 val exception = result.exceptionOrNull() as ResponseException
                 println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
-
+                code=exception.statusCode.toString()
+                println(code)
                 withContext(Dispatchers.Main) {
                     Toast.makeText(
                         context,
@@ -80,10 +83,25 @@ fun HomeView(
                         Toast.LENGTH_SHORT
                     ).show()
                 }
+                if (code == "401") {
+                    withContext(Dispatchers.Main) {
+                        val tokenManager = TokenManager(context)
+                        tokenManager.clearJwtToken()
+                        // Navigate to the login view
+                        navController.navigate("Login"){
+                            // Clear the back stack to prevent going back to Login
+                            popUpTo("Home") {
+                                inclusive = true
+                            }
+                        }
+                    }
+                }
+
             }
 
         }
     }
+
     /*
     val recipes = sequenceOf(
         Recipe(
