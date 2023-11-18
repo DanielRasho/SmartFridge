@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -63,7 +64,7 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
         //horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        Title("Login")
+        Title("Login", modifier.fillMaxWidth(), TextAlign.Center)
         Spacer(modifier = Modifier.height(50.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -74,8 +75,8 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
             painter = painterResource(id = R.drawable.logo),
             contentDescription = null,
             modifier = Modifier
-                .width(50.dp)
-                .height(50.dp)
+                .width(150.dp)
+                .height(150.dp)
         ) }
 
 

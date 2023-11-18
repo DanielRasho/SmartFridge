@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -58,11 +59,11 @@ fun RegisterView(navController: NavHostController, modifier: Modifier = Modifier
 
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp, 0.dp)
+            .padding(16.dp)
             .height(796.dp)
 
     ) {
-        Title("Register")
+        Title("Register", modifier.fillMaxWidth(), TextAlign.Center)
         Spacer(modifier = Modifier.height(50.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -73,24 +74,11 @@ fun RegisterView(navController: NavHostController, modifier: Modifier = Modifier
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = null,
                 modifier = Modifier
-                    .width(50.dp)
-                    .height(50.dp)
+                    .width(150.dp)
+                    .height(150.dp)
             )
         }
         Spacer(modifier = Modifier.height(10.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            Divider(
-                color = MaterialTheme.colorScheme.outline, // Customize the color as needed
-                thickness = 1.dp,   // Customize the thickness as needed
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .width(240.dp)
-            )
-        }
 
         Spacer(modifier = Modifier.height(100.dp))
         Row(
@@ -98,7 +86,7 @@ fun RegisterView(navController: NavHostController, modifier: Modifier = Modifier
             horizontalArrangement = Arrangement.Center,
             modifier = modifier.fillMaxWidth()
         ) {
-            textField(label = "Username", textValue = username)
+            textField(label = "User", textValue = username)
         }
         Spacer(modifier = Modifier.height(30.dp))
         Row(
