@@ -129,6 +129,8 @@ fun LoginView(sharedViewModel: SharedViewModel, navController: NavHostController
                             sharedViewModel.preferences = userSettings
                             sharedViewModel.useDarkTheme = userSettings.Theme.equals("Dark")
 
+                            Log.i("USER SETTINGS", sharedViewModel.preferences.toString())
+
                             val tokenManager = TokenManager(context)
                             tokenManager.saveJwtToken(JWT_TOKEN)
 

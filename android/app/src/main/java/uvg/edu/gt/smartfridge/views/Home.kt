@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -152,7 +153,7 @@ fun HomeView(
                             onClick = { navController.navigate("Recipe") },
                             modifier = modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp),
+                                .padding(15.dp, 0.dp , 15.dp, 40.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                         ) {
                             AsyncImage(
@@ -177,7 +178,9 @@ fun HomeView(
                                         tag,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = modifier
-                                            .background(MaterialTheme.colorScheme.secondaryContainer)
+                                            .background( color = MaterialTheme.colorScheme.secondaryContainer,
+                                                shape = RoundedCornerShape(5.dp)
+                                            )
                                             .padding(3.dp),
                                         style = MaterialTheme.typography.labelLarge
                                     )

@@ -77,7 +77,7 @@ fun SettingsView(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 RadioButton(selected = !useDarkTheme, onClick = {
                     setUseDarkTheme(false)
-
+                    println("SETTINGS (before api call) " + sharedViewModel.preferences.SettingsId)
                     coroutineScope.launch(Dispatchers.IO) {
                         settingsViewModel.saveSettings(
                             sharedViewModel.jwtToken,
