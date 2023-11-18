@@ -136,7 +136,7 @@ pub async fn save_settings(
     let theme = format!("{:?}", settings.theme);
     if let Err(err) = conn
         .execute(
-            "UPDATE sf_settings WHERE settings_id=$1 SET theme=$2",
+            "UPDATE sf_settings SET theme=$2 WHERE settings_id=$1",
             &[&settings.settings_id.to_string(), &theme],
         )
         .await
