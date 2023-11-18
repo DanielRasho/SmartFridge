@@ -19,34 +19,47 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.IconPrimaryButton
 import uvg.edu.gt.smartfridge.components.NavItem
 import uvg.edu.gt.smartfridge.components.Title
+import uvg.edu.gt.smartfridge.models.UserSettings
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
+import uvg.edu.gt.smartfridge.viewModels.SettingsViewModel
+import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 import uvg.edu.gt.smartfridge.viewModels.TokenManager
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsView(
+    sharedViewModel: SharedViewModel,
     useDarkTheme: Boolean,
     setUseDarkTheme: (Boolean) -> Unit,
     navController: NavHostController,
     context: Context,
-    startDestination:String,
+    startDestination: String,
     modifier: Modifier = Modifier
 ) {
     val navItems = sequenceOf(
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
+    val coroutineScope = rememberCoroutineScope()
+    val settingsViewModel = viewModel<SettingsViewModel>()
+    val context = LocalContext.current
+
+
     Scaffold(bottomBar = { BottomNavBar(items = navItems, navController = navController) }) {
         Column(
             modifier = modifier
@@ -62,7 +75,20 @@ fun SettingsView(
                 style = MaterialTheme.typography.bodyLarge
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(selected = !useDarkTheme, onClick = { setUseDarkTheme(false) })
+                RadioButton(selected = !useDarkTheme, onClick = {
+                    setUseDarkTheme(false)
+
+                    coroutineScope.launch(Dispatchers.IO) {
+                        settingsViewModel.saveSettings(
+                            sharedViewModel.jwtToken,
+                            UserSettings(
+                                sharedViewModel.preferences.SettingsId,
+                                sharedViewModel.preferences.UserId,
+                                "Light"
+                            )
+                        )
+                    }
+                })
                 Text(
                     "Light Theme",
                     color = MaterialTheme.colorScheme.onBackground,
@@ -73,10 +99,22 @@ fun SettingsView(
                 RadioButton(
                     selected = useDarkTheme,
                     onClick = {
-                        setUseDarkTheme(true); Log.d(
-                        "DarkTheme Radio Button",
-                        "Clicked!"
-                    )
+                        setUseDarkTheme(true);
+
+                        coroutineScope.launch(Dispatchers.IO) {
+                            settingsViewModel.saveSettings(
+                                sharedViewModel.jwtToken,
+                                UserSettings(
+                                    sharedViewModel.preferences.SettingsId,
+                                    sharedViewModel.preferences.UserId,
+                                    "Dark"
+                                )
+                            )
+                        }
+                        Log.d(
+                            "DarkTheme Radio Button",
+                            "Clicked!"
+                        )
                     })
                 Text(
                     "Dark Theme",
@@ -90,6 +128,9 @@ fun SettingsView(
                 modifier = modifier.fillMaxWidth()
             ) {
                 IconPrimaryButton(text = "Logout", icon = Icons.Rounded.ExitToApp) {
+                    coroutineScope.launch(Dispatchers.IO) {
+                        settingsViewModel.logout(sharedViewModel.jwtToken)
+                    }
                     val tokenManager = TokenManager(context)
                     tokenManager.clearJwtToken()
                     navController.navigate("Principal") {
@@ -107,8 +148,15 @@ fun SettingsView(
 @Preview
 @Composable
 fun SettingsViewPreview() {
-
+    val sharedViewModel = SharedViewModel()
     smartFridgeTheme {
-        SettingsView(false, {}, rememberNavController(), context = LocalContext.current,"Home")
+        SettingsView(
+            sharedViewModel,
+            false,
+            {},
+            rememberNavController(),
+            context = LocalContext.current,
+            "Home"
+        )
     }
 }

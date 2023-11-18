@@ -10,6 +10,7 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import uvg.edu.gt.smartfridge.models.UserSettings
 
@@ -40,11 +41,15 @@ class SettingsService(client: HttpClient) : Service(client) {
     suspend fun saveSettings(JWT_TOKEN : String, userSettings : UserSettings) : Result<String>{
 
         return handleHttpRequest {
+
+            val reqSettings = Json.encodeToJsonElement(userSettings)
             // Creating Request body
             val requestBody = buildJsonObject {
                 put("token", JWT_TOKEN)
-                put("settings", Json.encodeToString(userSettings))
+                put("settings", reqSettings)
             }.toString()
+
+            println(requestBody)
 
             // Making Request
             val response : HttpResponse = client.request(
