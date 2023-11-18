@@ -2,6 +2,7 @@ package uvg.edu.gt.smartfridge
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -22,9 +23,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import kotlinx.serialization.json.Json
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 import uvg.edu.gt.smartfridge.viewModels.TokenManager
+import uvg.edu.gt.smartfridge.views.EditIngredientView
 import uvg.edu.gt.smartfridge.views.FridgeView
 import uvg.edu.gt.smartfridge.views.HomeView
 import uvg.edu.gt.smartfridge.views.LoginView
@@ -78,11 +81,17 @@ fun MainComponent(
                 composable("Login") { LoginView(sharedViewModel, navController) }
                 composable("Register") { RegisterView(navController) }
                 composable("Home") { HomeView(sharedViewModel, setUseDarkTheme,navController) }
-                composable("Settings") { SettingsView(useDarkTheme, setUseDarkTheme, navController,context = context,startDestination) }
+                composable("Settings") { SettingsView(sharedViewModel, useDarkTheme, setUseDarkTheme, navController,context = context,startDestination) }
                 composable("Fridge") { FridgeView(sharedViewModel, navController) }
                 composable("Recipe") { RecipeView(navController) }
                 composable("NewIngredient") { NewIngredientView(sharedViewModel, navController) }
-
+                composable(route = "EditIngredient", arguments = listOf(
+                    navArgument("ingredient"){ type = NavType.StringType}
+                )) {
+                    val ingredient = it.arguments?.getString("ingredient")
+                    requireNotNull(ingredient) { Log.e("Error","ingredient must NOT be null")}
+                    EditIngredientView(navController, Json.decodeFromString(ingredient))
+                }
             }
         }
     }

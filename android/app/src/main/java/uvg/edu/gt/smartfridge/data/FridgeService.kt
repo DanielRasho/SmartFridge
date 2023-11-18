@@ -18,6 +18,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.viewModels.AddIngredientRequestPayload
+import uvg.edu.gt.smartfridge.viewModels.EditIngredientRequestPayload
 
 class FridgeService(client: HttpClient) : Service(client) {
 
@@ -43,7 +44,7 @@ class FridgeService(client: HttpClient) : Service(client) {
                 setBody(requestBody)
             }
 
-            println(response.body() as String)
+            println("Get Ingredients:" + response.body() as String)
 
             // Translating JSON response
             val data: JSONArray = JSONArray(response.body() as String)
@@ -124,7 +125,7 @@ class FridgeService(client: HttpClient) : Service(client) {
     }
 
 
-    suspend fun editIngredient(JWT_TOKEN: String, ingredient: Ingredient): Result<String> {
+    suspend fun editIngredient(JWT_TOKEN: String, ingredient: EditIngredientRequestPayload): Result<String> {
 
         return handleHttpRequest {
             // Creating Request body

@@ -35,11 +35,13 @@ import uvg.edu.gt.smartfridge.components.dateField
 import uvg.edu.gt.smartfridge.components.numberField
 import uvg.edu.gt.smartfridge.components.spinnerField
 import uvg.edu.gt.smartfridge.components.textField
+import uvg.edu.gt.smartfridge.models.Ingredient
+import uvg.edu.gt.smartfridge.models.Recipe
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import java.time.LocalDate
 
 @Composable
-fun EditIngredientView(navController: NavController){
+fun EditIngredientView(navController: NavController, ingredient : Ingredient){
     val name = remember { mutableStateOf("") }
     val amount = remember { mutableStateOf("") }
     var measureUnit = remember { mutableStateOf("") }
@@ -134,7 +136,8 @@ fun EditIngredientView(navController: NavController){
 @Composable
 fun previewEditIngredient(){
     val controller = rememberNavController()
+    val ingredient = Ingredient("234", "43", "Shrimp", "Meat", 34f, "Lb", "2/3/2023")
     smartFridgeTheme {
-        EditIngredientView(navController = controller)
+        EditIngredientView(navController = controller, ingredient)
     }
 }
