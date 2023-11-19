@@ -142,9 +142,11 @@ class FridgeService(client: HttpClient) : Service(client) {
 
         return handleHttpRequest {
             // Creating Request body
+            val reqIngredient = Json.encodeToJsonElement(ingredient)
+
             val requestBody = buildJsonObject {
                 put("token", JWT_TOKEN)
-                put("ingredient", Json.encodeToString(ingredient))
+                put("ingredient", reqIngredient)
             }.toString()
 
             // Making Request

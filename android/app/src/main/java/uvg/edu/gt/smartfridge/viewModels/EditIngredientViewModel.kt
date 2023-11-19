@@ -20,8 +20,9 @@ class EditIngredientViewModel : ViewModel() {
 
     private val fridgeService = FridgeService(_httpClient)
 
-    suspend fun addIngredient(JWT_TOKEN: String, ingredient: Ingredient): Result<String> {
+    suspend fun editIngredient(JWT_TOKEN: String, ingredient: Ingredient): Result<String> {
         val payload = EditIngredientRequestPayload(
+            ingredient.IngredientId,
             ingredient.Name,
             ingredient.Category,
             ingredient.Quantity,
@@ -35,6 +36,7 @@ class EditIngredientViewModel : ViewModel() {
 
 @Serializable
 class EditIngredientRequestPayload(
+    val IngredientId : String,
     val Name: String,
     val Category: String,
     val Quantity: Float,

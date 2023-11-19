@@ -117,7 +117,7 @@ fun FridgeView(sharedViewModel: SharedViewModel, navController: NavHostControlle
             searchBar("Search for Ingredients...")
             Spacer(modifier = Modifier.height(40.dp))
             for ((categoryName, ingredientList) in groupedIngredients) {
-                categoryList(categoryName, ingredientList)
+                categoryList(categoryName, ingredientList, navController)
                 Spacer(modifier = Modifier.height(36.dp))
             }
             Spacer(modifier = Modifier.height(96.dp))
@@ -127,7 +127,7 @@ fun FridgeView(sharedViewModel: SharedViewModel, navController: NavHostControlle
 }
 
 @Composable
-fun categoryList(category: String, ingredients: List<Ingredient>) {
+fun categoryList(category: String, ingredients: List<Ingredient>, navHostController: NavHostController) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = category,
@@ -140,7 +140,7 @@ fun categoryList(category: String, ingredients: List<Ingredient>) {
             color = MaterialTheme.colorScheme.outline
         )
         ingredients.forEach { ingredient ->
-            ingredientEntry(ingredient)
+            ingredientEntry(ingredient, navHostController)
             Divider(
                 thickness = 1.dp,
                 color = MaterialTheme.colorScheme.outline
@@ -150,12 +150,14 @@ fun categoryList(category: String, ingredients: List<Ingredient>) {
 }
 
 @Composable
-fun ingredientEntry(ingredient: Ingredient) {
+fun ingredientEntry(ingredient: Ingredient, navHostController: NavHostController) {
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { println("TESTING HERE") },
+            .clickable {
+                    navHostController.navigate("EditIngredient/${Json.encodeToString(ingredient)}")
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -249,7 +251,8 @@ fun testIngredientItem() {
                 3.0f,
                 "3",
                 "2023-11-03T03:03:49.309844585Z"
-            )
+            ),
+            rememberNavController()
         )
     }
 }
