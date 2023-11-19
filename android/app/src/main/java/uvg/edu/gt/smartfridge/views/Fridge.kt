@@ -101,8 +101,6 @@ fun FridgeView(sharedViewModel: SharedViewModel, navController: NavHostControlle
         }
     }
 
-    }
-
     val groupedIngredients: Map<String, List<Ingredient>> =
         fridgeViewModel.getIngredients().groupBy { it.Category }
 
