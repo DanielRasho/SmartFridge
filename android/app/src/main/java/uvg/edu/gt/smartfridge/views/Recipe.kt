@@ -1,6 +1,9 @@
 package uvg.edu.gt.smartfridge.views
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -98,7 +101,12 @@ fun RecipeView(navController: NavHostController, recipe: Recipe, sharedViewModel
         Spacer(modifier = Modifier.height(50.dp))
 
         PrimaryButton(text = "Prepare!", Modifier.fillMaxWidth()) {
-
+            Log.e("tag","URL IS "+ recipe.Source)
+            val urlIntent = Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse(recipe.Source)
+            )
+            context.startActivity(urlIntent)
         }
         Spacer(modifier = Modifier.height(200.dp))
 
