@@ -6,9 +6,9 @@
    A companion for your meals</i> </h5>
 </div>
 
-**Demo Video:** [Click Aqui !](https://youtu.be/JOmiLFdczcg?si=IRQpJqVgeiemvmnV)
+🔴 **Video demostración:** [Click Aquí!](https://youtu.be/Q0AqtbT0X9Q?si=kA7dIcc781y0b7L1)
 
-
+🔴 **Video Explicación Tecnica**: [Click Aqui!](https://youtu.be/WnpI1QcRkc0)
 
 Smart Fridge es una aplicación que se encargará de recomendarte recetas de cocina en base a lo que exista en tu refrigerador.
 
