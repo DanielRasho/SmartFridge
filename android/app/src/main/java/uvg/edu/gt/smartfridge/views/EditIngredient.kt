@@ -67,7 +67,11 @@ fun EditIngredientView(navController: NavController, ingredient : Ingredient, sh
 
     var (exposeUnitSelector, setExposeUnitSelector) = remember { mutableStateOf(false) }
 
-    var navigateBack : () -> Unit = { /*TODO: implement when navGraph is created*/ }
+    var areFieldsFilled: () -> Boolean = {
+        !(name.value.isEmpty() || amount.value.isEmpty() || measureUnit.value.isEmpty() || category.value.isEmpty())
+    }
+
+    var navigateBack : () -> Unit = { navController.popBackStack() }
 
     val unitCategories = mapOf(
         "Weight" to listOf("Kg", "g", "Lb"),
@@ -90,7 +94,7 @@ fun EditIngredientView(navController: NavController, ingredient : Ingredient, sh
 
                 Row (horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically){
-                    IconButton(onClick = { /*TODO*/ },
+                    IconButton(onClick = { navigateBack() },
                         content = { Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null) })
                     Text(
                         "Edit Ingredient",
@@ -116,6 +120,7 @@ fun EditIngredientView(navController: NavController, ingredient : Ingredient, sh
 
                 Row {
                     Button(onClick = {
+                        if(areFieldsFilled())
                         coroutineScope.launch(Dispatchers.IO) {
                             val result = editIngredientViewModel.editIngredient(
                                 jwtToken,
@@ -171,6 +176,9 @@ fun EditIngredientView(navController: NavController, ingredient : Ingredient, sh
                                 }
                             }
                         }
+                        else{
+                            Toast.makeText(context, "Not all fields are filled", Toast.LENGTH_LONG).show()
+                        }
                     },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error),
@@ -181,7 +189,55 @@ fun EditIngredientView(navController: NavController, ingredient : Ingredient, sh
                             color = MaterialTheme.colorScheme.onError)
                     }
                     Spacer(modifier = Modifier.width(16.dp))
-                    Button(onClick = { /*TODO*/ },
+                    Button(onClick = {
+                        coroutineScope.launch(Dispatchers.IO) {
+                            val result = editIngredientViewModel.deleteIngredient(
+                                jwtToken,
+                                ingredient.IngredientId
+                            )
+
+                            when (result.isSuccess) {
+                                true -> {
+                                    val message = result.getOrNull()!!
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                                        println(navController.toString())
+                                        navController.navigate("Fridge")
+                                    }
+
+                                }
+
+                                false -> {
+                                    val exception =
+                                        result.exceptionOrNull() as ResponseException
+                                    println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+                                    val code = exception.statusCode
+
+                                    withContext(Dispatchers.Main) {
+                                        Toast.makeText(
+                                            context,
+                                            "Error ${exception.statusCode} : ${exception.message}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+
+                                    if (code == 401) {
+                                        withContext(Dispatchers.Main) {
+                                            val tokenManager = TokenManager(context)
+                                            tokenManager.clearJwtToken()
+                                            // Navigate to the login view
+                                            navController.navigate("Login") {
+                                                // Clear the back stack to prevent going back to Login
+                                                popUpTo("Home") {
+                                                    inclusive = true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
                         border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
                         shape = RoundedCornerShape(5.dp),
                         colors = ButtonDefaults.outlinedButtonColors(

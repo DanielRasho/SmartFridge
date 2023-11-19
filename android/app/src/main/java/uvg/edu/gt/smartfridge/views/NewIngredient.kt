@@ -72,7 +72,11 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
 
     var (exposeUnitSelector, setExposeUnitSelector) = remember { mutableStateOf(false) }
 
-    var navigateBack: () -> Unit = { /*TODO: implement when navGraph is created*/ }
+    var navigateBack: () -> Unit = { navController.popBackStack() }
+
+    var areFieldsFilled: () -> Boolean = {
+        !(name.value.isEmpty() || amount.value.isEmpty() || measureUnit.value.isEmpty() || category.value.isEmpty())
+    }
 
     val unitCategories = mapOf(
         "Weight" to listOf("Kg", "g", "Lb"),
@@ -103,7 +107,7 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { navController.navigate("Fridge") },
+                    IconButton(onClick = { navigateBack() },
                         content = {
                             Icon(
                                 imageVector = Icons.Default.ArrowBack,
@@ -141,6 +145,7 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                 Row {
                     Button(
                         onClick = {
+                            if (areFieldsFilled())
                             coroutineScope.launch(Dispatchers.IO) {
                                 val result = newIngredientViewModel.addIngredient(
                                     jwtToken,
@@ -196,6 +201,9 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                                     }
                                 }
                             }
+                            else {
+                                Toast.makeText(context, "Not all fields are filled", Toast.LENGTH_LONG).show()
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.error
@@ -209,20 +217,6 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                         )
                     }
                     Spacer(modifier = Modifier.width(16.dp))
-                    Button(
-                        onClick = { /*TODO*/ },
-                        border = BorderStroke(2.dp, MaterialTheme.colorScheme.outline),
-                        shape = RoundedCornerShape(5.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "Continue",
-                            color = MaterialTheme.colorScheme.outline
-                        )
-                    }
                 }
             }
             if (exposeUnitSelector)

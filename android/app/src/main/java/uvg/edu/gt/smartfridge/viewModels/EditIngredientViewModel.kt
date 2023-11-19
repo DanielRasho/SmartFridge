@@ -32,6 +32,9 @@ class EditIngredientViewModel : ViewModel() {
         return fridgeService.editIngredient(JWT_TOKEN, payload)
     }
 
+    suspend fun deleteIngredient(JWT_TOKEN : String, IngredientId: String) : Result<String> {
+        return fridgeService.deleteIngredient(JWT_TOKEN, IngredientId)
+    }
 }
 
 @Serializable
