@@ -70,11 +70,14 @@ fun MainComponent(
         ) {
             val tokenManager = TokenManager(LocalContext.current)
             val jwtToken = tokenManager.getJwtToken()
-
+            val preferences = tokenManager.getUserSettings()
+            val theme = tokenManager.getThemePreference()
             // Set the start destination based on the presence of the JWT token
             val startDestination = if (jwtToken != null) "Home" else "Principal"
-            if (jwtToken != null) {
+            if(jwtToken!=null){
                 sharedViewModel.jwtToken = jwtToken
+                sharedViewModel.preferences= preferences
+                sharedViewModel.useDarkTheme=theme
             }
             NavHost(navController = navController, startDestination = startDestination) {
                 composable("Principal") { PrincipalView(navController) }
