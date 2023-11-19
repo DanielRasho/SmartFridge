@@ -1,59 +1,90 @@
 package uvg.edu.gt.smartfridge.views
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
+import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ExitToApp
-import androidx.compose.material3.Divider
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import uvg.edu.gt.smartfridge.R
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.CheckBoxList
-import uvg.edu.gt.smartfridge.components.IconPrimaryButton
-import uvg.edu.gt.smartfridge.components.IconSecondaryButton
 import uvg.edu.gt.smartfridge.components.NavItem
 import uvg.edu.gt.smartfridge.components.Title
+import uvg.edu.gt.smartfridge.models.LightIngredient
+import uvg.edu.gt.smartfridge.models.Recipe
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
+import uvg.edu.gt.smartfridge.components.PrimaryButton
+import uvg.edu.gt.smartfridge.data.ResponseException
+import uvg.edu.gt.smartfridge.models.Ingredient
+import uvg.edu.gt.smartfridge.viewModels.FridgeViewModel
+import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
 @Composable
-fun RecipeView(navController: NavHostController, modifier: Modifier = Modifier) {
-    val recipeIngredients = remember { arrayListOf("Shrimp", "Butter", "Italian Seasoning","Salt and Pepper") }
-    val userIngredients = remember { arrayListOf("Shrimp", "Italian Seasoning","Salt and Pepper") }
+fun RecipeView(navController: NavHostController, recipe: Recipe, sharedViewModel : SharedViewModel, modifier: Modifier = Modifier) {
+    val recipeIngredients = remember { recipe.Ingredients.map { i -> i.Name } }
     val navItems = sequenceOf(
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
+
+    val jwtToken = sharedViewModel.jwtToken
+    val coroutineScope = rememberCoroutineScope()
+    val fridgeViewModel = viewModel<FridgeViewModel>()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        coroutineScope.launch(Dispatchers.IO) {
+            println("JWT: $jwtToken")
+            val result= fridgeViewModel.fetchUserIngredients(jwtToken)
+
+            if(result.isFailure){
+                val exception = result.exceptionOrNull() as ResponseException
+                println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(context,
+                        "Error ${exception.statusCode} : ${exception.message}",
+                        Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    val userIngredients: List<String> = fridgeViewModel.getIngredients().map { it.Name }
+
     Scaffold(bottomBar = { BottomNavBar(items = navItems, navController = navController) }) {
     Column(
 
         modifier = modifier
             .background(MaterialTheme.colorScheme.background)
-            .padding(10.dp, 0.dp)
+            .padding(16.dp)
             .height(796.dp)
+            .verticalScroll(rememberScrollState())
 
     ) {
         Title("Shrimp with Garlic")
@@ -64,29 +95,12 @@ fun RecipeView(navController: NavHostController, modifier: Modifier = Modifier) 
         )
         Spacer(modifier = Modifier.width(40.dp))
         CheckBoxList(recipeIngredients, userIngredients)
-        Spacer(modifier = Modifier.width(24.dp))
-        Text(
-            text = "Procedure",
-            textDecoration = TextDecoration.Underline,
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Spacer(modifier = Modifier.width(24.dp))
-        Text(
-            text = "Notes",
-            textDecoration = TextDecoration.Underline,
-            style = MaterialTheme.typography.bodyLarge
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "1. BlahblahblahblahblahblahblahblahblahBlahblahblahblahblah\n2. BlahBlahblah",
-                fontSize = 12.sp
-            )
-        }
+        Spacer(modifier = Modifier.height(50.dp))
 
+        PrimaryButton(text = "Prepare!", Modifier.fillMaxWidth()) {
+
+        }
+        Spacer(modifier = Modifier.height(200.dp))
 
     }
     }
@@ -97,7 +111,19 @@ fun RecipeView(navController: NavHostController, modifier: Modifier = Modifier) 
 @Preview
 @Composable
 fun RecipeViewPreview() {
+    val recipe = Recipe(
+        RecipeId = "recipe:Plant-Based-Breakfast-Bowl-9118197,recipe,list.recipe.trending",
+        Recipe = "Asian Lime Dressing Recipe",
+        Banner = "https://peartreekitchen.com/louisiana-crunch-cake.jpg",
+        Tags = emptyList(),
+        Source = "https://peartreekitchen.com/louisiana-crunch-cake",
+        Ingredients = listOf(
+            LightIngredient("Lime Juice", "½ cup riced sweet potato"),
+            LightIngredient("Soy sauce", "2 Teaspoons of Soy sauce")
+    )
+    )
+    val sharedViewModel = SharedViewModel()
     smartFridgeTheme {
-        RecipeView(rememberNavController())
+        RecipeView(rememberNavController(), recipe, sharedViewModel)
     }
 }

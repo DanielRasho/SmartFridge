@@ -35,6 +35,8 @@ import coil.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.NavItem
 import uvg.edu.gt.smartfridge.components.Title
@@ -150,7 +152,8 @@ fun HomeView(
                 homeViewModel.getRecipesList().forEach { recipe ->
                     item {
                         Card(
-                            onClick = { navController.navigate("Recipe") },
+                            onClick = {
+                                navController.navigate("Recipe/${Json.encodeToString(recipe).replace("/", "@")}") },
                             modifier = modifier
                                 .fillMaxWidth()
                                 .padding(15.dp, 0.dp , 15.dp, 40.dp),

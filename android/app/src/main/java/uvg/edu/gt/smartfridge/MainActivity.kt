@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
 
-            MainComponent(sharedViewModel,context = LocalContext.current)
+            MainComponent(sharedViewModel, context = LocalContext.current)
         }
     }
 }
@@ -73,23 +73,44 @@ fun MainComponent(
 
             // Set the start destination based on the presence of the JWT token
             val startDestination = if (jwtToken != null) "Home" else "Principal"
-            if(jwtToken!=null){
+            if (jwtToken != null) {
                 sharedViewModel.jwtToken = jwtToken
             }
             NavHost(navController = navController, startDestination = startDestination) {
                 composable("Principal") { PrincipalView(navController) }
                 composable("Login") { LoginView(sharedViewModel, navController) }
                 composable("Register") { RegisterView(navController) }
-                composable("Home") { HomeView(sharedViewModel, setUseDarkTheme,navController) }
-                composable("Settings") { SettingsView(sharedViewModel, useDarkTheme, setUseDarkTheme, navController,context = context,startDestination) }
+                composable("Home") { HomeView(sharedViewModel, setUseDarkTheme, navController) }
+                composable("Settings") {
+                    SettingsView(
+                        sharedViewModel,
+                        useDarkTheme,
+                        setUseDarkTheme,
+                        navController,
+                        context = context,
+                        startDestination
+                    )
+                }
                 composable("Fridge") { FridgeView(sharedViewModel, navController) }
-                composable("Recipe") { RecipeView(navController) }
+                composable(
+                    "Recipe/{recipe}", arguments = listOf(
+                        navArgument("recipe") { type = NavType.StringType })
+                ) {
+                    val recipe = it.arguments?.getString("recipe")
+                    println(recipe)
+                    requireNotNull(recipe) { Log.e("Error", "ingredient must NOT be null") }
+                    RecipeView(
+                        navController,
+                        Json.decodeFromString(recipe.replace("@", "/")),
+                        sharedViewModel
+                    )
+                }
                 composable("NewIngredient") { NewIngredientView(sharedViewModel, navController) }
                 composable(route = "EditIngredient", arguments = listOf(
-                    navArgument("ingredient"){ type = NavType.StringType}
+                    navArgument("ingredient") { type = NavType.StringType }
                 )) {
                     val ingredient = it.arguments?.getString("ingredient")
-                    requireNotNull(ingredient) { Log.e("Error","ingredient must NOT be null")}
+                    requireNotNull(ingredient) { Log.e("Error", "ingredient must NOT be null") }
                     EditIngredientView(navController, Json.decodeFromString(ingredient))
                 }
             }
@@ -106,6 +127,6 @@ fun GreetingPreview() {
         SharedViewModel() // Create a new instance of SharedViewModel for the preview
 
     smartFridgeTheme {
-        MainComponent(sharedViewModel,context = LocalContext.current)
+        MainComponent(sharedViewModel, context = LocalContext.current)
     }
 }
