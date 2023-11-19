@@ -31,9 +31,6 @@ class HomeViewModel : ViewModel()  {
     }
 
     suspend fun fetchRecipesList(JWT_TOKEN : String) : Result<List<Recipe>> {
-        val result = homeService.getRecipes(JWT_TOKEN)
-        if (result.isSuccess)
-            recipes = result.getOrNull()!!
         return homeService.getRecipes(JWT_TOKEN)
     }
 
