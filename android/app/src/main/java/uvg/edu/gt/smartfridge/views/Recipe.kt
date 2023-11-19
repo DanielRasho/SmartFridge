@@ -87,7 +87,7 @@ fun RecipeView(navController: NavHostController, recipe: Recipe, sharedViewModel
             .verticalScroll(rememberScrollState())
 
     ) {
-        Title("Shrimp with Garlic")
+        Title(recipe.Recipe)
         Text(
             text = "Ingredients",
             textDecoration = TextDecoration.Underline,
