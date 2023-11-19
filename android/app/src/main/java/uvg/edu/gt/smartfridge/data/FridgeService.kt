@@ -9,6 +9,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -42,6 +43,10 @@ class FridgeService(client: HttpClient) : Service(client) {
                     append(HttpHeaders.ContentType, "application/json")
                 }
                 setBody(requestBody)
+            }
+
+            if (response.status == HttpStatusCode.Unauthorized) {
+                throw ResponseException(response.status.value, response.body<String>().toString())
             }
 
             println("Get Ingredients:" + response.body() as String)
@@ -80,6 +85,10 @@ class FridgeService(client: HttpClient) : Service(client) {
                 setBody(requestBody)
             }
 
+            if (response.status == HttpStatusCode.Unauthorized) {
+                throw ResponseException(response.status.value, response.body<String>().toString())
+            }
+
             // Translating JSON response
             val data: JSONArray = JSONArray(response.body() as String)
 
@@ -116,6 +125,10 @@ class FridgeService(client: HttpClient) : Service(client) {
                 setBody(requestBody)
             }
 
+            if (response.status == HttpStatusCode.Unauthorized) {
+                throw ResponseException(response.status.value, response.body<String>().toString())
+            }
+
             val body = response.body() as String
             println("The response body is: " + body.toString())
             println(HttpRoutes.BASE_URL + HttpRoutes.ADD_INGREDIENT + ": Sending data: " + requestBody)
@@ -145,6 +158,10 @@ class FridgeService(client: HttpClient) : Service(client) {
                 setBody(requestBody)
             }
 
+            if (response.status == HttpStatusCode.Unauthorized) {
+                throw ResponseException(response.status.value, response.body<String>().toString())
+            }
+
             "Ingredient edited"
         }
     }
@@ -168,6 +185,11 @@ class FridgeService(client: HttpClient) : Service(client) {
                 }
                 setBody(requestBody)
             }
+
+            if (response.status == HttpStatusCode.Unauthorized) {
+                throw ResponseException(response.status.value, response.body<String>().toString())
+            }
+
             "Ingredient removed"
         }
     }

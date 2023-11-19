@@ -1,5 +1,6 @@
 package uvg.edu.gt.smartfridge.data
 
+import android.util.Log
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.headers
@@ -8,6 +9,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -33,6 +35,10 @@ class HomeService (client: HttpClient) : Service(client) {
                     append(HttpHeaders.ContentType, "application/json")
                 }
                 setBody( requestBody )
+            }
+
+            if (response.status == HttpStatusCode.Unauthorized) {
+                throw ResponseException(response.status.value, response.body<String>().toString())
             }
 
             println(response.body() as String)
@@ -69,6 +75,10 @@ class HomeService (client: HttpClient) : Service(client) {
                 setBody( requestBody )
             }
 
+            if (response.status == HttpStatusCode.Unauthorized) {
+                throw ResponseException(response.status.value, response.body<String>().toString())
+            }
+
             // Translating JSON response
             val data : JSONArray = JSONArray(response.body() as String)
 
@@ -102,6 +112,11 @@ class HomeService (client: HttpClient) : Service(client) {
                     append(HttpHeaders.ContentType, "application/json")
                 }
                 setBody( requestBody )
+            }
+
+            if (response.status.value == HttpStatusCode.Unauthorized.value) {
+                Log.e("HomeService", "Error, invalid JWT: $response")
+                throw ResponseException(response.status.value, response.body<String>().toString())
             }
 
             // Translating JSON response

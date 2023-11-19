@@ -30,10 +30,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.IconPrimaryButton
 import uvg.edu.gt.smartfridge.components.NavItem
 import uvg.edu.gt.smartfridge.components.Title
+import uvg.edu.gt.smartfridge.data.ResponseException
 import uvg.edu.gt.smartfridge.models.UserSettings
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.SettingsViewModel
@@ -79,7 +81,7 @@ fun SettingsView(
                     setUseDarkTheme(false)
                     println("SETTINGS (before api call) " + sharedViewModel.preferences.SettingsId)
                     coroutineScope.launch(Dispatchers.IO) {
-                        settingsViewModel.saveSettings(
+                        val result = settingsViewModel.saveSettings(
                             sharedViewModel.jwtToken,
                             UserSettings(
                                 sharedViewModel.preferences.SettingsId,
@@ -87,6 +89,23 @@ fun SettingsView(
                                 "Light"
                             )
                         )
+
+                        if (result.isFailure) {
+                            val code = (result.exceptionOrNull() as ResponseException).statusCode
+                            if (code == 401) {
+                                withContext(Dispatchers.Main) {
+                                    val tokenManager = TokenManager(context)
+                                    tokenManager.clearJwtToken()
+                                    // Navigate to the login view
+                                    navController.navigate("Login") {
+                                        // Clear the back stack to prevent going back to Login
+                                        popUpTo("Home") {
+                                            inclusive = true
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 })
                 Text(
@@ -102,7 +121,7 @@ fun SettingsView(
                         setUseDarkTheme(true);
 
                         coroutineScope.launch(Dispatchers.IO) {
-                            settingsViewModel.saveSettings(
+                            val result = settingsViewModel.saveSettings(
                                 sharedViewModel.jwtToken,
                                 UserSettings(
                                     sharedViewModel.preferences.SettingsId,
@@ -110,6 +129,23 @@ fun SettingsView(
                                     "Dark"
                                 )
                             )
+                            if (result.isFailure) {
+                                val code =
+                                    (result.exceptionOrNull() as ResponseException).statusCode
+                                if (code == 401) {
+                                    withContext(Dispatchers.Main) {
+                                        val tokenManager = TokenManager(context)
+                                        tokenManager.clearJwtToken()
+                                        // Navigate to the login view
+                                        navController.navigate("Login") {
+                                            // Clear the back stack to prevent going back to Login
+                                            popUpTo("Home") {
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                         Log.d(
                             "DarkTheme Radio Button",

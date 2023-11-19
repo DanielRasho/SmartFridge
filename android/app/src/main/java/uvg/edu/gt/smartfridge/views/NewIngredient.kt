@@ -51,6 +51,7 @@ import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.NewIngredientViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
+import uvg.edu.gt.smartfridge.viewModels.TokenManager
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Locale
@@ -169,6 +170,7 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                                         val exception =
                                             result.exceptionOrNull() as ResponseException
                                         println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+                                        val code = exception.statusCode
 
                                         withContext(Dispatchers.Main) {
                                             Toast.makeText(
@@ -176,6 +178,20 @@ fun NewIngredientView(sharedViewModel: SharedViewModel, navController: NavContro
                                                 "Error ${exception.statusCode} : ${exception.message}",
                                                 Toast.LENGTH_SHORT
                                             ).show()
+                                        }
+
+                                        if (code == 401) {
+                                            withContext(Dispatchers.Main) {
+                                                val tokenManager = TokenManager(context)
+                                                tokenManager.clearJwtToken()
+                                                // Navigate to the login view
+                                                navController.navigate("Login"){
+                                                    // Clear the back stack to prevent going back to Login
+                                                    popUpTo("Home") {
+                                                        inclusive = true
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }

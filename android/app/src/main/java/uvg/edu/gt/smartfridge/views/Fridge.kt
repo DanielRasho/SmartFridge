@@ -48,13 +48,14 @@ import uvg.edu.gt.smartfridge.models.Ingredient
 import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.FridgeViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
+import uvg.edu.gt.smartfridge.viewModels.TokenManager
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostController) {
+fun FridgeView(sharedViewModel: SharedViewModel, navController: NavHostController) {
     val jwtToken = sharedViewModel.jwtToken
     val coroutineScope = rememberCoroutineScope()
     val fridgeViewModel = viewModel<FridgeViewModel>()
@@ -62,29 +63,48 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
     val navItems = sequenceOf(
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
+
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
             println("JWT: $jwtToken")
-            val result= fridgeViewModel.fetchUserIngredients(jwtToken)
+            val result = fridgeViewModel.fetchUserIngredients(jwtToken)
 
-            if(result.isFailure){
-                    val exception = result.exceptionOrNull() as ResponseException
-                    println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+            if (result.isFailure) {
+                val exception = result.exceptionOrNull() as ResponseException
+                println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+                val code = exception.statusCode
 
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        context,
+                        "Error ${exception.statusCode} : ${exception.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                if (code == 401) {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context,
-                            "Error ${exception.statusCode} : ${exception.message}",
-                            Toast.LENGTH_SHORT).show()
+                        val tokenManager = TokenManager(context)
+                        tokenManager.clearJwtToken()
+                        // Navigate to the login view
+                        navController.navigate("Login") {
+                            // Clear the back stack to prevent going back to Login
+                            popUpTo("Home") {
+                                inclusive = true
+                            }
+                        }
                     }
                 }
             }
         }
 
+    }
+
     val groupedIngredients: Map<String, List<Ingredient>> =
         fridgeViewModel.getIngredients().groupBy { it.Category }
 
-    Scaffold(bottomBar = { BottomNavBar(items = navItems, navController = navHostController) },
-        floatingActionButton = { addIngredientButton(navHostController) }) {
+    Scaffold(bottomBar = { BottomNavBar(items = navItems, navController = navController) },
+        floatingActionButton = { addIngredientButton(navController) }) {
         Column(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
@@ -95,7 +115,7 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
             Spacer(modifier = Modifier.height(24.dp))
             searchBar("Search for Ingredients...")
             Spacer(modifier = Modifier.height(40.dp))
-            for ((categoryName, ingredientList) in groupedIngredients){
+            for ((categoryName, ingredientList) in groupedIngredients) {
                 categoryList(categoryName, ingredientList)
                 Spacer(modifier = Modifier.height(36.dp))
             }
@@ -106,33 +126,42 @@ fun FridgeView(sharedViewModel: SharedViewModel,navHostController: NavHostContro
 }
 
 @Composable
-fun categoryList (category : String,  ingredients : List<Ingredient>){
-    Column ( modifier = Modifier.fillMaxWidth()){
-        Text(text = category,
+fun categoryList(category: String, ingredients: List<Ingredient>) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = category,
             color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.titleMedium)
+            style = MaterialTheme.typography.titleMedium
+        )
         Spacer(modifier = Modifier.height(16.dp))
-        Divider(thickness = 1.dp,
-            color = MaterialTheme.colorScheme.outline)
-        ingredients.forEach{ingredient ->  
+        Divider(
+            thickness = 1.dp,
+            color = MaterialTheme.colorScheme.outline
+        )
+        ingredients.forEach { ingredient ->
             ingredientEntry(ingredient)
-            Divider(thickness = 1.dp,
-                color = MaterialTheme.colorScheme.outline)
+            Divider(
+                thickness = 1.dp,
+                color = MaterialTheme.colorScheme.outline
+            )
         }
     }
 }
 
 @Composable
-fun ingredientEntry (ingredient : Ingredient){
+fun ingredientEntry(ingredient: Ingredient) {
 
-    Row (modifier = Modifier
-        .fillMaxWidth()
-        .clickable { println("TESTING HERE") },
-        verticalAlignment = Alignment.CenterVertically){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { println("TESTING HERE") },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
 
-        Row ( verticalAlignment = Alignment.CenterVertically,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.weight(2f)
-        ){
+        ) {
             Text(
                 text = formatDateString(ingredient.ExpireDate),
                 color = MaterialTheme.colorScheme.outline,
@@ -153,8 +182,10 @@ fun ingredientEntry (ingredient : Ingredient){
                 )
             }
         }
-        Row (verticalAlignment = Alignment.Bottom,
-            modifier = Modifier.weight(1f)){
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier.weight(1f)
+        ) {
             Text(
                 text = ingredient.Quantity.toString(),
                 color = MaterialTheme.colorScheme.onSurface,
@@ -172,7 +203,7 @@ fun ingredientEntry (ingredient : Ingredient){
 }
 
 @Composable
-fun addIngredientButton( navHostController: NavHostController) {
+fun addIngredientButton(navHostController: NavHostController) {
     FloatingActionButton(
         onClick = { navHostController.navigate("NewIngredient") },
         shape = CircleShape,
@@ -198,16 +229,26 @@ fun formatDateString(inputDateString: String): String {
 
 @Preview
 @Composable
-fun testFridgeView(){
+fun testFridgeView() {
     smartFridgeTheme {
-        FridgeView(SharedViewModel(),rememberNavController())
+        FridgeView(SharedViewModel(), rememberNavController())
     }
 }
 
 @Preview
 @Composable
-fun testIngredientItem(){
+fun testIngredientItem() {
     smartFridgeTheme {
-        ingredientEntry(ingredient = Ingredient("32", "UserID", "Soy Sause", "Souce", 3.0f, "3", "2023-11-03T03:03:49.309844585Z"))
+        ingredientEntry(
+            ingredient = Ingredient(
+                "32",
+                "UserID",
+                "Soy Sause",
+                "Souce",
+                3.0f,
+                "3",
+                "2023-11-03T03:03:49.309844585Z"
+            )
+        )
     }
 }
