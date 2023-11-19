@@ -160,7 +160,7 @@ pub async fn edit_ingredient(
         quantity,
         unit,
     } = &ingredient;
-    if let Err(err) = conn.execute("UPDATE sf_ingredient SET expire_date=$2, name=$3, category=$4, quantity=$5, unit=$6 WHERE ingredient_id=$1", &[&ingredient_id.to_string(), expire_date, name, category, &(*quantity as i16), unit]).await {
+    if let Err(err) = conn.execute("UPDATE sf_ingredient SET expire_date=$2, name=$3, category=$4, quantity=$5, unit=$6 WHERE ingredient_id=$1", &[&ingredient_id.to_string(), expire_date, name, category, quantity, unit]).await {
         tracing::error!("{} An error `{:?}` occurred while trying to update the ingredient `{:?}`", tracing_prefix, err, ingredient);
         let error: ResponseError<_> = (StatusCode::INTERNAL_SERVER_ERROR, EditIngredientErrors::ErrorUpdatingIngredientInDB).into();
         Err(error)?

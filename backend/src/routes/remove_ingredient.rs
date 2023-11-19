@@ -128,7 +128,7 @@ pub async fn remove_ingredient(
     tracing::debug!("{} Removing ingredient...", tracing_prefix);
     if let Err(err) = conn
         .execute(
-            "REMOVE FROM sf_ingredient WHERE ingredient_id=$1",
+            "DELETE FROM sf_ingredient WHERE ingredient_id=$1",
             &[&ingredient_id.to_string()],
         )
         .await
