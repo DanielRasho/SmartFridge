@@ -1,7 +1,7 @@
 #![recursion_limit = "256"]
 use std::{net::SocketAddr, sync::Arc};
 
-use axum::{routing::post, Router, response::IntoResponse};
+use axum::{response::IntoResponse, routing::post, Router};
 use backend::{
     routes::{
         add_ingredient::add_ingredient, edit_ingredient::edit_ingredient,
