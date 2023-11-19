@@ -119,7 +119,8 @@ fun HomeView(
                     item {
                         Card(
                             onClick = {
-                                navController.navigate("Recipe/${Json.encodeToString(recipe).replace("/", "@")}") },
+                                navController.navigate("Recipe/${Json.encodeToString(recipe).replace("/", "@")}")
+                                      },
                             modifier = modifier
                                 .fillMaxWidth()
                                 .padding(15.dp, 0.dp , 15.dp, 40.dp),

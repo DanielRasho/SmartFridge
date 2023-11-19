@@ -39,6 +39,8 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import uvg.edu.gt.smartfridge.components.BottomNavBar
 import uvg.edu.gt.smartfridge.components.NavItem
 import uvg.edu.gt.smartfridge.components.Title
@@ -97,6 +99,7 @@ fun FridgeView(sharedViewModel: SharedViewModel, navController: NavHostControlle
                 }
             }
         }
+    }
 
     }
 

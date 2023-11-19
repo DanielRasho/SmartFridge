@@ -106,7 +106,7 @@ fun MainComponent(
                     )
                 }
                 composable("NewIngredient") { NewIngredientView(sharedViewModel, navController) }
-                composable(route = "EditIngredient", arguments = listOf(
+                composable(route = "EditIngredient/{ingredient}", arguments = listOf(
                     navArgument("ingredient") { type = NavType.StringType }
                 )) {
                     val ingredient = it.arguments?.getString("ingredient")
