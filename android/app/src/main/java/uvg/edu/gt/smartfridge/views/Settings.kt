@@ -107,6 +107,8 @@ fun SettingsView(
                             }
                         }
                     }
+                    val tokenManager = TokenManager(context)
+                    tokenManager.saveThemePreference(false)
                 })
                 Text(
                     "Light Theme",
@@ -151,6 +153,8 @@ fun SettingsView(
                             "DarkTheme Radio Button",
                             "Clicked!"
                         )
+                        val tokenManager = TokenManager(context)
+                        tokenManager.saveThemePreference(true)
                     })
                 Text(
                     "Dark Theme",
