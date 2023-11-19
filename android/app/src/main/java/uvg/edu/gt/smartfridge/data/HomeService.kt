@@ -58,6 +58,7 @@ class HomeService (client: HttpClient) : Service(client) {
 
     suspend fun searchRecipes( JWT_TOKEN : String, query : String) : Result<List<Recipe>>{
         return handleHttpRequest {
+            println("JWT: $JWT_TOKEN")
             // Creating Request body
             val requestBody = buildJsonObject {
                 put("token", JWT_TOKEN)
@@ -79,6 +80,8 @@ class HomeService (client: HttpClient) : Service(client) {
                 throw ResponseException(response.status.value, response.body<String>().toString())
             }
 
+            println(response.body() as String)
+
             // Translating JSON response
             val data : JSONArray = JSONArray(response.body() as String)
 
@@ -86,10 +89,7 @@ class HomeService (client: HttpClient) : Service(client) {
 
             // Fetching ingredients.
             for (index in 0 until data.length()){
-                var tempRecipe = data.getJSONArray(index)
-                tempRecipes.add(
-                    Json.decodeFromString(tempRecipe.toString())
-                )
+                tempRecipes.add(Json.decodeFromString(data.getString(index)))
             }
             tempRecipes
         }

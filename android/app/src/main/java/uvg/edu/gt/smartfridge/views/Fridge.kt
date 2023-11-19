@@ -114,7 +114,7 @@ fun FridgeView(sharedViewModel: SharedViewModel, navController: NavHostControlle
         ) {
             Title(text = "Fridge")
             Spacer(modifier = Modifier.height(24.dp))
-            searchBar("Search for Ingredients...")
+            //searchBar("Search for Ingredients...")
             Spacer(modifier = Modifier.height(40.dp))
             for ((categoryName, ingredientList) in groupedIngredients) {
                 categoryList(categoryName, ingredientList, navController)

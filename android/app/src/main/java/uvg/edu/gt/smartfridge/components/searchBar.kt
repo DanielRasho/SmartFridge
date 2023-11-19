@@ -30,13 +30,11 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun searchBar(placeholder: String) {
-    var text by remember { mutableStateOf("") }
-
+fun searchBar(placeholder: String, value: String, setValue: (String) -> Unit) {
     OutlinedTextField(
 
-        value = text,
-        onValueChange = { text = it },
+        value = value,
+        onValueChange = setValue,
         placeholder = { Text(text = placeholder,color=MaterialTheme.colorScheme.outlineVariant,style=MaterialTheme.typography.bodyLarge, fontSize = 20.sp) },
         leadingIcon = {
             Icon(Icons.Default.Search, contentDescription = "Button Icon",tint=MaterialTheme.colorScheme.outline)
@@ -55,5 +53,5 @@ fun searchBar(placeholder: String) {
 @Preview
 @Composable
 fun SearchBarPreview() {
-    searchBar(placeholder = "Search")
+    searchBar(placeholder = "Search", "") {}
 }

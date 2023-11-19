@@ -31,11 +31,17 @@ class HomeViewModel : ViewModel()  {
     }
 
     suspend fun fetchRecipesList(JWT_TOKEN : String) : Result<List<Recipe>> {
-        return homeService.getRecipes(JWT_TOKEN)
+        val result = homeService.getRecipes(JWT_TOKEN)
+        if (result.isSuccess)
+            recipes = result.getOrNull()!!
+        return result
     }
 
     suspend fun searchRecipes(JWT_TOKEN: String, query : String) : Result<List<Recipe>> {
-        return homeService.searchRecipes(JWT_TOKEN, query.trim())
+        val result = homeService.searchRecipes(JWT_TOKEN, query)
+        if (result.isSuccess)
+            recipes = result.getOrNull()!!
+        return result
     }
 
 }

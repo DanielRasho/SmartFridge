@@ -21,6 +21,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -46,6 +49,7 @@ import uvg.edu.gt.smartfridge.ui.theme.smartFridgeTheme
 import uvg.edu.gt.smartfridge.viewModels.HomeViewModel
 import uvg.edu.gt.smartfridge.viewModels.SharedViewModel
 import uvg.edu.gt.smartfridge.viewModels.TokenManager
+import kotlin.time.Duration.Companion.seconds
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @ExperimentalMaterial3Api
@@ -63,43 +67,93 @@ fun HomeView(
         NavItem.Fridge, NavItem.Home, NavItem.Settings
     )
     val jwtToken = sharedViewModel.jwtToken
-    //println("Hi "+jwtToken)
+    val (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
+    val (searching, setSearching) = remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(searchQuery) {
+        coroutineScope.launch {
+            if (searching) {
+                return@launch
+            }
 
-        setUseDarkTheme(sharedViewModel.useDarkTheme);
+            setSearching(true)
+            delay(2.seconds)
+            setSearching(false)
+        }
+    }
 
-        coroutineScope.launch(Dispatchers.IO) {
-            println("JWT: $jwtToken")
-            val result = homeViewModel.fetchRecipesList(jwtToken)
+    if (searching && searchQuery.isNotBlank()) {
+        LaunchedEffect(Unit) {
+            coroutineScope.launch {
+                val result = homeViewModel.searchRecipes(jwtToken, searchQuery)
 
-            if (result.isFailure) {
-                val exception = result.exceptionOrNull() as ResponseException
-                println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
-                val code=exception.statusCode
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        context,
-                        "Error ${exception.statusCode} : ${exception.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                if (code == 401) {
+                if (result.isFailure) {
+                    val exception = result.exceptionOrNull() as ResponseException
+                    println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+                    val code = exception.statusCode
                     withContext(Dispatchers.Main) {
-                        val tokenManager = TokenManager(context)
-                        tokenManager.clearJwtToken()
-                        // Navigate to the login view
-                        navController.navigate("Login"){
-                            // Clear the back stack to prevent going back to Login
-                            popUpTo("Home") {
-                                inclusive = true
+                        Toast.makeText(
+                            context,
+                            "Error ${exception.statusCode} : ${exception.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    if (code == 401) {
+                        withContext(Dispatchers.Main) {
+                            val tokenManager = TokenManager(context)
+                            tokenManager.clearJwtToken()
+                            // Navigate to the login view
+                            navController.navigate("Login") {
+                                // Clear the back stack to prevent going back to Login
+                                popUpTo("Home") {
+                                    inclusive = true
+                                }
                             }
                         }
                     }
+
+                }
+            }
+        }
+    }
+
+    if (searchQuery.isBlank()) {
+        LaunchedEffect(Unit) {
+
+            setUseDarkTheme(sharedViewModel.useDarkTheme);
+
+            coroutineScope.launch(Dispatchers.IO) {
+                println("JWT: $jwtToken")
+                val result = homeViewModel.fetchRecipesList(jwtToken)
+
+                if (result.isFailure) {
+                    val exception = result.exceptionOrNull() as ResponseException
+                    println("ERROR! " + "Error ${exception.statusCode} : ${exception.message}")
+                    val code = exception.statusCode
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(
+                            context,
+                            "Error ${exception.statusCode} : ${exception.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    if (code == 401) {
+                        withContext(Dispatchers.Main) {
+                            val tokenManager = TokenManager(context)
+                            tokenManager.clearJwtToken()
+                            // Navigate to the login view
+                            navController.navigate("Login") {
+                                // Clear the back stack to prevent going back to Login
+                                popUpTo("Home") {
+                                    inclusive = true
+                                }
+                            }
+                        }
+                    }
+
                 }
 
             }
-
         }
     }
 
@@ -112,18 +166,22 @@ fun HomeView(
         ) {
             Title("Home")
             Spacer(modifier = Modifier.height(24.dp))
-            searchBar("Search for Recipes...")
+            searchBar("Search for Recipes...", searchQuery, setSearchQuery)
             Spacer(modifier = Modifier.height(60.dp))
             LazyColumn {
                 homeViewModel.getRecipesList().forEach { recipe ->
                     item {
                         Card(
                             onClick = {
-                                navController.navigate("Recipe/${Json.encodeToString(recipe).replace("/", "@")}")
-                                      },
+                                navController.navigate(
+                                    "Recipe/${
+                                        Json.encodeToString(recipe).replace("/", "@")
+                                    }"
+                                )
+                            },
                             modifier = modifier
                                 .fillMaxWidth()
-                                .padding(15.dp, 0.dp , 15.dp, 40.dp),
+                                .padding(15.dp, 0.dp, 15.dp, 40.dp),
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                         ) {
                             AsyncImage(
@@ -148,7 +206,8 @@ fun HomeView(
                                         tag,
                                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                                         modifier = modifier
-                                            .background( color = MaterialTheme.colorScheme.secondaryContainer,
+                                            .background(
+                                                color = MaterialTheme.colorScheme.secondaryContainer,
                                                 shape = RoundedCornerShape(5.dp)
                                             )
                                             .padding(3.dp),
@@ -172,6 +231,6 @@ fun HomeView(
 fun HomeViewPreview() {
     val sharedViewModel = SharedViewModel()
     smartFridgeTheme {
-        HomeView(sharedViewModel, {} ,navController = rememberNavController())
+        HomeView(sharedViewModel, {}, navController = rememberNavController())
     }
 }
